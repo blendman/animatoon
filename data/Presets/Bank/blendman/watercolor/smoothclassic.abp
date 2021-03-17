@@ -1,0 +1,24 @@
+//Animatoon Brush Preset (ABP)- Blendman 2011 - On the floute
+name=smoothclassic
+brushdir=blendman
+brush=21
+size=21
+sizeY=100
+sizeX=60
+sizemini=0
+alpha=255
+transpmini=0
+rotate=0
+rotmini=0
+scatter=0
+scattermini=0
+mixing=98
+visco=1
+lavage=1
+paintline=0
+randSiz=1
+randRot=360
+randTra=1
+randSca=1
+randbrush=1
+randCol=0

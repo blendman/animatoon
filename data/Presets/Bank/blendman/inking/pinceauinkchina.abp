@@ -1,0 +1,37 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+; //Animatoon brush Preset - Blendman 2015
+name = pinceauinkchina
+version = 6
+size = 18
+sizeX = 100
+sizeY = 80
+randSiz = 0
+sizemini = 1
+sizepressure = 1
+brushsizeRndfactor = 2
+rotate = 0
+randRot = 360
+scatter = 0
+alpha = 255
+alphapressure = 0
+alphaFactorVsTime = 0
+alphaVsTime = 15
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 78
+pas = 40
+paintline = 1
+hardness = 0
+smooth = 1
+mixing = 0
+visco = 0
+group = 
+sizeMin = 6
+size_min = 6
+rotateangle = 0
+alphaRand = 0
+alphaMin = 0
+softness = 0
+intensity = 0
+mixtyp = 2

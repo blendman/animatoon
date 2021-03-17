@@ -1,0 +1,20 @@
+//Animatoon brush Preset - Blendman 2011
+name=lighting
+brush=16
+size=110
+sizeY=50
+sizeX=100
+sizemini=45
+alpha=12
+rotate=5
+scatter=0
+mixing=85
+visco=1
+lavage=1
+paintline=1
+randSiz=1
+randRot=360
+randTra=10
+randSca=3
+randbrush=0
+randCol=0

@@ -1,0 +1,20 @@
+//Animatoon brush Preset - Blendman 2011
+name=crayon02
+brush=1
+size=10
+sizeY=100
+sizeX=100
+sizemini=45
+alpha=191
+rotate=0
+scatter=20
+mixing=85
+visco=1
+lavage=1
+paintline=1
+randSiz=1
+randRot=360
+randTra=1
+randSca=2
+randbrush=1
+randCol=1

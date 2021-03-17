@@ -1,0 +1,32 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = crayon04
+size = 9
+size_random = 0
+size_min = 0
+rotate = 0
+rotation = 0
+scatter = 1
+color = 637534208
+alpha = 63
+image = 
+brushdir = blendman
+brush = 5
+group = 
+pas = 24
+version = 0
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 0
+sizepressure = 1
+brushsizeRndfactor = 2
+randRot = 360
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 15
+paintline  = 1
+hardness  = 0
+smooth  = 0
+mixing = 0
+visco = 0

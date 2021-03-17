@@ -1,0 +1,13 @@
+name = 
+size = 9
+size_random = 0
+size_min = 0
+rotate = 1
+rotation = 0
+scatter = 1
+alpha = 35
+image = 
+brushdir = blendman
+brush = 5
+pas = 4
+group = Misc

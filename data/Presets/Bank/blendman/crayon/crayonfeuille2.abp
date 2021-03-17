@@ -1,0 +1,19 @@
+﻿
+name = 
+size = 6
+sizeX = 100
+sizeY = 50
+randSiz = 0
+sizemini = 0
+rotate = 0
+scatter = 13
+alpha = 100
+alphaFactorVsTime = 0
+alphaVsTime = 0
+image = 
+brushdir = blendman
+brush = 7
+pas = 10
+mixing = 0
+visco = 0
+group = 

@@ -1,0 +1,16 @@
+name = acrylic
+size = 56
+sizeX = 100
+sizeY = 80
+randSiz = 0
+sizemini = 0
+rotate = 1
+rotation = 0
+scatter = 0
+alpha = 255
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 17
+pas = 5
+mixing = 85
+group = Misc

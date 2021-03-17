@@ -1,0 +1,29 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = fusain3
+size = 90
+sizeX = 100
+sizeY = 100
+randSiz = 15
+sizemini = 1
+rotate = 1
+rotation = 0
+scatter = 0
+alpha = 211
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 11
+pas = 30
+mixing = 10
+group = 
+alphaFactorVsTime = 1
+alphaVsTime = 15
+visco = 0
+brushsizeRndfactor = 2
+randRot = 300
+version = 0
+sizepressure = 1
+alphapressure = 1
+paintline  = 1
+hardness  = 120
+smooth  = 0

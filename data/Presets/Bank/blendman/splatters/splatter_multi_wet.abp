@@ -1,0 +1,16 @@
+name = 
+size = 70
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 0
+rotate = 1
+rotation = 0
+scatter = 45
+alpha = 170
+image = 
+brushdir = blendman
+brush = 4
+pas = 5
+mixing = 99
+group = Misc

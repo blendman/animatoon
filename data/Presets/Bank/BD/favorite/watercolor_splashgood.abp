@@ -1,0 +1,35 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = backlight1
+version = 6
+size = 215
+sizeMin = 135
+sizeX = 100
+sizeY = 100
+randSiz = 0
+size_min = 135
+sizepressure = 1
+brushsizeRndfactor = 2
+rotate = 140
+randRot = 360
+rotateangle = 0
+scatter = 0
+alpha = 65
+alphapressure = 0
+alphaFactorVsTime = 0
+alphaVsTime = 15
+alphaRand = 0
+alphaMin = 0
+image = 
+brushdir = blendman
+brush = 8
+pas = 105
+paintline = 1
+hardness = 0
+softness = 0
+intensity = 0
+smooth = 0
+mixing = 25
+visco = 2
+mixtyp = 0
+group = 

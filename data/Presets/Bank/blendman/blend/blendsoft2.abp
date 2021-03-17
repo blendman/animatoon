@@ -1,0 +1,16 @@
+name = blendbigsoft
+size = 200
+sizeX = 50
+sizeY = 100
+randSiz = 0
+sizemini = 0
+rotate = 1
+rotation = 0
+scatter = 0
+alpha = 100
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 2
+pas = 5
+mixing = 100
+group = Misc

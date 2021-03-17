@@ -1,0 +1,23 @@
+﻿
+name = aquarelle_wet_mix_grainy
+size = 77
+sizeX = 100
+sizeY = 58
+randSiz = 0
+sizemini = 1
+rotate = 0
+rotation = 0
+scatter = 0
+alpha = 104
+alphaFactorVsTime = 4
+alphaVsTime = 35
+image = 
+brushdir = blendman
+brush = 6
+pas = 25
+mixing = 100
+visco = 0
+group = 
+randRot = 360
+brushsizeRndfactor = 2
+version = 0

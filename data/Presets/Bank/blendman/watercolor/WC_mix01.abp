@@ -1,0 +1,28 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = ice01
+version = 6
+size = 60
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 1
+sizepressure = 1
+brushsizeRndfactor = 0
+rotate = 0
+randRot = 265
+scatter = 0
+alpha = 255
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 0
+image = 
+brushdir = blendman
+brush = 73
+pas = 75
+paintline  = 1
+hardness  = 191
+smooth  = 0
+mixing = 80
+visco = 1
+group = 

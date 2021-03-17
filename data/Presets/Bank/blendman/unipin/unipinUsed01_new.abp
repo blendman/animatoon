@@ -1,0 +1,16 @@
+name = unipinUsed01
+size = 30
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 0
+rotate = 1
+rotation = 0
+scatter = 0
+alpha = 255
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 1
+pas = 5
+mixing = 1
+group = Misc

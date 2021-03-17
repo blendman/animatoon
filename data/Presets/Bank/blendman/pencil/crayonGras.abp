@@ -1,0 +1,16 @@
+name = BrushName
+size = 14
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 0
+rotate = 1
+rotation = 0
+scatter = 2
+alpha = 173
+image = 
+brushdir = blendman
+brush = 10
+pas = 0
+mixing = 1
+group = Misc

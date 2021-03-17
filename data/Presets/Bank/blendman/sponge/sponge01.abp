@@ -1,0 +1,29 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = sponge01
+size = 73
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 1
+rotate = 1
+rotation = 0
+scatter = 11
+alpha = 85
+image = 
+brushdir = blendman
+brush = 63
+pas = 20
+mixing = 98
+group = 
+brushsizeRndfactor = 2
+randRot = 360
+alphaFactorVsTime = 0
+alphaVsTime = 15
+visco = 0
+version = 0
+sizepressure = 1
+alphapressure = 1
+paintline  = 1
+hardness  = 100
+smooth  = 0

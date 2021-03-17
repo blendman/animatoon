@@ -1,0 +1,27 @@
+﻿
+name = 
+version = 6
+size = 37
+sizeX = 100
+sizeY = 50
+randSiz = 0
+sizemini = 0
+sizepressure = 1
+brushsizeRndfactor = 0
+rotate = 0
+randRot = 360
+scatter = 0
+alpha = 255
+alphapressure = 0
+alphaFactorVsTime = 0
+alphaVsTime = 0
+image = 
+brushdir = blendman
+brush = 72
+pas = 25
+paintline  = 1
+hardness  = 150
+smooth  = 0
+mixing = 85
+visco = 0
+group = 

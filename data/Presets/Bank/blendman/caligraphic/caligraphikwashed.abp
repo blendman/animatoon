@@ -1,0 +1,16 @@
+name = caligraphik01
+size = 95
+sizeX = 100
+sizeY = 50
+randSiz = 0
+sizemini = 0
+rotate = 0
+rotation = 0
+scatter = 0
+alpha = 13
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 1
+pas = 0
+mixing = 5
+group = Misc

@@ -1,0 +1,36 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+//Animatoon brush Preset - Blendman 2011 = 
+name = charcoal_Big
+brush = 75
+size = 48
+sizeY = 100
+sizeX = 100
+sizemini = 1
+alpha = 60
+rotate = 0
+scatter = 80
+mixing = 0
+visco = 0
+lavage = 1
+paintline = 1
+randSiz = 0
+randRot = 360
+randTra = 1
+randSca = 2
+randbrush = 1
+randCol = 1
+rotation = 0
+alphaFactorVsTime = 0
+alphaVsTime = 15
+image = aquarelle01.jpg
+brushdir = blendman
+pas = 25
+group = 
+version = 0
+sizepressure = 1
+brushsizeRndfactor = 2
+alphapressure = 1
+paintline  = 1
+hardness  = 120
+smooth  = 0

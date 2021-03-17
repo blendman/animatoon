@@ -1,0 +1,32 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = shogun_inkrough2
+version = 6
+size = 3
+sizeMin = 1
+sizeX = 100
+sizeY = 100
+randSiz = 0
+size_min = 1
+sizepressure = 1
+brushsizeRndfactor = 2
+rotate = 0
+randRot = 260
+scatter = 0
+alpha = 255
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 0
+alphaRand = 0
+alphaMin = 0
+image = 31
+brushdir = blendman
+brush = 28
+pas = 8
+paintline = 1
+hardness = 0
+smooth = 0
+mixing = 0
+visco = 0
+mixtyp = 2
+group = 

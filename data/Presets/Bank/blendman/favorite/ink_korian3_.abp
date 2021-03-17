@@ -1,0 +1,35 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = ink_korian02
+version = 6
+size = 3
+sizeMin = 1
+sizeX = 100
+sizeY = 100
+randSiz = 0
+size_min = 1
+sizepressure = 1
+brushsizeRndfactor = 2
+rotate = 0
+randRot = 260
+rotateangle = 1
+scatter = 0
+alpha = 255
+alphapressure = 0
+alphaFactorVsTime = 0
+alphaVsTime = 0
+alphaRand = 0
+alphaMin = 0
+image = 31
+brushdir = blendman
+brush = 28
+pas = 15
+paintline = 1
+hardness = 50
+softness = 0
+intensity = 0
+smooth = 0
+mixing = 0
+visco = 0
+mixtyp = 2
+group = 

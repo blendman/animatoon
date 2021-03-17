@@ -1,0 +1,28 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = colorWC
+version = 6
+size = 67
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 1
+sizepressure = 1
+brushsizeRndfactor = 0
+rotate = 0
+randRot = 360
+scatter = 0
+alpha = 190
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 0
+image = 
+brushdir = blendman
+brush = 50
+pas = 32
+paintline  = 1
+hardness  = 100
+smooth  = 0
+mixing = 86
+visco = 1
+group = 

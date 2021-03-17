@@ -1,0 +1,35 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = ink_cleanhardsmooth
+version = 6
+size = 3
+sizeMin = 1
+sizeX = 100
+sizeY = 100
+randSiz = 0
+size_min = 1
+sizepressure = 1
+brushsizeRndfactor = 2
+rotate = 0
+randRot = 0
+rotateangle = 0
+scatter = 0
+alpha = 255
+alphapressure = 0
+alphaFactorVsTime = 0
+alphaVsTime = 15
+alphaRand = 0
+alphaMin = 0
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 78
+pas = 9
+paintline = 1
+hardness = 0
+softness = 0
+intensity = 0
+smooth = 0
+mixing = 1
+visco = 0
+mixtyp = 2
+group = 

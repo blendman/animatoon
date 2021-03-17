@@ -1,0 +1,26 @@
+﻿
+name = crayon01
+size = 100
+size_random = 0
+size_min = 20
+rotate = 1
+rotation = 0
+scatter = 6
+color = 5197647
+alpha = 196
+image = crayon01.jpg
+brushdir = blendman
+brush = 36
+group = 
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 20
+brushsizeRndfactor = 2
+randRot = 360
+alphaFactorVsTime = 0
+alphaVsTime = 15
+pas = 25
+mixing = 0
+visco = 0
+version = 0

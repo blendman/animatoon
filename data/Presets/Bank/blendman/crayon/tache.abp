@@ -1,0 +1,19 @@
+﻿
+name = crayon07
+size = 6
+sizeX = 100
+sizeY = 50
+randSiz = 0
+sizemini = 0
+rotate = 1
+scatter = 23
+alpha = 100
+alphaFactorVsTime = 0
+alphaVsTime = 15
+image = 
+brushdir = blendman
+brush = 5
+pas = 28
+mixing = 0
+visco = 0
+group = 

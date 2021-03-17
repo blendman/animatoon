@@ -1,0 +1,37 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+; //Animatoon brush Preset - Blendman 2015
+; //Animatoon brush Preset - Blendman 2015
+name = grainyblend
+size = 85
+sizeX = 100
+sizeY = 100
+randSiz = 0
+sizemini = 1
+rotate = 0
+rotation = 0
+scatter = 0
+alpha = 110
+alphaFactorVsTime = 0
+alphaVsTime = 15
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 73
+pas = 50
+mixing = 100
+visco = 0
+group = 
+brushsizeRndfactor = 2
+randRot = 265
+version = 0
+sizepressure = 1
+alphapressure = 1
+paintline = 1
+hardness = 0
+smooth = 0
+paintline = 1
+hardness = 0
+smooth = 0
+paintline  = 1
+hardness  = 199
+smooth  = 0

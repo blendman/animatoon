@@ -1,0 +1,29 @@
+﻿
+; //Animatoon brush Preset - Blendman 2015
+name = caligraphik0
+size = 59
+sizeX = 100
+sizeY = 60
+randSiz = 0
+sizemini = 1
+rotate = 30
+rotation = 0
+scatter = 0
+alpha = 255
+image = aquarelle01.jpg
+brushdir = blendman
+brush = 78
+pas = 10
+mixing = 0
+group = 
+version = 0
+sizepressure = 1
+brushsizeRndfactor = 2
+randRot = 0
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 15
+paintline  = 1
+hardness  = 0
+smooth  = 0
+visco = 0

@@ -1,0 +1,21 @@
+//Animatoon brush Preset - Blendman 2011
+name=eraserSoft01
+brush=6
+size=32
+sizeY=100
+sizeX=80
+sizemini=45
+alpha=153
+rotate=160
+scatter=60
+mixing=85
+visco=1
+lavage=1
+paintline=0
+randSiz=1
+randRot=360
+randTra=1
+randSca=2
+randbrush=1
+randCol=1
+tool = 2
