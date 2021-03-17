@@ -1,6 +1,7 @@
 # Animatoon
 
 (Made in Purebasic)
+
 Animatoon is a 2D painting program (and later, I hope to add animation).
 This program is open-source (licence GPLv3)
 
