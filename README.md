@@ -7,7 +7,10 @@ This program is open-source (licence GPLv3)
 
 Made by blendman (Since 2011, 2012-2015, 2017, 2021), with the help of a lot of people :) (purebasic forums french, english and german)
 
-Contributions and help : 
+# Screenshots
+![animatoon 0.5.8.8.7](https://github.com/blendman/animatoon/blob/main/screenshots/animatoon0.588.7.jpg)
+
+# Contributions and help
 Kernadec, Dobro, Attomo, G-rom, Le Soldat Inconnu (LSI), Kwandjeen, Djes, Falsam, Typhoon, Guillot, Netmaestro, Danillo, Rashad, Wilbert, Onilink, Marc256, and probably a lot of others users of purebasic I have forgotten (sorry)...
 
 
