@@ -1,5 +1,5 @@
 ﻿
-
+; Paper: see gadgets.pbi
 
 Macro Layer_DrawImg(u,alpha)
   If layer(u)\Typ = #Layer_TypBG
@@ -35,7 +35,7 @@ Procedure Layer_importImage(update=1)
         DrawAlphaImage(ImageID(temp),0,0)
         StopDrawing()
       EndIf
-    
+      
       If update
         NewPainting = 1
         ScreenUpdate()
@@ -49,7 +49,7 @@ EndProcedure
 Procedure Layer_UpdateList(u=-1)
   
   IE_UpdateLayerUi() 
-
+  
 EndProcedure
 Procedure IE_UpdateLayerUi() 
   
@@ -58,12 +58,12 @@ Procedure IE_UpdateLayerUi()
   If OpenGadgetList(#G_LayerList)
     
     For i =0 To n
-       Layer_updateUi(i)  
+      Layer_updateUi(i)  
     Next
     CloseGadgetList()
     
   EndIf
-
+  
   
 EndProcedure
 
@@ -74,7 +74,7 @@ Procedure Layer_ConvertToBm(i)
   If IsImage(layer(i)\ImageTemp) = 0
     Layer(i)\ImageTemp = CreateImage(#PB_Any,doc\w,doc\h, 32,#PB_Image_Transparent)
   EndIf
-
+  
   If StartDrawing(ImageOutput(layer(i)\ImageTemp))
     
     DrawingMode(#PB_2DDrawing_AllChannels)
@@ -82,14 +82,14 @@ Procedure Layer_ConvertToBm(i)
     ; d'abord, on doit ajouter une box de la couleur nécessaire, pour certain BM
     Select Layer(i)\bm
         
-      ;Case #Bm_Darken
+        ;Case #Bm_Darken
         ;Box(0,0,doc\w,doc\h,RGB(255,255,255))
         
-;       Case 
+        ;       Case 
         
     EndSelect
     
-        
+    
     
     ; puis pour le mask alpha
     If layer(layerid)\MaskAlpha =1
@@ -103,12 +103,12 @@ Procedure Layer_ConvertToBm(i)
     EndIf
     
     SetBm(i,0)    
-
-   ;  DrawingMode(#PB_2DDrawing_AlphaBlend)
+    
+    ;  DrawingMode(#PB_2DDrawing_AlphaBlend)
     DrawAlphaImage(ImageID(layer(i)\Image),0,0)    
     StopDrawing()    
   EndIf
-    
+  
 EndProcedure
 Procedure Layer_GetBm(id)
   ; à changer si on ajoute des blendmode supplémentaires !
@@ -131,7 +131,7 @@ Procedure Layer_GetBm(id)
       
     Case #Bm_ColorBurn
       bm = #SetBm_ColorBurn
-    
+      
     Case #Bm_Darken
       bm = #SetBm_Darken
       
@@ -257,8 +257,8 @@ Procedure Layer_UpdateText(i=0,w=0,h=0,mode=0)
         DrawAlphaImage(ImageID(\image),0,0)
         StopDrawing()
       EndIf 
-       ; ZoomSprite(\sprite,\w,\h)
-       
+      ; ZoomSprite(\sprite,\w,\h)
+      
     EndIf
     
     
@@ -292,7 +292,7 @@ Procedure Layer_ChangeText()
       StopDrawing()
     EndIf
   EndWith
-
+  
   ScreenUpdate()
   
   
@@ -321,7 +321,7 @@ Procedure Layer_Add(x=0,y=0,txt$="")
   n = ArraySize(layer())
   LayerId = n
   
-
+  
   With layer(n)
     
     \typ = OptionsIE\LayerTyp
@@ -329,7 +329,7 @@ Procedure Layer_Add(x=0,y=0,txt$="")
     \id = LayerIdMax ; id unique, même si on supprime un layer
     
     \ImgLayer = CreateImage(#PB_Any, 220,25); for the gadget
-
+    
     \bm = #Bm_Normal
     \view = 1
     \alpha = 255
@@ -375,8 +375,8 @@ Procedure Layer_Add(x=0,y=0,txt$="")
     \NewH = \h
     \CenterX = \w/2
     \CenterY = \h/2
-   
-      
+    
+    
     If \typ = #Layer_TypBG
       \Image = CreateImage(#PB_Any,\W_Repeat,\H_Repeat,32,#PB_Image_Transparent)
       Debug ImageWidth(\image)
@@ -390,7 +390,7 @@ Procedure Layer_Add(x=0,y=0,txt$="")
       DrawingMode(#PB_2DDrawing_AlphaChannel)
       ; Circle(\w/2,\h/2,50,RGBA(0,0,0,255))
       Box(0,0,\w,\h,RGBA(0,0,0,0)) ; on efface tout
-      ;Box(0,0,\w,\h,RGBA(255,255,255,255)) ; et on révèle tout
+                                   ;Box(0,0,\w,\h,RGBA(255,255,255,255)) ; et on révèle tout
       Box(0,0,\w,\h,RGBA(0,0,0,255)) ; et on révèle tout
       
       StopDrawing()
@@ -420,7 +420,7 @@ Procedure Layer_Add(x=0,y=0,txt$="")
     ; Debug "sprite size : "+Str(SpriteWidth(\sprite))+"/"+Str(SpriteHeight(\Sprite))
     ; Debug "Image size : "+Str(ImageWidth(\Image))+"/"+Str(ImageHeight(\Image))
     
-
+    
     
   EndWith  
   
@@ -509,7 +509,7 @@ Procedure Layer_UpdateUi(i)
       EndIf 
       
       
-        
+      
       DrawImage(ImageID(checker), 23,3)
       DrawAlphaImage(ImageID(temp), 23,3)
       
@@ -568,7 +568,7 @@ Procedure Layer_UpdateUi(i)
     
     
   EndWith
-    
+  
 EndProcedure
 Procedure Layer_UpdateImg()
   
@@ -610,7 +610,7 @@ Procedure Layer_Bm2(i) ; pour calculer le bm sur les images // calcul the bm on 
   ; puis on fixe le bm // set the bm
   Select layer(i)\bm 
       
-    ; Case #Bm_Normal
+      ; Case #Bm_Normal
       ; DrawingMode(#PB_2DDrawing_AlphaBlend)
       
     Case #Bm_Normal ; normal            
@@ -673,10 +673,10 @@ Procedure Layer_Bm2(i) ; pour calculer le bm sur les images // calcul the bm on 
       
       
   EndSelect
- 
+  
 EndProcedure
 Procedure Layer_Bm(i) ; pour le bm sur les sprite (l'affichage) // bm on sprite (preview)
-      
+  
   Select layer(i)\bm 
       
     Case #Bm_Normal
@@ -724,7 +724,7 @@ Procedure Layer_Bm(i) ; pour le bm sur les sprite (l'affichage) // bm on sprite 
       ;SpriteBlendingMode(4,4)  
       SpriteBlendingMode(2,4)  
       
-    ;Case  #Bm_Overlay2
+      ;Case  #Bm_Overlay2
       ;SpriteBlendingMode(2,4)  
       
     Case  #Bm_Inverse
@@ -762,7 +762,7 @@ Procedure Layer_Draw(i)
   ZoomSprite(Layer(i)\Sprite,w,h)
   DisplayTransparentSprite(Layer(i)\Sprite,canvasX+layer(i)\x * z,canvasY+layer(i)\y * z,layer(i)\alpha)
   SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
-
+  
 EndProcedure
 Procedure Layer_DrawBorder(i)
   
@@ -779,9 +779,9 @@ Procedure Layer_DrawBorder(i)
       DrawingMode(#PB_2DDrawing_Outlined|#PB_2DDrawing_XOr)
       ; la sélection
       If OptionsIE\Selection = 1
-         Box(canvasX+OptionsIE\SelectionX*z,canvasY+OptionsIE\Selectiony*z,OptionsIE\SelectionW*Z,OptionsIE\SelectionH*z,RGB(0,0,0))
+        Box(canvasX+OptionsIE\SelectionX*z,canvasY+OptionsIE\Selectiony*z,OptionsIE\SelectionW*Z,OptionsIE\SelectionH*z,RGB(0,0,0))
       EndIf
-
+      
       StopDrawing()
     EndIf
     
@@ -795,7 +795,7 @@ Procedure Layer_DrawAll()
       Layer_Draw(i)
       If i = layerId
         If OptionsIE\Shape=1 
-          DisplayTransparentSprite(#Sp_LayerTempo,canvasX,canvasY,layer(layerid)\alpha)  
+          DisplayTransparentSprite(#Sp_LayerTempo, canvasX, canvasY, layer(layerid)\alpha)  
         EndIf
       EndIf  
     EndIf
@@ -824,7 +824,7 @@ Procedure Layer_FreeAll()
   ReDim Layer(0)
   LayerNb = 0
   LayerIdMax = 0
-
+  
 EndProcedure
 Procedure Layer_Clear(i, onlyAlpha=0)
   
@@ -836,7 +836,7 @@ Procedure Layer_Clear(i, onlyAlpha=0)
   
   If  StartDrawing(ImageOutput(img))
     ;If onlyAlpha = 1
-      Box(0,0,LAyer(i)\W+20,LAyer(i)\h+20,RGBA(255,255,255,255))
+    Box(0,0,LAyer(i)\W+20,LAyer(i)\h+20,RGBA(255,255,255,255))
     ;EndIf    
     DrawingMode(#PB_2DDrawing_AlphaChannel)
     If OptionsIE\Selection
@@ -862,7 +862,7 @@ Procedure Layer_Clear(i, onlyAlpha=0)
   
   NewPainting = 1
   ScreenUpdate(1) 
-                         
+  
 EndProcedure
 
 
@@ -907,7 +907,7 @@ Procedure Layer_ChangePos(dir=1)
     ; SetGadgetState(#G_LayerList,LayerId)
     
   EndIf
-
+  
 EndProcedure
 
 
@@ -916,7 +916,7 @@ EndProcedure
 Procedure Layer_Merge(mode=0)
   
   NewPainting = 1
-
+  
   If mode = 0 ; Only Two layers (from top to bottom) :: seulement 2 layer vers le bas
     
     ; convert the layer bm if needed
@@ -1000,7 +1000,7 @@ Procedure Layer_Fill(mode=0)
   If mode = 0 ; on remplit avec une couleur
     
     tmp = CopyImage(Img, #PB_Any)
-        
+    
     If StartDrawing(ImageOutput(tmp))
       DrawingMode(#PB_2DDrawing_AllChannels)
       Box(0,0,doc\w,doc\h, RGBA(Red(Brush(Action)\ColorBG\R),Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B,255))
@@ -1019,7 +1019,7 @@ Procedure Layer_Fill(mode=0)
     FreeImage2(tmp)
     
   ElseIf mode = 1 ; on efface le calque avec le couleur de fond
-        
+    
     If StartDrawing(ImageOutput(img))
       DrawingMode(#PB_2DDrawing_AllChannels)
       Box(0,0,doc\w,doc\h, RGBA(Red(Brush(Action)\ColorBG\R),Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B,255))
@@ -1039,7 +1039,7 @@ Procedure Layer_Fill(mode=0)
         w = ImageWidth(tmp)
         h = ImageHeight(tmp)
         
-       ; tmp = CopyImage(layer(layerId)\Image, #PB_Any)
+        ; tmp = CopyImage(layer(layerId)\Image, #PB_Any)
         If StartDrawing(ImageOutput(img))
           DrawingMode(#PB_2DDrawing_AllChannels)
           Box(0,0,doc\w,doc\h, RGBA(0,0,0,0))
@@ -1079,67 +1079,67 @@ Procedure Layer_ValidChange(Action,i=-1)
     If OptionsIE\confirmAction = 1
       resultat=MessageRequester("Confirm?","Do you want to apply the transformation ?",#PB_MessageRequester_YesNo)
     EndIf
-  
+    
     If resultat =  #PB_MessageRequester_Yes  Or OptionsIE\ConfirmAction = 0
       
       Select layer(i)\Typ 
           
-          Case #Layer_TypBitmap
+        Case #Layer_TypBitmap
+          
+          tmp = CopyImage(layer(i)\Image,#PB_Any)
+          rotimg = tmp
+          
+          ; on dessine sur la nouvelle image
+          If StartDrawing(ImageOutput(tmp))                
+            DrawingMode(#PB_2DDrawing_AllChannels)
+            Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+            DrawingMode(#PB_2DDrawing_AlphaBlend)
+            DrawAlphaImage(ImageID(layer(i)\Image),layer(i)\x,layer(i)\y)
+            StopDrawing()
+          EndIf
+          
+          If Action = #Action_Transform          
             
-            tmp = CopyImage(layer(i)\Image,#PB_Any)
-            rotimg = tmp
+            ResizeImage(tmp,Layer(i)\w,Layer(i)\h)  
+            Layer(i)\w = doc\w
+            Layer(i)\h = doc\h
+            Layer(i)\NewW = doc\w
+            Layer(i)\NewH = doc\h
             
-            ; on dessine sur la nouvelle image
-            If StartDrawing(ImageOutput(tmp))                
-              DrawingMode(#PB_2DDrawing_AllChannels)
-              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-              DrawingMode(#PB_2DDrawing_AlphaBlend)
-              DrawAlphaImage(ImageID(layer(i)\Image),layer(i)\x,layer(i)\y)
-              StopDrawing()
-            EndIf
+          ElseIf action = #action_rotate
             
-            If Action = #Action_Transform          
-              
-              ResizeImage(tmp,Layer(i)\w,Layer(i)\h)  
-              Layer(i)\w = doc\w
-              Layer(i)\h = doc\h
-              Layer(i)\NewW = doc\w
-              Layer(i)\NewH = doc\h
-              
-            ElseIf action = #action_rotate
-              
-              rotimg = RotateImageEx2(ImageID(tmp),layer(i)\Angle)
-              FreeImage2(tmp)
-              
-              w = ImageWidth(rotimg)
-              h = ImageHeight(rotimg)
-              
-              w1 = ImageWidth(layer(i)\Image)
-              h1 = ImageHeight(layer(i)\Image)
-              
-              xn = -(w-w1)/2
-              yn = -(h-h1)/2
-              
-              
-            EndIf
+            rotimg = RotateImageEx2(ImageID(tmp),layer(i)\Angle)
+            FreeImage2(tmp)
             
-            If StartDrawing(ImageOutput(layer(i)\Image))
-              DrawingMode(#PB_2DDrawing_AllChannels)
-              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-              DrawingMode(#PB_2DDrawing_AlphaBlend)         
-              DrawAlphaImage(ImageID(Rotimg),xn,yn)
-              StopDrawing()
-            EndIf
+            w = ImageWidth(rotimg)
+            h = ImageHeight(rotimg)
             
-            FreeImage2(rotimg)
+            w1 = ImageWidth(layer(i)\Image)
+            h1 = ImageHeight(layer(i)\Image)
             
-          Case #Layer_TypText
-            Layer_UpdateText(i,Layer(i)\w,Layer(i)\h,1)
-            ; Layer_Update(i) 
+            xn = -(w-w1)/2
+            yn = -(h-h1)/2
             
             
-        EndSelect
-    
+          EndIf
+          
+          If StartDrawing(ImageOutput(layer(i)\Image))
+            DrawingMode(#PB_2DDrawing_AllChannels)
+            Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+            DrawingMode(#PB_2DDrawing_AlphaBlend)         
+            DrawAlphaImage(ImageID(Rotimg),xn,yn)
+            StopDrawing()
+          EndIf
+          
+          FreeImage2(rotimg)
+          
+        Case #Layer_TypText
+          Layer_UpdateText(i,Layer(i)\w,Layer(i)\h,1)
+          ; Layer_Update(i) 
+          
+          
+      EndSelect
+      
     EndIf
     
     Select layer(i)\Typ 
@@ -1161,7 +1161,7 @@ Procedure Layer_ValidChange(Action,i=-1)
         Layer(i)\Angle = 0
         
     EndSelect
-
+    
     
     NewPainting = 1
     ScreenUpdate(1)  
@@ -1175,16 +1175,16 @@ Procedure Layer_Rotate(i,angle)
   
   tmp = CopyImage(layer(i)\Image,#PB_Any)
   
-;   ; on dessine sur la nouvelle image
-;   If StartDrawing(ImageOutput(tmp))                
-;     DrawingMode(#PB_2DDrawing_AllChannels)
-;     Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-;     DrawingMode(#PB_2DDrawing_AlphaBlend)
-;     DrawAlphaImage(ImageID(layer(i)\Image),0,0)
-;     StopDrawing()
-;   EndIf
+  ;   ; on dessine sur la nouvelle image
+  ;   If StartDrawing(ImageOutput(tmp))                
+  ;     DrawingMode(#PB_2DDrawing_AllChannels)
+  ;     Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+  ;     DrawingMode(#PB_2DDrawing_AlphaBlend)
+  ;     DrawAlphaImage(ImageID(layer(i)\Image),0,0)
+  ;     StopDrawing()
+  ;   EndIf
   
-    
+  
   rotimg = RotateImageEx2(ImageID(tmp),angle)
   FreeImage2(tmp)
   
@@ -1196,7 +1196,7 @@ Procedure Layer_Rotate(i,angle)
   
   xn = -(w-w1)/2
   yn = -(h-h1)/2
-
+  
   If StartDrawing(ImageOutput(layer(i)\Image))
     DrawingMode(#PB_2DDrawing_AllChannels)
     Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
@@ -1214,7 +1214,7 @@ EndProcedure
 
 ; temporary layer
 Procedure Layer_DrawTempo()
-    
+  
   If OptionsIE\Shape >=1
     If action >= #Action_Line And Action <= #Action_Gradient
       
@@ -1249,7 +1249,7 @@ EndProcedure
 
 ; alpha selection
 Procedure Layer_SelectAlpha()
-    
+  
   ;CreateImage2(#Img_AlphaSel,doc\w,doc\h,"Alpha selection",32,#PB_Image_Transparent)
   CopyImage(layer(layerid)\Image, #Img_AlphaSel)
   If StartDrawing(ImageOutput(#Img_AlphaSel))
@@ -1262,10 +1262,12 @@ Procedure Layer_SelectAlpha()
 EndProcedure
 
 ; windows
-; windowprop sur window.pbi
+; windowprop : see window.pbi
+
+
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 922
-; FirstLine = 63
-; Folding = AgpAAAAAAUGHA9DAAAe5
+; CursorPosition = 1264
+; FirstLine = 51
+; Folding = AAAAAAAAAAAAAAAAAAAAAA-
 ; EnableXP
 ; EnableUnicode

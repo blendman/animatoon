@@ -1,4 +1,5 @@
 ﻿
+
 ; check If there is no error With keyboard And screen.
 If InitKeyboard()=0
   MessageRequester(LAng("error"), lang("Keyboard error"))
@@ -14,7 +15,7 @@ EndIf
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 10
+; CursorPosition = 1
 ; Folding = -
 ; EnableXP
 ; Warnings = Display

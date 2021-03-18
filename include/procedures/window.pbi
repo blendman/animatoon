@@ -40,7 +40,7 @@ Macro WinDocNewCont(typ)
         xt = GadgetWidth(TGTemplate)+5
         CbTemplate = ComboBoxGadget(#PB_Any,xx+xt,yy,w2-xt-20,20) : yy + 40
         
-       
+        
         
         
         Directory$ = GetCurrentDirectory() + "data\Presets\Template\"  ; Liste tous les fichiers et les dossiers du répertoire racine de l'utilisateur qui est actuellement logué (Home)
@@ -48,7 +48,7 @@ Macro WinDocNewCont(typ)
         If ExamineDirectory(0, Directory$, "*.txt")  
           While NextDirectoryEntry(0)
             If DirectoryEntryType(0) = #PB_DirectoryEntry_File
-             
+              
               template_nom$ = DirectoryEntryName(0)
               If ReadFile(0, Directory$+template_nom$)                
                 While Eof(0) = 0       
@@ -71,7 +71,7 @@ Macro WinDocNewCont(typ)
           Wend
           FinishDirectory(0)
         EndIf
-
+        
         n=7
         Dim Format$(n)
         Format$(0) = "Millimeters (mm)"
@@ -86,7 +86,7 @@ Macro WinDocNewCont(typ)
         TGWidth=TG(xx+5,yy,"Width",col2)
         SpinGadget(#GADGET_WNewW,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewW,Str(doc\w_def))
         CBPixelW = ComboBoxGadget(#PB_Any,xx+115,yy,80,20) 
-       
+        
         YY +25
         TGHeight=TG(xx+5,yy,"Height",col2)
         SpinGadget(#GADGET_WNewH,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewH,Str(doc\h_def)) 
@@ -109,7 +109,7 @@ Macro WinDocNewCont(typ)
         
         CloseGadgetList()
       EndIf
-    
+      
     Case 2 ; preset cinema 
       
   EndSelect
@@ -117,7 +117,6 @@ Macro WinDocNewCont(typ)
   
   
 EndMacro
-
 Procedure WindowDocNew()
   
   If OpenWindow(#winNewTileset,0,0,650,500,Lang("NewDoc"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
@@ -160,13 +159,13 @@ Procedure WindowDocNew()
               templat = GetGadgetState(CbTemplate)
               SetGadgetText(#GADGET_WNewW,Str(template(templat)\w))
               SetGadgetText(#GADGET_WNewH,Str(template(templat)\h))
-
+              
             Case canvas
               
             Case SGnom
               name$ =GetGadgetText(SGNom)
               
-           
+              
               
             Case #GADGET_WNewW,#GADGET_WNewH
               W = Val(GetGadgetText(#GADGET_WNewW))
@@ -202,26 +201,26 @@ Procedure WindowDocNew()
       
     Until quit = 1
     
-
+    
     If ok =1
       Layer_FreeAll()
       
-;       w = Val(InputRequester("Infos","New Width of Document",Str(doc\w)))
-;       If w >0 And w < 10000
-;         Doc\w = w
-;       Else
-;         MessageRequester("Infos", "The width must be between 1 and 10000. The default width is applied")
-;         Doc\w = 1024
-;       EndIf
-; ;       
-; ;       h = Val(InputRequester("Infos","New Height of Document",Str(doc\h)))
-;       If h >0 And w < 10000
-;         Doc\h = h
-;       Else
-;         MessageRequester("Infos", "The height must be between 1 and 10000. The default height is applied")
-;         Doc\h = 768
-;       EndIf
-;       
+      ;       w = Val(InputRequester("Infos","New Width of Document",Str(doc\w)))
+      ;       If w >0 And w < 10000
+      ;         Doc\w = w
+      ;       Else
+      ;         MessageRequester("Infos", "The width must be between 1 and 10000. The default width is applied")
+      ;         Doc\w = 1024
+      ;       EndIf
+      ; ;       
+      ; ;       h = Val(InputRequester("Infos","New Height of Document",Str(doc\h)))
+      ;       If h >0 And w < 10000
+      ;         Doc\h = h
+      ;       Else
+      ;         MessageRequester("Infos", "The height must be between 1 and 10000. The default height is applied")
+      ;         Doc\h = 768
+      ;       EndIf
+      ;       
       
       Doc\name$ = name$
       Doc\w = Val(GetGadgetText(#GADGET_WNewW))
@@ -237,7 +236,7 @@ Procedure WindowDocNew()
       
       IE_StatusBarUpdate()
       ScreenUpdate()
-    
+      
     EndIf
     
     
@@ -245,7 +244,7 @@ Procedure WindowDocNew()
     FreeArray(Format$())
     
     CloseWindow(#winNewTileset)
-
+    
     
   EndIf  
   
@@ -415,7 +414,7 @@ Macro WinLayerPropCont(newtyp)
           FrameGadget(#GADGET_WNewTile,xx,yy,w3-10,150,Lang("Border"))
           CloseGadgetList()
         EndIf
-
+        
     EndSelect
     
   EndIf
@@ -475,7 +474,7 @@ Procedure WindowLayerProp()
         ; Layer_ChangeText()                       
         
     EndSelect  
-
+    
     
     
     Repeat
@@ -536,10 +535,10 @@ Procedure WindowLayerProp()
     If ok = 1
     EndIf
     
-  
+    
   EndIf
   
-
+  
   
   
   
@@ -558,7 +557,7 @@ Procedure WindowAbout()
   txtcredit$ +Chr(13)+"FatCow Web Hosting, Jaanos"
   
   t1$ = "Developped By : "  
-    
+  
   
   ;txt_1$ + Chr(13)+ Chr(13)+"Distributed under the LGPL Licence"
   
@@ -577,7 +576,7 @@ Procedure WindowAbout()
       CloseGadgetList()
     EndIf
     SetGadgetColor(#GADGET_WAboutSA,#PB_Gadget_BackColor  ,RGB(170,170,170))
-   
+    
     
     If StartDrawing(ImageOutput(ImgAbout))     
       Box(0,0,400,WindowHeight(#win_About),RGB(170,170,170))
@@ -654,8 +653,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 253
-; FirstLine = 21
-; Folding = AwfDAA5
+; CursorPosition = 119
+; Folding = AAAAAA5
 ; EnableXP
 ; EnableUnicode

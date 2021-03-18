@@ -9,42 +9,42 @@
 Procedure SwatchUpdatePropCanvas(x1=0,y1=0,Selected=0)
   
   If IsGadget(#G_WinSwatchCanvas)
-  column = OptionsIE\SwatchColumns
-  u = Round((GadgetWidth(#G_WinSwatchCanvas)-25) / column, #PB_Round_Down)
-  n = ArraySize(SwatchColor()) -1
-  
-  y = (1+n/column) *u
-  If n> 0 And y < 32000
-  ;If GadgetHeight(#G_WinSwatchCanvas) <> y Or 
-    ResizeGadget(#G_WinSwatchCanvas,#PB_Ignore,#PB_Ignore,#PB_Ignore,y+25)
-    SetGadgetAttribute(#G_WinSwatchScroll,#PB_ScrollArea_InnerHeight,y+50)
-  ;EndIf
-
-  EndIf
-  
-  
-  
-  If StartDrawing(CanvasOutput(#G_WinSwatchCanvas))
-    Box(0,0,GadgetWidth(#G_WinSwatchCanvas),GadgetHeight(#G_WinSwatchCanvas),RGB(150,150,150))
-    For i = 0 To ArraySize(SwatchColor()) -1
-            
-      With SwatchColor(i)
-        x = (i%column) * u
-        y = (i/column) *u
-        Box(x,y,u,u,RGB(\col\R,\col\G,\col\B))
-            
-      EndWith
-      
-    Next 
-     
-    If Selected = 1
-      DrawingMode(#PB_2DDrawing_Outlined)
-      Box(x1*u,y1*u,u,u,RGB(255,0,0))
-      Box(x1*u+1,y1*u+1,u-2,u-2,RGB(0,0,0))
-    EndIf   
-    StopDrawing()
+    column = OptionsIE\SwatchColumns
+    u = Round((GadgetWidth(#G_WinSwatchCanvas)-25) / column, #PB_Round_Down)
+    n = ArraySize(SwatchColor()) -1
     
-  EndIf
+    y = (1+n/column) *u
+    If n> 0 And y < 32000
+      ;If GadgetHeight(#G_WinSwatchCanvas) <> y Or 
+      ResizeGadget(#G_WinSwatchCanvas,#PB_Ignore,#PB_Ignore,#PB_Ignore,y+25)
+      SetGadgetAttribute(#G_WinSwatchScroll,#PB_ScrollArea_InnerHeight,y+50)
+      ;EndIf
+      
+    EndIf
+    
+    
+    
+    If StartDrawing(CanvasOutput(#G_WinSwatchCanvas))
+      Box(0,0,GadgetWidth(#G_WinSwatchCanvas),GadgetHeight(#G_WinSwatchCanvas),RGB(150,150,150))
+      For i = 0 To ArraySize(SwatchColor()) -1
+        
+        With SwatchColor(i)
+          x = (i%column) * u
+          y = (i/column) *u
+          Box(x,y,u,u,RGB(\col\R,\col\G,\col\B))
+          
+        EndWith
+        
+      Next 
+      
+      If Selected = 1
+        DrawingMode(#PB_2DDrawing_Outlined)
+        Box(x1*u,y1*u,u,u,RGB(255,0,0))
+        Box(x1*u+1,y1*u+1,u-2,u-2,RGB(0,0,0))
+      EndIf   
+      StopDrawing()
+      
+    EndIf
   EndIf
   
 EndProcedure
@@ -74,40 +74,40 @@ Procedure AddRandomSwatchColor()
     ;\gadImg = n + #G_LastGadget
     If OpenGadgetList(#G_SA_Swatch)
       \img = CreateImage(#PB_Any,u,u)
-        h = n/40
-        ;r = 255
-        ;g = 255
-        ;b = 255
-        Select h             
-          Case 0
-            r = (n*10)
-            g = n*20
-          Case  1
-            g = (n*10)
-          Case  2            
-            b = (n*10) 
-          Case 3            
-            r = (n*10)
-            g = (n*10)
-          Case 4            
-            r = (n*10)
-            b = (n*10)
-          Case 5
-            g = (n*10)
-            b = (n*10)
-            r = n*10
-        EndSelect
-        SetMaximum(r,255)
-        SetMaximum(g,255)
-        SetMaximum(b,255)
-        \Color = RGB(r,g,b)
-        \col\R = r
-        \col\G = g
-        \col\B = b
-        If StartDrawing(ImageOutput(\img))
-          Box(0,0,u,u,\Color)
-          StopDrawing()
-        EndIf
+      h = n/40
+      ;r = 255
+      ;g = 255
+      ;b = 255
+      Select h             
+        Case 0
+          r = (n*10)
+          g = n*20
+        Case  1
+          g = (n*10)
+        Case  2            
+          b = (n*10) 
+        Case 3            
+          r = (n*10)
+          g = (n*10)
+        Case 4            
+          r = (n*10)
+          b = (n*10)
+        Case 5
+          g = (n*10)
+          b = (n*10)
+          r = n*10
+      EndSelect
+      SetMaximum(r,255)
+      SetMaximum(g,255)
+      SetMaximum(b,255)
+      \Color = RGB(r,g,b)
+      \col\R = r
+      \col\G = g
+      \col\B = b
+      If StartDrawing(ImageOutput(\img))
+        Box(0,0,u,u,\Color)
+        StopDrawing()
+      EndIf
       \gadImg = ImageGadget(#PB_Any,\x,\y,u,u,ImageID(\img))
       GadgetToolTip(\gadImg, Str(\color))
       CloseGadgetList()
@@ -116,7 +116,7 @@ Procedure AddRandomSwatchColor()
   EndWith
   
   ReDim SwatchColor(n+1)
-
+  
 EndProcedure
 Procedure AddSwatchColor(r,g,b, name$="",id=-1)
   
@@ -134,39 +134,39 @@ Procedure AddSwatchColor(r,g,b, name$="",id=-1)
   ;w = GadgetWidth(#G_SwatchCanvas)
   ;u = 10
   ;col = OptionsIE\SwatchColumns
-;   If col = 0
-;     col = 7
-;   EndIf
+  ;   If col = 0
+  ;     col = 7
+  ;   EndIf
   
   With SwatchColor(n)
     
-;     If n > 0
-;       If n >= col
-;         \x = n%col * 10
-;         ; \x = Round(\x/ 10,#PB_Round_Down) * 10
-;       Else
-;         \x = n*u
-;       EndIf      
-;       \y = Round(n/col,#PB_Round_Down) * u
-;     EndIf
-;     
-;     If OpenGadgetList(#G_SA_Swatch)
-;       \img = CreateImage(#PB_Any,u,u)
-      
-        \Color = RGB(r,g,b)
-        \col\R = r
-        \col\G = g
-        \col\B = b
-        \name$ = name$
-        ; Debug \name$ + "/"+Str(\color)
-;         If StartDrawing(ImageOutput(\img))
-;           Box(0,0,u,u,\Color)
-;           StopDrawing()
-;         EndIf
-;       \gadImg = ImageGadget(#PB_Any,\x,\y,u,u,ImageID(\img))
-;       GadgetToolTip(\gadImg, name$)
-;       
-      ;CloseGadgetList()
+    ;     If n > 0
+    ;       If n >= col
+    ;         \x = n%col * 10
+    ;         ; \x = Round(\x/ 10,#PB_Round_Down) * 10
+    ;       Else
+    ;         \x = n*u
+    ;       EndIf      
+    ;       \y = Round(n/col,#PB_Round_Down) * u
+    ;     EndIf
+    ;     
+    ;     If OpenGadgetList(#G_SA_Swatch)
+    ;       \img = CreateImage(#PB_Any,u,u)
+    
+    \Color = RGB(r,g,b)
+    \col\R = r
+    \col\G = g
+    \col\B = b
+    \name$ = name$
+    ; Debug \name$ + "/"+Str(\color)
+    ;         If StartDrawing(ImageOutput(\img))
+    ;           Box(0,0,u,u,\Color)
+    ;           StopDrawing()
+    ;         EndIf
+    ;       \gadImg = ImageGadget(#PB_Any,\x,\y,u,u,ImageID(\img))
+    ;       GadgetToolTip(\gadImg, name$)
+    ;       
+    ;CloseGadgetList()
     ;EndIf
     
   EndWith
@@ -191,9 +191,9 @@ Procedure SwatchDeleteColor(id,x,y)
   
 EndProcedure
 Procedure SwatchSort()
-    
- typ = Val(InputRequester("Type of sorting ?", "Typ of sorting ? 0 = by color, 1 = by name","0"))
-
+  
+  typ = Val(InputRequester("Type of sorting ?", "Typ of sorting ? 0 = by color, 1 = by name","0"))
+  
   Select typ 
     Case 0  
       SortStructuredArray(SwatchColor(),#PB_Sort_Descending,OffsetOf(sSwatch\color),  TypeOf(sSwatch\color))
@@ -242,7 +242,7 @@ Procedure SwatchUpdate()
     StopDrawing()
     
   EndIf
-
+  
   
 EndProcedure
 Procedure SwatchOpen(load=0)
@@ -267,7 +267,7 @@ Procedure SwatchOpen(load=0)
     Else
       ReDim SwatchColor(0)
     EndIf
-  
+    
   EndIf
   
   If load = 2 ; not merge
@@ -279,7 +279,7 @@ Procedure SwatchOpen(load=0)
     ext$ = LCase(GetExtensionPart(OptionsIE\Swatch$))
     
     If ext$ = "gpl"
-    
+      
       If ReadFile(0,OptionsIE\Swatch$)
         
         Editor$ = ReadString(0)     
@@ -316,13 +316,13 @@ Procedure SwatchOpen(load=0)
         Wend
         CloseFile(0)
       EndIf   
-    
-  ElseIf ext$ = "colors"
-    
-    MessageRequester(Lang("Info"),Lang("Not implemented"),4)
-
-    
-  EndIf
+      
+    ElseIf ext$ = "colors"
+      
+      MessageRequester(Lang("Info"),Lang("Not implemented"),4)
+      
+      
+    EndIf
     
   EndIf
   
@@ -348,7 +348,7 @@ Procedure SwatchSave(export=0)
   ; several format supported : GPL (gimp palette, krita...)
   
   If export = 1 ; save only
-   
+    
     File$ = SaveFileRequester(Lang("Save Swatch"),"","GPL (Gimp, Krita, Inkscape, Animatoon)|*.gpl|KDE (Koffice)|*.colors",0)
     
     If File$ <> ""
@@ -376,54 +376,54 @@ Procedure SwatchSave(export=0)
   
   If export =0
     
-     ext$  = GetExtensionPart(OptionsIE\Swatch$)
+    ext$  = GetExtensionPart(OptionsIE\Swatch$)
     
-     If ext$ = "gpl"
-       
-       If OpenFile(0,OptionsIE\Swatch$)
-         
-         WriteStringN(0, "Animatoon Palette")
-         WriteStringN(0, "Name: "+ OptionsIE\SwatchName$)
-         WriteStringN(0, "Columns: "+ Str(OptionsIE\SwatchColumns))
-         WriteStringN(0, "# ")
-         
-         For i = 0 To ArraySize(SwatchColor())-1
-                        
-             SwatchSet(R$,SwatchColor(i)\col\R)
-             SwatchSet(G$,SwatchColor(i)\col\G)
-             SwatchSet(B$,SwatchColor(i)\col\B)             
-             WriteStringN(0, R$+" "+G$+" "+B$+"	"+SwatchColor(i)\name$)
-           
-         Next i
-         
-         
-         
-         CloseFile(0)
-         
-       EndIf
-       
-     ElseIf ext$ = "colors"
-       
-       MessageRequester(Lang("Info"),Lang("Not implemented"),4)
-     EndIf
-     
-     
+    If ext$ = "gpl"
+      
+      If OpenFile(0,OptionsIE\Swatch$)
+        
+        WriteStringN(0, "Animatoon Palette")
+        WriteStringN(0, "Name: "+ OptionsIE\SwatchName$)
+        WriteStringN(0, "Columns: "+ Str(OptionsIE\SwatchColumns))
+        WriteStringN(0, "# ")
+        
+        For i = 0 To ArraySize(SwatchColor())-1
+          
+          SwatchSet(R$,SwatchColor(i)\col\R)
+          SwatchSet(G$,SwatchColor(i)\col\G)
+          SwatchSet(B$,SwatchColor(i)\col\B)             
+          WriteStringN(0, R$+" "+G$+" "+B$+"	"+SwatchColor(i)\name$)
+          
+        Next i
+        
+        
+        
+        CloseFile(0)
+        
+      EndIf
+      
+    ElseIf ext$ = "colors"
+      
+      MessageRequester(Lang("Info"),Lang("Not implemented"),4)
+    EndIf
+    
+    
     
     
   EndIf
   
-
+  
   
 EndProcedure
 
 
 ; create
 Macro CreateSwatch()
-    
-;   For i = 0 To 200
-;     AddRandomSwatchColor()
-;   Next i
-;   
+  
+  ;   For i = 0 To 200
+  ;     AddRandomSwatchColor()
+  ;   Next i
+  ;   
   
   SwatchOpen()
   
@@ -503,7 +503,7 @@ Procedure SwatchEditProp()
       i + 405 
       CloseGadgetList()
     EndIf
-  
+    
     If StringGadget(#G_WinSwatchNameSwatch,10,i,150,20,Lang("Swatch name")) : EndIf
     ;If ButtonGadget(#G_WinSwatchBtnOk,10,i,150,20,Lang("Swatch name")) : EndIf
     
@@ -518,7 +518,7 @@ Procedure SwatchEditProp()
     If ButtonGadget(#G_WinSwatchInsert,xb,i,w1,20,Lang("Insert")) : i + 25  : EndIf
     If ButtonGadget(#G_WinSwatchAdd,xb,i,w1,20,   Lang("Add"))    : i + 25  : EndIf
     If ButtonGadget(#G_WinSwatchDel,xb,i,w1,20,   Lang("Delete")) : i + 25  : EndIf
-
+    
     SwatchUpdatePropCanvas()
     
     
@@ -527,7 +527,7 @@ Procedure SwatchEditProp()
       Event       = WaitWindowEvent(1)
       EventType   = EventType()
       EventGadget = EventGadget()
-
+      
       Select Event
           
         Case #PB_Event_Gadget
@@ -535,7 +535,7 @@ Procedure SwatchEditProp()
           Select EventGadget()
               
             Case #G_WinSwatchCanvas
-               
+              
               If EventType = #PB_EventType_LeftButtonDown 
                 u = Round((GadgetWidth(#G_WinSwatchCanvas)-25) / OptionsIE\SwatchColumns, #PB_Round_Down)
                 xsw = Round(GetGadgetAttribute(#G_WinSwatchCanvas, #PB_Canvas_MouseX)/u,#PB_Round_Down)
@@ -565,14 +565,14 @@ Procedure SwatchEditProp()
               If EventType = #PB_EventType_Focus  Or EventType = #PB_EventType_Change  
                 OptionsIE\SwatchName$ = GetGadgetText(#G_WinSwatchName)        
               EndIf
-            
+              
             Case #G_WinSwatchNameSwatch
               If EventType = #PB_EventType_Focus  Or EventType = #PB_EventType_Change  
                 If id <=ArraySize(SwatchColor())
                   SwatchColor(id)\name$ = GetGadgetText(#G_WinSwatchNameSwatch)     
                 EndIf
               EndIf
-            
+              
             Case #G_WinSwatchNew
               ReDim SwatchColor(0)
               SwatchUpdatePropCanvas()
@@ -612,12 +612,12 @@ Procedure SwatchEditProp()
               
           EndSelect
           
-              
-              
+          
+          
           
       EndSelect
       
-                  
+      
     Until event = #PB_Event_CloseWindow
     
     CloseWindow(#Win_Swatch)
@@ -644,7 +644,7 @@ Procedure SwatchEvent(EventType)
   If idd < ArraySize(SwatchColor())-1 And idd >=0
     GadgetToolTip(#G_SwatchCanvas,SwatchColor(idd)\name$)
   EndIf
-
+  
   If EventType = #PB_EventType_LeftButtonDown
     
     If StartDrawing(CanvasOutput(#G_SwatchCanvas))
@@ -669,8 +669,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 101
-; FirstLine = 60
-; Folding = fmEAAAAAs-f-----
+; CursorPosition = 179
+; Folding = AAAAAAAAAAY--AA+
 ; EnableXP
 ; EnableUnicode

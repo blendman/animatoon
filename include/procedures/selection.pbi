@@ -141,7 +141,7 @@ Procedure Umriss(wAnzX.w, wAnzY.w, *lBild, *pFunction.fPixelTest)
   Protected i.w,j.w
   Protected iAnzP.i = 0
   Protected Dim bRand.b(wAnzX,wAnzY) ; Feld für Randkennung
- 
+  
   For i=0 To wAnzY-1 Step 1
     For j=0 To wAnzX-1 Step 1
       If *pFunction(j,i,wAnzX,wAnzY,*lBild) = #True  ; Pixel gehört zum Bereich
@@ -158,7 +158,7 @@ Procedure Umriss(wAnzX.w, wAnzY.w, *lBild, *pFunction.fPixelTest)
       EndIf
     Next j
   Next i
- 
+  
   Protected iMaxS = 1000
   Protected Dim sStr.STRECKE(iMaxS)
   Protected iAnzS.i = 0
@@ -217,13 +217,13 @@ Procedure Umriss(wAnzX.w, wAnzY.w, *lBild, *pFunction.fPixelTest)
   Next i
   ; Feld sortieren
   SortStructuredArray(sStr(),#PB_Sort_Ascending,OffsetOf(STRECKE\wX1),#PB_Word,0,iAnzS-1)
- 
+  
   Protected Dim sStr1.STRECKE(iAnzS)
   Protected k.i,iS.i=-1,iE.i, iAnz.i=1, iFind.i=0, iIdx.i=0
   Protected wX0.w = sStr(0)\wX2
   Protected wDx1.w=sStr(0)\wX2-sStr(0)\wX1,wDy1.w=sStr(0)\wY2-sStr(0)\wY1
   Protected wDx2.w,wDy2.w,wDx3.w,wDy3.w,wW2.w,wW3.w
- 
+  
   ; erste Strecke ist Startstrecke
   For k=0 To iAnzS Step 1
     If sStr(k)\wX1 = wX0 And iS = -1
@@ -357,7 +357,7 @@ Procedure.i GetPixelFromImage (iImage.i, *sPixel.PIXEL)
     Protected *bBuffer2, bL.b
     Protected i.i,j.i
     Protected sPixel.PIXEL, *sPixel1.PIXEL = *sPixel
-   
+    
     If iPixelFormat & #PB_PixelFormat_24Bits_RGB
       iByte = 3
       iRev  = 1
@@ -375,7 +375,7 @@ Procedure.i GetPixelFromImage (iImage.i, *sPixel.PIXEL)
       ProcedureReturn 1
     EndIf
     iPitch / iByte
-   
+    
     If iPitch < iWidth
       StopDrawing()
       ProcedureReturn 2
@@ -462,9 +462,8 @@ EndProcedure
 
 InitializeStructure(@sBereich,PIXELBEREICH)
 
-; IDE Options = PureBasic 5.31 (Windows - x64)
-; CursorPosition = 428
-; FirstLine = 32
-; Folding = AAAAAAAAAGAA-
-; EnableUnicode
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 38
+; Folding = AAAAAAAAAAAw
 ; EnableXP
+; EnableUnicode

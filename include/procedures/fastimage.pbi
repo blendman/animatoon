@@ -10,43 +10,43 @@ EndStructure
 ;- Macros
 
 Macro FastRGB(r, g, b)
-
+  
   ; Faster equivalent of RGB(), although only suitable for integers
-
+  
   (((r << 8 + g) << 8 ) + b)
- 
+  
 EndMacro
 
 Macro FastRed(color)
- 
+  
   ; Faster equivalent of Red(), although only suitable for integers
-
+  
   ((color & $FF0000) >> 16)
- 
+  
 EndMacro
 
 Macro FastGreen(color)
-
+  
   ; Faster equivalent of Green(), although only suitable for integers
-
+  
   ((color & $FF00) >> 8)
- 
+  
 EndMacro
 
 Macro FastBlue(color)
-
+  
   ; Faster equivalent of Blue(), although only suitable for integers
-
+  
   (color & $FF)
- 
+  
 EndMacro
 
 Macro ReverseRGB(color)
-
+  
   ; Changes RGB to BGR or vice versa
-
+  
   ((color & $FF) << 16 | (color & $FF00) | (color & $FF0000) >> 16)
- 
+  
 EndMacro
 
 Macro FastPlot(image_info, x, y, color)
@@ -112,8 +112,8 @@ Procedure CopyMemoryToImage(*mem, image_no.l)
     StopDrawing()
   CompilerEndIf
 EndProcedure
-; IDE Options = PureBasic 5.31 (Windows - x64)
-; CursorPosition = 56
-; Folding = CCw
-; EnableUnicode
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 55
+; Folding = AAw
 ; EnableXP
+; EnableUnicode

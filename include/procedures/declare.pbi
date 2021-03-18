@@ -1,5 +1,8 @@
 ﻿
+Declare CreateOptionsFile()
+Declare AddLogError(error, info$) ; needed for error with initsprite/initkeyboard...
 
+; layers
 Declare Layer_FreeAll()
 Declare Layer_Add(x=0,y=0,text$="") 
 Declare Layer_Clear(i,onlyAlpha=0) 
@@ -42,7 +45,7 @@ Declare BrushResetColor()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 24
-; FirstLine = 3
+; CursorPosition = 44
+; FirstLine = 18
 ; EnableXP
 ; EnableUnicode

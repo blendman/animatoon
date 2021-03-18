@@ -3,36 +3,36 @@
 ; july 2015
 ; by blendman
 ; pb 5.31
- 
 
-Structure MenuPlugin ; Action sur les icones du haut
-  MenuId.i
-  Name$
-  *linkFunction
-EndStructure 
+; 
+; Structure MenuPlugin ; Action on the top icon // Action sur les icones du haut
+;   MenuId.i
+;   Name$
+;   *linkFunction
+; EndStructure 
+; 
+; Structure Application
+;   
+;   winMain.i       ; identifiant de la fenêtre principale
+;   canvasID.i      ; id du canvas principal
+;   menuID.i        ; id du menu
+;   
+;   List MenuPlugin.MenuPlugin()
+;   *funcCreateToolBarButton 
+;   
+;   version_major.c ; version de l'application
+;   version_minor.c
+;   
+;   event.i         ; evenement de l'application
+;   
+; EndStructure
 
-Structure Application
- 
-  winMain.i       ; identifiant de la fenêtre principale
-  canvasID.i      ; id du canvas principal
-  menuID.i        ; id du menu
 
-  List MenuPlugin.MenuPlugin()
-  *funcCreateToolBarButton 
-
-  version_major.c ; version de l'application
-  version_minor.c
-
-  event.i         ; evenement de l'application
-  
-EndStructure
-
-
-; image vers tableau, tableau vers image
+; Image -> array , array-> image // image vers tableau, tableau vers image
 Procedure.i imageToArray(pbImage.i, width.i, height.i)
-
+  
   *nArray = AllocateMemory( (width * height) * 4 ) ; RGBA
- 
+  
   If StartDrawing(ImageOutput(pbImage))
     
     DrawingMode(#PB_2DDrawing_AlphaBlend)
@@ -50,37 +50,36 @@ Procedure.i imageToArray(pbImage.i, width.i, height.i)
     Next
     StopDrawing()
   EndIf
- 
+  
   ProcedureReturn *nArray
 EndProcedure
-
 Procedure ArrayToImage(pbImage, *pixel_data, width.i, height.i)
-
+  
   StartDrawing(ImageOutput(pbImage))
- 
-    DrawingMode(#PB_2DDrawing_AlphaChannel)
-    Box(0,0,width, height,RGBA(0,0,0,0))
-   
-    DrawingMode(#PB_2DDrawing_AlphaBlend)
- 
-    For y = 0 To height -1
-      For x = 0 To width -1
-       
-        red.c   = PeekC( (*pixel_data + (x*4) + width * (y*4))+0 )
-        green.c = PeekC( (*pixel_data + (x*4) + width * (y*4))+1 )
-        blue.c  = PeekC( (*pixel_data + (x*4) + width * (y*4))+2 )
-        alpha.c = PeekC( (*pixel_data + (x*4) + width * (y*4))+3 )
-       
-        Plot(x,y,RGBA(red,green,blue,alpha))
- 
-      Next
+  
+  DrawingMode(#PB_2DDrawing_AlphaChannel)
+  Box(0,0,width, height,RGBA(0,0,0,0))
+  
+  DrawingMode(#PB_2DDrawing_AlphaBlend)
+  
+  For y = 0 To height -1
+    For x = 0 To width -1
+      
+      red.c   = PeekC( (*pixel_data + (x*4) + width * (y*4))+0 )
+      green.c = PeekC( (*pixel_data + (x*4) + width * (y*4))+1 )
+      blue.c  = PeekC( (*pixel_data + (x*4) + width * (y*4))+2 )
+      alpha.c = PeekC( (*pixel_data + (x*4) + width * (y*4))+3 )
+      
+      Plot(x,y,RGBA(red,green,blue,alpha))
+      
     Next
+  Next
   StopDrawing()
- 
+  
 EndProcedure
 
 
-; les filtres présents
+; Filters presents // les filtres présents
 Procedure ImgFilterNoise()
   
   IE_SetImageOutput(Layer(LayerID)\Image)
@@ -148,7 +147,7 @@ Procedure ImgFilterBlur(ratio.d=0.1111)
       
     Next 
   Next 
-   
+  
   red   = red   * ratio
   green = green * ratio
   blue  = blue  * ratio
@@ -201,7 +200,7 @@ Procedure ImgFilterSharpenAlpha()
   green = PeekA( Buffer + i*4 + width * j + 1 )
   blue  = PeekA( Buffer + i*4 + width * j + 2 )
   alpha = PeekA( Buffer + i*4 + width * j + 3 )
-
+  
   For yy = -1 To 1
     For xx = -1 To 1
       ; alpha + PeekA( (Buffer + ((i+xx)*4) + width * ((j+yy)))+3 )
@@ -235,7 +234,6 @@ Procedure ImgFilterSharpenAlpha()
   
   
 EndProcedure
-
 Procedure ImgFilterSharpen(ratio.d=1.5)
   
   IE_SetImageOutput(Layer(LayerID)\Image,1)
@@ -284,7 +282,7 @@ Procedure ImgFilterSharpen(ratio.d=1.5)
   x = i
   y = j
   
-   ; on poke le pixel
+  ; on poke le pixel
   PokeA(Buffer + 4 * i + j * lineLength,      r);Bleu
   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
   PokeA(Buffer + 4 * i + j * lineLength + 2,  b);Rouge  
@@ -318,9 +316,9 @@ Procedure ImgFilterOffset()
 EndProcedure
 
 
-; IDE Options = PureBasic 5.31 (Windows - x64)
-; CursorPosition = 268
-; FirstLine = 57
-; Folding = 5O++--+
-; EnableUnicode
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 11
+; FirstLine = 10
+; Folding = AAPeAv
 ; EnableXP
+; EnableUnicode

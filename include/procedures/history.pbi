@@ -16,7 +16,7 @@ Procedure ExportScript()
 EndProcedure
 
 Procedure SaveScript(Event)  
-    
+  
   Shared Nscript
   
   If OptionsIE\DoScript = 1
@@ -34,11 +34,11 @@ Procedure SaveScript(Event)
       
       If EventMenu() <> #Menu_ActionStop And EventMenu() <>#Menu_ActionRun And EventMenu() <>#Menu_ActionSave
         
-        n = ArraySize(Script(Nscript)\event())
+        n = ArraySize(Script(Nscript)\Event())
         
         Debug "on ajoute 1 event "+Str(n)
         
-        Script(Nscript)\event(n)\Event = event
+        Script(Nscript)\Event(n)\Event = event
         
         Select event 
             
@@ -50,8 +50,8 @@ Procedure SaveScript(Event)
             id = EventGadget()
             Debug "on a utilisé le gadget "+Str(id)
         EndSelect  
-        Script(Nscript)\event(n)\id = id
-        ReDim Script(Nscript)\event(n+1)
+        Script(Nscript)\Event(n)\id = id
+        ReDim Script(Nscript)\Event(n+1)
         
         
       EndIf
@@ -61,21 +61,22 @@ Procedure SaveScript(Event)
   EndIf
   
 EndProcedure
+
 Macro RunScript(sc)
   
   If OptionsIE\DoScript = 5
     
-    If OptionsIE\NbScript < ArraySize(Script(sc)\event())
+    If OptionsIE\NbScript < ArraySize(Script(sc)\Event())
       sc_ev = OptionsIE\NbScript
-      event = Script(sc)\event(sc_ev)\Event
+      event = Script(sc)\Event(sc_ev)\Event
       
       Select event 
           
         Case #PB_Event_Menu
-          EventMenu = Script(sc)\event(sc_ev)\id 
+          EventMenu = Script(sc)\Event(sc_ev)\id 
           
         Case  #PB_Event_Gadget
-          EventGadget = Script(sc)\event(sc_ev)\id 
+          EventGadget = Script(sc)\Event(sc_ev)\id 
           
       EndSelect
       Debug "on run le script "+Str(ev) +" et l'event "+Str(sc_ev)
@@ -132,8 +133,9 @@ Procedure ImageForUndo(save=1)
 EndProcedure
 
 
-; IDE Options = PureBasic 5.31 (Windows - x64)
-; CursorPosition = 13
-; Folding = -A-
-; EnableUnicode
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 133
+; FirstLine = 107
+; Folding = ---
 ; EnableXP
+; EnableUnicode

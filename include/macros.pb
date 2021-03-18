@@ -10,25 +10,25 @@ Macro point_direction(x1,y1,x2,y2)
 EndMacro
 
 Procedure.f GetAngle(xb,yb,Xa,Ya)
-
-     
-   ;calcul de l'angle en radian
-   
-   ar.f=ATan((Ya-yb)/(Xa-xb))
-   
-   ;conversion en degres (je suis pas un crac des radians, je préfère bosser avec les degrés)
-   ad=ar*360/2/3.1415
-
-   
-   ;ajout de la partie de l'angle suivant la position des points car Atang ne renvoie qu'un angle de -90 à 90
-   If Xa<xb And Ya<yb : ad=180+ad :EndIf ; cas haut gauche
-   If Xa>xb And Ya<yb : ad=360+ad :EndIf ;cas haut droite
-   If Xa<xb And Ya>yb : ad=180+ad :EndIf ; cas bas gauche
-   If Xa>xb And Ya>yb :           :EndIf ; cas bas droite
-
-   ; reconversion en radian si tu en as besoins
-   ;ar=ad*2*3.1415/360
-   
+  
+  
+  ;calcul de l'angle en radian
+  
+  ar.f=ATan((Ya-yb)/(Xa-xb))
+  
+  ;conversion en degres (je suis pas un crac des radians, je préfère bosser avec les degrés)
+  ad=ar*360/2/3.1415
+  
+  
+  ;ajout de la partie de l'angle suivant la position des points car Atang ne renvoie qu'un angle de -90 à 90
+  If Xa<xb And Ya<yb : ad=180+ad :EndIf ; cas haut gauche
+  If Xa>xb And Ya<yb : ad=360+ad :EndIf ;cas haut droite
+  If Xa<xb And Ya>yb : ad=180+ad :EndIf ; cas bas gauche
+  If Xa>xb And Ya>yb :           :EndIf ; cas bas droite
+  
+  ; reconversion en radian si tu en as besoins
+  ;ar=ad*2*3.1415/360
+  
   ProcedureReturn ad+ar
 EndProcedure
 
@@ -147,19 +147,19 @@ EndProcedure
 
 
 Macro DeleteArrayElement(ar, el)
- 
+  
   For a=el To ArraySize(ar())-1
     ar(a) = ar(a+1)
   Next 
- 
+  
   ReDim ar(ArraySize(ar())-1)
- 
+  
 EndMacro
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 64
-; FirstLine = 12
-; Folding = 52f4VA9
+; CursorPosition = 157
+; FirstLine = 131
+; Folding = -------
 ; EnableXP
 ; EnableUnicode

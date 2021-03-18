@@ -1,45 +1,43 @@
-﻿
-XIncludeFile "include\infos.pb" ; infos
+﻿;-- infos
+XIncludeFile "include\infos.pb" 
 
-;{ *** constante
+;-- constantes
 XIncludeFile "include\enumeration.pb"
-#ProgramVersion   = "0.5.8.8"
-#ProgramRevision  = 7
+;{ constantes by default
+#ProgramVersion   = "0.5.8.9"
+#ProgramRevision  = 0
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
-#ProgramNbLine    = "19960"
+#ProgramNbLine    = "21000"
 ;}
 
-;{ *** structure
+;-- structure
 XIncludeFile "include\structures.pb"
-;}
 
-XIncludeFile "include\lang.pbi" ; for langages
-Declare AddLogError(error, info$) ; needed for error with initsprite/initkeyboard...
+;-- declare
+XIncludeFile "include\procedures\declare.pbi" 
 
-;{ *** init (Screen & image)
+;-- for langage
+XIncludeFile "include\lang.pbi" 
+
+;-- init (Screen & image)
 XIncludeFile "include\initscreen.pb" ; just initkeyboard and initscreen, we use the screen for the view (and save screen as image)
+XIncludeFile "include\init.pb" ; init image encoder/decoder, load images for GUI
 
-XIncludeFile "include\init.pb" ; init image encoder/decord, load images for GUI
-
-;}
-
-
-;{ *** prototypes
+;-- prototypes
 XIncludeFile "include\prototypes.pb" ; for tablet (wacom)
-                                     ;}
 
-;{ *** Variable
+;-- Variables
 XIncludeFile "include\variables.pb"
-;}
 
-;{ *** macro & utiles
+;-- macro & utiles
 XIncludeFile "include\macros.pb"
-;}
+
 
 ;{ *** procedure 
+;-- procedures
 XIncludeFile "include\procedures.pb" ;  screen et sprite
 
-; Contient :
+; contain :
 ; XIncludeFile "include\procedures\declare.pbi" 
 ; XIncludeFile "include\procedures\menu.pbi" ; menu, file, edition..
 ; XIncludeFile "include\procedures\history.pbi" ; script, history
@@ -55,7 +53,9 @@ XIncludeFile "include\procedures.pb" ;  screen et sprite
 
 ;}
 
+
 ;{ *** Open window 
+;-- Open window
 
 ; fenêtre d'introduction (pour faire patienter pendant le chargement des images par exemple
 w= 500
@@ -176,10 +176,11 @@ If tablet ; pour tablet
   
 EndIf
 
+
 InitScreen()
 OpenOptions()
-IE_StatusBarAdd()
 
+IE_StatusBarAdd()
 
 ScreenY = OptionsIE\ToolbarH -6
 CanvasW = WinW-ScreenX*2
@@ -216,14 +217,19 @@ ShowCursor_(1) ; montre le curseur sur le screen
                ; CompilerEndIf
 
 ; PaperChange()
-PaperInit()
+PaperInit() ; in 
 BrushUpdateImage(2)
 ; ChangeCursor()
+
+
+
 
 Action = #Action_Brush
 ;{ gadgets
 IE_GadgetAdd()
 BrushUpdateColor()
+
+
 ;}
 
 ;{ autres
@@ -262,16 +268,14 @@ EndIf
 
 ;}
 
-;{ ************ loop ******
+;-- Loop 
 XIncludeFile "include\loop.pb"
-;}
-
-;; XIncludeFile "include\datasection.pb" ; No more used (I keep the file , I don't know why :)) // n'est plus utilisé
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 8
-; Folding = FBAA5
+; CursorPosition = 272
+; FirstLine = 30
+; Folding = CAA8
 ; EnableXP
 ; EnableUser
 ; UseIcon = teo.ico

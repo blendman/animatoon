@@ -28,7 +28,7 @@ Macro IE_btn2(id, icon, tip, x = 1, toggle=1)
     
     xx + (siz + u)
   EndIf
-
+  
 EndMacro
 Macro IE_Btn(id, icon, tip)
   
@@ -56,7 +56,7 @@ Macro AddCheckBox(gadg,x,y,w,h,nom,val,tip)
     SetGadgetState(gadg, val)
     GadgetToolTip(gadg, lang(tip)) 
   EndIf
-
+  
 EndMacro
 Macro AddButonImage(gadg,x,y,w,h,img,flag,tip)
   
@@ -70,13 +70,13 @@ Procedure AddSTringTBGadget(gad0,gad1,gad2,val,name$,tip$,x,y,w1,w2,min,max) ; s
   
   ; test pour ajouter un gadget "spécial : nom, trackbar et stringgadget
   h = 20
-  If TextGadget(gad0, 5, y, 50, h, lang(name$))
+  If TextGadget(gad0, 5, y, 50, h, name$)
     If TrackBarGadget(gad1, x+25, y, w1, h, min, max)
       If StringGadget(gad2,x+25+W1, y, w2, h, Str(val))  
         SetGadgetState(gad1, val)
         SetGadgetState(gad2, val)
-        GadgetToolTip(gad1, lang(tip$))
-        GadgetToolTip(gad2, lang(tip$))
+        GadgetToolTip(gad1, tip$)
+        GadgetToolTip(gad2, tip$)
         ProcedureReturn 1
       EndIf
     EndIf
@@ -91,21 +91,21 @@ Procedure AddCheckBox2(x,y,w,h,nom$,val,tip$)
     SetGadgetState(gad, val)
     GadgetToolTip(gad, lang(tip$)) 
   EndIf
-ProcedureReturn gad
+  ProcedureReturn gad
 EndProcedure
 Procedure AddButonImage2(x,y,w,h,img,flag,tip$)
   gad = ButtonImageGadget(#PB_Any,x,y,w,h, ImageID(img),flag) 
   If gad 
     GadgetToolTip(gad, lang(tip$))
   EndIf
-ProcedureReturn gad
+  ProcedureReturn gad
 EndProcedure
 Procedure AddButon2(x,y,w,h,txt$,flag,tip$)
   gad = ButtonGadget(#PB_Any,x,y,w,h, lang(txt$),flag) 
   If gad 
     GadgetToolTip(gad, lang(tip$))
   EndIf
-ProcedureReturn gad
+  ProcedureReturn gad
 EndProcedure
 
 
@@ -120,7 +120,7 @@ Macro FreeGadget2(gad)
   If IsGadget(gad)
     FreeGadget(gad)
   EndIf
-    
+  
 EndMacro
 
 ; Utile (create gadget)
@@ -136,7 +136,7 @@ Procedure TG(x,y,txt$,col=-1) ; create textgadget
   
 EndProcedure
 Procedure SG(x,y,w,txt$,col=-1)  ; create Stringgadget
-  ; a procedure to create a string gadget
+                                 ; a procedure to create a string gadget
   gad = StringGadget(#PB_Any,x,y,w,20, lang(txt$))
   If col <> -1
     SetGadgetColor(gad,#PB_Gadget_BackColor,col)
@@ -164,8 +164,8 @@ EndProcedure
 
 ; statusbar...
 Procedure IE_StatusBarUpdate()
-  StatusBarText(#statusbar, 0, "Zoom : "+Str(OptionsIE\zoom))
-  StatusBarText(#statusbar, 1, "Doc : "+Str(Doc\w)+"/"+Str(Doc\h))
+  StatusBarText(#statusbar, 0, Lang("Zoom")+" : "+Str(OptionsIE\zoom))
+  StatusBarText(#statusbar, 1, Lang("Doc")+" : "+Str(Doc\w)+"/"+Str(Doc\h))
   StatusBarText(#Statusbar, 3, "")
 EndProcedure
 Procedure IE_StatusBarAdd()
@@ -210,38 +210,38 @@ Procedure RgbToHSV(r,g,b)
     ProcedureReturn 
   EndIf
   
-; HUE
-
-If  Delta = 0  ;//This is a gray, no chroma...
-
-   HSV\H = 0   ;//HSV results from 0 To 1
-   HSV\S = 0
-
-Else   ;//Chromatic Data...
-
-   HSV\S = Delta / Cmax
-
-   del_R.f = ( ( ( Cmax - R1 ) / 6 ) + ( Delta / 2 ) ) / Delta
-   del_G.f = ( ( ( Cmax - G1 ) / 6 ) + ( Delta / 2 ) ) / Delta
-   del_B.f = ( ( ( Cmax - B1 ) / 6 ) + ( Delta / 2 ) ) / Delta
-
-   If  R1 = Cmax  
-     HSV\H = del_B - del_G
-   ElseIf G1 = Cmax  
-     HSV\H = ( 1 / 3 ) + del_R - del_B
-   ElseIf  B1 = Cmax  
-     HSV\H = ( 2 / 3 ) + del_G - del_R
-   EndIf
-   
-   If  HSV\H < 0  
-     HSV\H + 1   
-   ElseIf  HSV\H > 1  
-     HSV\H - 1
-   EndIf
-   
-   
-           
-EndIf
+  ; HUE
+  
+  If  Delta = 0  ;//This is a gray, no chroma...
+    
+    HSV\H = 0   ;//HSV results from 0 To 1
+    HSV\S = 0
+    
+  Else   ;//Chromatic Data...
+    
+    HSV\S = Delta / Cmax
+    
+    del_R.f = ( ( ( Cmax - R1 ) / 6 ) + ( Delta / 2 ) ) / Delta
+    del_G.f = ( ( ( Cmax - G1 ) / 6 ) + ( Delta / 2 ) ) / Delta
+    del_B.f = ( ( ( Cmax - B1 ) / 6 ) + ( Delta / 2 ) ) / Delta
+    
+    If  R1 = Cmax  
+      HSV\H = del_B - del_G
+    ElseIf G1 = Cmax  
+      HSV\H = ( 1 / 3 ) + del_R - del_B
+    ElseIf  B1 = Cmax  
+      HSV\H = ( 2 / 3 ) + del_G - del_R
+    EndIf
+    
+    If  HSV\H < 0  
+      HSV\H + 1   
+    ElseIf  HSV\H > 1  
+      HSV\H - 1
+    EndIf
+    
+    
+    
+  EndIf
   
   
   HSV\h * 360  ;				// degrees
@@ -249,46 +249,46 @@ EndIf
     HSV\h + 360
   EndIf
   
-    
+  
   
 EndProcedure
 Procedure.i HSV2RGB(H.f,S.f,V.f) 
   
   Define.COLOUR  sat 
-
-    While h < 0 
-        h = h + 360 
-    Wend 
-    
-    While h > 360 
-        h = h - 360 
-    Wend 
-
-    If h < 120 
-        sat\r = (120 - h) / 60.0 
-        sat\g = h / 60.0 
-        sat\b = 0 
-    ElseIf h < 240 
-        sat\r = 0 
-        sat\g = (240 - h) / 60.0 
-        sat\b = (h - 120) / 60.0 
-    Else 
-        sat\r = (h - 240) / 60.0 
-        sat\g = 0 
-        sat\b = (360 - h) / 60.0 
-    EndIf 
-    
-    sat\r = MinF(sat\r, 1) 
-    sat\g = MinF(sat\g, 1) 
-    sat\b = MinF(sat\b, 1) 
-
-    r = ((1 - s + s * sat\r) * v )*255
-    g = ((1 - s + s * sat\g) * v )*255
-    b = ((1 - s + s * sat\b) * v )*255
-    
-    ; Debug "RGB (d'après la teinte) : " + Str(R)+"/"+Str(G)+"/"+Str(B)
-    
-    ProcedureReturn RGB(r,g,b)    
+  
+  While h < 0 
+    h = h + 360 
+  Wend 
+  
+  While h > 360 
+    h = h - 360 
+  Wend 
+  
+  If h < 120 
+    sat\r = (120 - h) / 60.0 
+    sat\g = h / 60.0 
+    sat\b = 0 
+  ElseIf h < 240 
+    sat\r = 0 
+    sat\g = (240 - h) / 60.0 
+    sat\b = (h - 120) / 60.0 
+  Else 
+    sat\r = (h - 240) / 60.0 
+    sat\g = 0 
+    sat\b = (360 - h) / 60.0 
+  EndIf 
+  
+  sat\r = MinF(sat\r, 1) 
+  sat\g = MinF(sat\g, 1) 
+  sat\b = MinF(sat\b, 1) 
+  
+  r = ((1 - s + s * sat\r) * v )*255
+  g = ((1 - s + s * sat\g) * v )*255
+  b = ((1 - s + s * sat\b) * v )*255
+  
+  ; Debug "RGB (d'après la teinte) : " + Str(R)+"/"+Str(G)+"/"+Str(B)
+  
+  ProcedureReturn RGB(r,g,b)    
 EndProcedure 
 
 
@@ -316,25 +316,25 @@ EndProcedure
 Procedure SetColor(mode = 0)
   
   ; If mode = 0
-    ;Brush(Action)\color = CurrentColor
+  ;Brush(Action)\color = CurrentColor
   ;EndIf  
   ;SetBrush()
   ;If ui\PanelBrush =0
-;     If StartDrawing(ImageOutput(#IMAGE_Color))
-;       Box(0, 0, 30,30, CurrentColor)
-;       StopDrawing()
-;       SetGadgetState(#GADGET_Color, ImageID(#IMAGE_Color))
-;     EndIf 
-;   Else
-   UpdateColorImageBG_FG()
+  ;     If StartDrawing(ImageOutput(#IMAGE_Color))
+  ;       Box(0, 0, 30,30, CurrentColor)
+  ;       StopDrawing()
+  ;       SetGadgetState(#GADGET_Color, ImageID(#IMAGE_Color))
+  ;     EndIf 
+  ;   Else
+  UpdateColorImageBG_FG()
   ;EndIf
   ;ChangeBrushImage()   
-   BrushResetColor()
-   BrushUpdateImage(0,1)
-   Brush(Action)\colorQ = Brush(Action)\color
-   
-   ;SetGadgetState(#GADGET_BrushPreview,ImageID(#IMAGE_BrushPreview))
-   
+  BrushResetColor()
+  BrushUpdateImage(0,1)
+  Brush(Action)\colorQ = Brush(Action)\color
+  
+  ;SetGadgetState(#GADGET_BrushPreview,ImageID(#IMAGE_BrushPreview))
+  
 EndProcedure
 Procedure SetArcEnCiel()
   
@@ -418,7 +418,7 @@ Procedure SetColorSelector(color,x=0,y=0,mode=0,txt=1)
     CursorY = HG - HG * HSV\v
   EndIf
   
-    
+  
   ; Debug "Selector size : "+Str(GadgetWidth(#G_ColorSelector))+"/"+Str(GadgetHeight(#G_ColorSelector))
   
   If mode <> 1
@@ -452,11 +452,11 @@ Procedure SetColorSelector(color,x=0,y=0,mode=0,txt=1)
     
   EndIf
   
- ; Debug "Cursor : "+Str(cursorX)+"/"+Str(cursorY)
-
-      ;w = GadgetWidth(#G_ColorSelector)
-    ;ResizeImage(#IMAGE_ColorSelector,w,w,#PB_Image_Smooth)
-
+  ; Debug "Cursor : "+Str(cursorX)+"/"+Str(cursorY)
+  
+  ;w = GadgetWidth(#G_ColorSelector)
+  ;ResizeImage(#IMAGE_ColorSelector,w,w,#PB_Image_Smooth)
+  
   If IsGadget(#G_ColorSelector)    
     If StartDrawing(CanvasOutput(#G_ColorSelector))
       Box(0,0,256,256,RGB(255,255,255))    
@@ -486,7 +486,7 @@ Procedure SetColorSelector(color,x=0,y=0,mode=0,txt=1)
     SetGadgetText(#GADGET_ColorTxtG,Str(G))
     SetGadgetText(#GADGET_ColorTxtB,Str(B))
   EndIf
-
+  
 EndProcedure
 Procedure ColorSelect(x,y,selector=0)
   
@@ -499,13 +499,13 @@ Procedure ColorSelect(x,y,selector=0)
   EndIf
   
   ;If x>=0 And y>=0 And x<=GadgetWidth(gad) And y<=GadgetHeight(gad)
-    
+  
   If selector =0; arc en ciel
     
-;     If StartDrawing(WindowOutput(#WinMain))
-;       col = Point(WindowMouseX(#winmain),WindowMouseY(#winmain)) 
-;       StopDrawing()
-;     EndIf
+    ;     If StartDrawing(WindowOutput(#WinMain))
+    ;       col = Point(WindowMouseX(#winmain),WindowMouseY(#winmain)) 
+    ;       StopDrawing()
+    ;     EndIf
     
     If StartDrawing(CanvasOutput(#G_ColorArcEnCiel))
       col = Point(x,y)        
@@ -530,38 +530,38 @@ Procedure ColorSelect(x,y,selector=0)
     
   Else
     
-     If StartDrawing(CanvasOutput(#G_ColorSelector))
-       
-       Select OptionsIE\selectColor 
+    If StartDrawing(CanvasOutput(#G_ColorSelector))
+      
+      Select OptionsIE\selectColor 
           
         Case 0 ; BG / base color, of the brush, box..
-           ;Brush(Action)\color  = Point(WindowMouseX(#winmain),WindowMouseY(#winmain))
-           Brush(Action)\color  = Point(x,y)
-           ; Brush(Action)\colorBG = Brush(Action)\color
-           
+               ;Brush(Action)\color  = Point(WindowMouseX(#winmain),WindowMouseY(#winmain))
+          Brush(Action)\color  = Point(x,y)
+          ; Brush(Action)\colorBG = Brush(Action)\color
+          
         Case 1 ; FG color
-           ;Brush(Action)\ColorFG  = Point(WindowMouseX(#winmain),WindowMouseY(#winmain))
-           Brush(Action)\ColorFG  = Point(x,y)
+               ;Brush(Action)\ColorFG  = Point(WindowMouseX(#winmain),WindowMouseY(#winmain))
+          Brush(Action)\ColorFG  = Point(x,y)
           
       EndSelect
       StopDrawing()
     EndIf
-     col = Brush(Action)\color
-     
-   EndIf
-   
-   
-   Brush(Action)\ColorBG\R = Red(Brush(Action)\Color)
-   Brush(Action)\ColorBG\G = Green(Brush(Action)\Color)
-   Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color)                      
-   BrushChangeColor(1)
-   color = RGBA(Brush(Action)\col\R,Brush(Action)\col\G,Brush(Action)\col\B,Brush(Action)\alpha)
-   
-   SetColor()
-   SetColorSelector(col,x,y,selector,1)
-   
- ;EndIf
+    col = Brush(Action)\color
     
+  EndIf
+  
+  
+  Brush(Action)\ColorBG\R = Red(Brush(Action)\Color)
+  Brush(Action)\ColorBG\G = Green(Brush(Action)\Color)
+  Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color)                      
+  BrushChangeColor(1)
+  color = RGBA(Brush(Action)\col\R,Brush(Action)\col\G,Brush(Action)\col\B,Brush(Action)\alpha)
+  
+  SetColor()
+  SetColorSelector(col,x,y,selector,1)
+  
+  ;EndIf
+  
 EndProcedure
 Procedure RGBToHLS(lCR.l, lCG.l, lCB.l, *lCH, *lCL, *lCS)
   
@@ -578,7 +578,7 @@ Procedure RGBToHLS(lCR.l, lCG.l, lCB.l, *lCH, *lCL, *lCS)
   Define lNmR.l
   Define lNmG.l
   Define lNmB.l
-
+  
   If lCR < lCG
     If lCR < lCB
       lMin = lCR
@@ -631,7 +631,7 @@ Procedure RGBToHLS(lCR.l, lCG.l, lCB.l, *lCH, *lCL, *lCS)
     EndIf
   EndIf
   If fCH = 360
-   fCH = 0
+    fCH = 0
   EndIf
   fCH = (fCH / 360 *  #COLOR_SPECTRUM_SIZE_MAX)
   fCL = fCL *  #COLOR_SPECTRUM_SIZE_MAX
@@ -639,7 +639,7 @@ Procedure RGBToHLS(lCR.l, lCG.l, lCB.l, *lCH, *lCL, *lCS)
   PokeL(*lCH, Int(fCH))
   PokeL(*lCL, Int(fCL))
   PokeL(*lCS, Int(fCS))
-
+  
 EndProcedure
 Procedure RGBtoHSL2()
   
@@ -659,7 +659,7 @@ Macro CreateColorSelector()
   
   ww = #GetColor_ArcEnCiel_L
   hh = PanelToolsW_IE-#GetColor_ArcEnCiel_L-10 ;  #GetColor_ArcEnCiel_H -(screenX+10 - #GetColor_ArcEnCiel_H)
-
+  
   If CreateImage(#IMAGE_ColorSelector,hh,hh) : EndIf
   
   
@@ -672,7 +672,7 @@ Macro CreateColorSelector()
     Box(0,1,32,1,RGBA(255,255,255,255))
     StopDrawing()
   EndIf
-    
+  
   ; Arc en ciel
   If CreateImage(#IMAGE_ColorArcEnCiel,#GetColor_ArcEnCiel_L,256,32)
     SetArcEnCiel()
@@ -691,7 +691,7 @@ Macro CreateColorSelector()
   If StringGadget(#GADGET_ColorTxtG,70,148+i,35,20,Str(Brush(Action)\col\G)) : EndIf
   If StringGadget(#GADGET_ColorTxtB,110,148+i,35,20,Str(Brush(Action)\col\B)) : EndIf
   
-   SetColorSelector(Brush(Action)\ColorBG)
+  SetColorSelector(Brush(Action)\ColorBG)
   
   If StartDrawing(CanvasOutput(#G_ColorSelector))
     Box(0,0,hh,hh,RGB(255,255,255))    
@@ -713,345 +713,374 @@ EndMacro
 
 
 ; gadgets & updates gadgets
-Procedure CreateToolPanel() ; pour créer les gadgets en fonction de l'outil choisi
+Procedure CreateToolPanel() ; to create the gadget for each tool when selected // pour créer les gadgets en fonction de l'outil choisi
   
   Shared ToolbarH  
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
   Shared ScrolSwInt
   
-    
+  
   ClearGadgetItems(#G_PanelTool)
-;   n = CountGadgetItems(#G_PanelTool)
-;   For i = 0 To n
-;     RemoveGadgetItem(#G_PanelTool,0)
-;   Next i 
+  ;   n = CountGadgetItems(#G_PanelTool)
+  ;   For i = 0 To n
+  ;     RemoveGadgetItem(#G_PanelTool,0)
+  ;   Next i 
   
   
   OpenGadgetList(#G_PanelTool)
   ; add at least one panel item
-  AddGadgetItem(#G_PanelTool,0,Lang("Gen"))
+  AddGadgetItem(#G_PanelTool,0, Lang("Gen"))
   
   ToolbarH = 30
   
   w = WindowWidth(#WinMain) - ScreenX
   h = WindowHeight(#WinMain) - 25 - ToolbarH
   
-  h1 = 0
-  xx = 5
-  wb = 50
-  ub = 25
-  xb = wb+5+30
+  h1 = 0 ; position in Y by default
+  xx = 5 ; position in y by defaut
+  wb = 50; width of some gadgets
+  ub = 25; the height betwen two line of gagdets
+  xb = wb+5+30 ; position for some gadgets
   xg = 2
-
+  cbbh = 25 ; combobogadget height
   xa1 = 8
   
   
   ; to create the panel depending of the Action selected (brush, eraser, movelayer, transform layer....)
   Select Action
       
-      Case #Action_Brush, #Action_eraser, #Action_Pen
-        ;{ Brush, eraser, pen
+    Case #Action_Brush, #Action_eraser, #Action_Pen
+      ;{ Brush, eraser, pen
       
-        
-        ;AddGadgetItem(#G_PanelTool,0,Lang("Gen"))
-        ;{ general parameters
-        i=0
-        If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,75,Lang("Size"))
-          i+20
-        EndIf    
-        AddSpinGadget(#G_BrushSize,Brush(Action)\size,lang("Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
-        AddCheckBox(#G_BrushSizePressure,xb,h1+i,58,20,LAng("Pressure"),Brush(Action)\sizepressure, lang("Size varie with Pressure"))    
-        AddCheckBox(#G_BrushSizeRand,xb-25,h1+i,25,20,Lang("Rd"),Brush(Action)\SizeRand,lang("SizeRandom"))
-        i+ub  
-        AddSpinGadget(#G_BrushSizeMin,Brush(Action)\SizeMin,lang("Minimum Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
-        ; i+ub
-        AddSpinGadget(#G_BrushSizeW,Brush(Action)\SizeW,lang("Brush width"),5+wb+xg,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
-        AddSpinGadget(#G_BrushSizeH,Brush(Action)\SizeH,lang("Brush height"),5+(wb+xg)*2,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
-        i+ub + 10
-        
-        ; brush Shape (preview)
-        If FrameGadget(#G_FrameBrushImage,0,h1+3+i,ScreenX-15,155,Lang("Shape"))
-          i+20
-        EndIf 
-        ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
-        UpdateBrushPreview()
-        ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
-        ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
-        i+110
-        
-        ComboBoxGadget(#G_BrushStrokeTyp,5,h1+i,65,20)
-        AddGadgetItem(#G_BrushStrokeTyp,0,lang("Image"))
-        AddGadgetItem(#G_BrushStrokeTyp,1,lang("Circle"))
-        GadgetToolTip(#G_BrushStrokeTyp, Lang("The brush shape"))
-        SetGadgetState(#G_BrushStrokeTyp,0)
-        
-        AddCheckBox(#G_BrushTrim,75,h1+i,60,20,lang("Trim"),brush(action)\Trim, lang("Crop the image of the brush"))
-        
-        ;}
-        
-        AddGadgetItem(#G_PanelTool,1,Lang("Tra"))
-        ;{ alpha, aspect & flow
-        i = 5
-        If FrameGadget(#G_FrameAlpha,0,h1+3,ScreenX-15,80,Lang("Transparency"))
-          i+20
-        EndIf
-        
-        AddSpinGadget(#G_BrushAlpha,Brush(Action)\Alpha,"transparency of the brush", xa1,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-        AddCheckBox(#G_BrushAlphaRand,GadgetX(#G_BrushAlpha)+wb+5,h1+i,ub,20,"R",Brush(Action)\AlphaRand,"Transparency varie randomly")    
-        AddCheckBox(#G_BrushAlphaPressure,GadgetX(#G_BrushAlphaRand)+ub+5,h1+i,58,20,"Pressure",Brush(Action)\alphaPressure,"Transparency varie with pressure")    
-        i+ub
-        
-         ; aspect
-        If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,50,Lang("Aspect"))
-          i+20
-        EndIf 
-        AddSpinGadget(#G_brushHardness, Brush(Action)\Hardness,"Hardness of the image", 5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-        AddSpinGadget(#G_brushSoftness, Brush(Action)\Softness,"Softness of the image", 5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-        CheckBoxGadget(#G_brushSmooth, 5+xg*2+wb*2,h1+i,65,20,"Smooth")
-        GadgetToolTip(#G_brushSmooth,lang("Smooth the image of the brush (or not).")) 
-        i+ub+10
-        ;}
-                
-        AddGadgetItem(#G_PanelTool,2,Lang("Dyn"))
-        ;{ dynamics
-        i =5
-        If FrameGadget(#G_FrameRot,0,h1+3,ScreenX-15,80,Lang("Rotation"))
-          i+20
-        EndIf   
-        AddSpinGadget(#G_BrushRandRotate, Brush(Action)\randRot,"Random Rotation",xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
-        i+ub    
-        AddSpinGadget(#G_BrushRotate, Brush(Action)\rotate, "Rotation of the brush",xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
-        AddCheckBox(#G_BrushRotateAngle,xa1+wb+5,h1+i,wb,20,"Angle", Brush(Action)\RotateParAngle,"Rotate the brush in function of the Angle")
-        i+ub +10
-        
-        ; Stroke (trait)
-        If FrameGadget(#G_FrameStroke,0,h1+3+i,ScreenX-15,75,Lang("Stroke"))
-          i+20
-        EndIf 
-        AddSpinGadget(#G_BrushPas, Brush(Action)\pas,"Space between dots", 5,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
-        AddSpinGadget(#G_brushIntensity, Brush(Action)\Intensity,"Intensity of the brush", 5+xg+wb,h1+i,wb,20,-255,255,#PB_Spin_Numeric)
-        AddCheckBox(#G_brushTrait, 5+xg*2+wb*2,h1+i,50,20,"Line",Brush(Action)\Trait,"Line of the brush") 
-        i+ub
-        
-        ComboBoxGadget(#G_BrushStroke,5,h1+i,65,20)
-        AddGadgetItem(#G_BrushStroke,0,lang("Rough"))
-        AddGadgetItem(#G_BrushStroke,1,Lang("Knife"))
-        AddGadgetItem(#G_BrushStroke,2,Lang("Dash"))
-        AddGadgetItem(#G_BrushStroke,3,Lang("Line"))
-        AddGadgetItem(#G_BrushStroke,4,Lang("Gersam"))
-        GadgetToolTip(#G_BrushStroke,Lang("Choose the type of curve for the stroke"))
-        SetGadgetState(#G_BrushStroke,0)
-        i+ub+10   
-        
-        ; Scater
-        If FrameGadget(#G_FrameScatter,0,h1+3+i,ScreenX-15,50,Lang("Scatter"))
-          i+20
-        EndIf   
-        AddSpinGadget(#G_BrushScatter, Brush(Action)\scatter, "Brush Scatter", xa1,h1+i,wb,20,0,100,#PB_Spin_Numeric)
-        i+ub+10
-        
-        
-        If FrameGadget(#G_FrameMisc,0,h1+3+i,ScreenX-15,70,Lang("Misc"))
-          i+20
-        EndIf 
-        ComboBoxGadget(#G_BrushSymetry,xa1,h1+i,70,20)
-        GadgetToolTip(#G_BrushSymetry, Lang("Symetry"))
-        SetGadgetState(#G_BrushSymetry, Brush(Action)\symetry)
-        AddGadgetItem(#G_BrushSymetry,0, Lang("Inactive"))
-        AddGadgetItem(#G_BrushSymetry,1, Lang("Vertical"))
-        AddGadgetItem(#G_BrushSymetry,2, Lang("Horizontal"))
-        AddGadgetItem(#G_BrushSymetry,3, Lang("Hor & Vert"))
-        AddGadgetItem(#G_BrushSymetry,4, Lang("4 views"))
-        SetGadgetState(#G_BrushSymetry,0)
-        i+ub
-        AddSpinGadget(#G_BrushFilter,Brush(Action)\filter,"Set the filter Type parameter (if used)",xa1,h1+i,50,20,0,250,#PB_Spin_Numeric)
-        ;}
-                
-        AddGadgetItem(#G_PanelTool,3,Lang("Col"))
-        ;{ color
-        i =5
-        If FrameGadget(#G_FrameColor,0,h1+3,ScreenX-15,110,Lang("Color"))
-          i+20
-        EndIf   
-        AddSpinGadget(#G_BrushMix, Brush(Action)\mix,lang("Mixing color"), 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
-        AddSpinGadget(#G_BrushVisco, Brush(Action)\Visco,lang("Viscosity"), 5+wb+2,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
-        AddCheckBox(#G_BrushLavage,5+wb*2+4,h1+i,45,20,lang("Wash"),Brush(Action)\Wash,lang("Wash the brush after paint"))
-        i+ub
-        ComboBoxGadget(#G_BrushMixLayer,5,h1+i,70,20); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
-        AddGadgetItem(#G_BrushMixLayer,0, Lang("All above"))
-        AddGadgetItem(#G_BrushMixLayer,1, Lang("Layer Only"))
-        AddGadgetItem(#G_BrushMixLayer,2, Lang("All"))
-        ; AddGadgetItem(#G_BrushMixLayer,3, "Custom")
-        GadgetToolTip(#G_BrushMixLayer,Lang("Define the layers to pick the colors"))
-        SetGadgetState(#G_BrushMixLayer,brush(action)\MixLayer)
-        ;ButtonGadget(#G_BrushMixLayerCustom,80,h1+i,20,20,"+")
-        ;GadgetToolTip(#G_BrushMixLayerCustom,"Define the layers to pick the color. Only available if 'custom' is choose to define the layers for color mixing")
-        i+ub
-        
-        ;AddCheckBox(#G_BrushMixTyp,5,h1+i,70,20,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
-        ComboBoxGadget(#G_BrushMixTyp,5,h1+i,70,20); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
-        GadgetToolTip(#G_BrushMixTyp, Lang("Choose the color blending type"))
-        AddGadgetItem(#G_BrushMixTyp,0, Lang("Classic"))
-        AddGadgetItem(#G_BrushMixTyp,1, Lang("Inverse"))
-        AddGadgetItem(#G_BrushMixTyp,2, Lang( "Old"))
-        AddGadgetItem(#G_BrushMixTyp,3, Lang("New"))
-        SetGadgetState(#G_BrushMixTyp,brush(action)\MixType)
-        i+ub + ub
-        
-        If FrameGadget(#G_FrameWater,0,i+h1+3,ScreenX-15,110, Lang("Water"))
-          i+20
+      
+      ;AddGadgetItem(#G_PanelTool,0,Lang("Gen"))
+      ;{ general parameters
+      i=0
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,75,Lang("Size"))
+        i+20
+      EndIf    
+      AddSpinGadget(#G_BrushSize,Brush(Action)\size,lang("Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
+      AddCheckBox(#G_BrushSizePressure,xb,h1+i,58,20,LAng("Pressure"),Brush(Action)\sizepressure, lang("Size varie with Pressure"))    
+      AddCheckBox(#G_BrushSizeRand,xb-25,h1+i,25,20,Lang("Rd"),Brush(Action)\SizeRand,lang("Size Random"))
+      i+ub  
+      AddSpinGadget(#G_BrushSizeMin,Brush(Action)\SizeMin,lang("Minimum Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
+      ; i+ub
+      AddSpinGadget(#G_BrushSizeW,Brush(Action)\SizeW,lang("Brush width"),5+wb+xg,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
+      AddSpinGadget(#G_BrushSizeH,Brush(Action)\SizeH,lang("Brush height"),5+(wb+xg)*2,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
+      i+ub + 10
+      
+      ; brush Shape (preview)
+      If FrameGadget(#G_FrameBrushImage,0,h1+3+i,ScreenX-15,155,Lang("Shape"))
+        i+20
+      EndIf 
+      ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
+      UpdateBrushPreview()
+      ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
+      ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
+      i+110
+      
+      ComboBoxGadget(#G_BrushStrokeTyp,5,h1+i,65,cbbh)
+      AddGadgetItem(#G_BrushStrokeTyp,0,lang("Image"))
+      AddGadgetItem(#G_BrushStrokeTyp,1,lang("Circle"))
+      GadgetToolTip(#G_BrushStrokeTyp, Lang("The brush shape"))
+      SetGadgetState(#G_BrushStrokeTyp,0)
+      
+      AddCheckBox(#G_BrushTrim,75,h1+i,60,20,lang("Trim"),brush(action)\Trim, lang("Crop the image of the brush"))
+      
+      ;}
+      
+      AddGadgetItem(#G_PanelTool,1,Lang("Tra"))
+      ;{ alpha, aspect & flow
+      i = 5
+      If FrameGadget(#G_FrameAlpha,0,h1+3,ScreenX-15,80,Lang("Transparency"))
+        i+20
+      EndIf
+      
+      AddSpinGadget(#G_BrushAlpha,Brush(Action)\Alpha, lang("transparency of the brush"), xa1,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+      AddCheckBox(#G_BrushAlphaRand,GadgetX(#G_BrushAlpha)+wb+5,h1+i,ub,20, lang("Rand"),Brush(Action)\AlphaRand, lang("Transparency varie randomly"))    
+      AddCheckBox(#G_BrushAlphaPressure,GadgetX(#G_BrushAlphaRand)+ub+5,h1+i,58,20, lang("Pressure"),Brush(Action)\alphaPressure, lang("Transparency varie with pressure"))    
+      i+ub
+      
+      ; aspect
+      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,50,Lang("Aspect"))
+        i+20
+      EndIf 
+      AddSpinGadget(#G_brushHardness, Brush(Action)\Hardness, lang("Hardness of the image"), 5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+      AddSpinGadget(#G_brushSoftness, Brush(Action)\Softness, lang("Softness of the image"), 5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+      CheckBoxGadget(#G_brushSmooth, 5+xg*2+wb*2,h1+i,65,20, lang("Smooth"))
+      GadgetToolTip(#G_brushSmooth,lang("Smooth the image of the brush (or not).")) 
+      i+ub+10
+      ;}
+      
+      AddGadgetItem(#G_PanelTool,2,Lang("Dyn"))
+      ;{ dynamics
+      i =5
+      If FrameGadget(#G_FrameRot,0,h1+3,ScreenX-15,80,Lang("Rotation"))
+        i+20
+      EndIf   
+      AddSpinGadget(#G_BrushRandRotate, Brush(Action)\randRot, lang("Random Rotation"),xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
+      i+ub    
+      AddSpinGadget(#G_BrushRotate, Brush(Action)\rotate, lang("Rotation of the brush"),xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
+      AddCheckBox(#G_BrushRotateAngle,xa1+wb+5,h1+i,wb,20, lang("Angle"), Brush(Action)\RotateParAngle, lang("Rotate the brush in function of the Angle"))
+      i+ub +10
+      
+      ; Stroke (trait)
+      If FrameGadget(#G_FrameStroke,0,h1+3+i,ScreenX-15,75,Lang("Stroke"))
+        i+20
+      EndIf 
+      AddSpinGadget(#G_BrushPas, Brush(Action)\pas, lang("Space between dots"), 5,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
+      AddSpinGadget(#G_brushIntensity, Brush(Action)\Intensity, lang("Intensity of the brush"), 5+xg+wb,h1+i,wb,20,-255,255,#PB_Spin_Numeric)
+      AddCheckBox(#G_brushTrait, 5+xg*2+wb*2,h1+i,50,20, lang("Line"),Brush(Action)\Trait, lang("Line of the brush")) 
+      i+ub
+      
+      ComboBoxGadget(#G_BrushStroke,5,h1+i,65,cbbh)
+      AddGadgetItem(#G_BrushStroke,0,lang("Rough"))
+      AddGadgetItem(#G_BrushStroke,1,Lang("Knife"))
+      AddGadgetItem(#G_BrushStroke,2,Lang("Dash"))
+      AddGadgetItem(#G_BrushStroke,3,Lang("Line"))
+      AddGadgetItem(#G_BrushStroke,4,Lang("Gersam"))
+      GadgetToolTip(#G_BrushStroke,Lang("Choose the type of curve for the stroke"))
+      SetGadgetState(#G_BrushStroke,0)
+      i+ub+10   
+      
+      ; Scater
+      If FrameGadget(#G_FrameScatter,0,h1+3+i,ScreenX-15,50,Lang("Scatter"))
+        i+20
+      EndIf   
+      AddSpinGadget(#G_BrushScatter, Brush(Action)\scatter, lang("Brush Scatter"), xa1,h1+i,wb,20,0,100,#PB_Spin_Numeric)
+      i+ub+10
+      
+      
+      If FrameGadget(#G_FrameMisc,0,h1+3+i,ScreenX-15,70,Lang("Misc"))
+        i+20
+      EndIf 
+      ComboBoxGadget(#G_BrushSymetry,xa1,h1+i,70,20)
+      GadgetToolTip(#G_BrushSymetry, Lang("Symetry"))
+      SetGadgetState(#G_BrushSymetry, Brush(Action)\symetry)
+      AddGadgetItem(#G_BrushSymetry,0, Lang("Inactive"))
+      AddGadgetItem(#G_BrushSymetry,1, Lang("Vertical"))
+      AddGadgetItem(#G_BrushSymetry,2, Lang("Horizontal"))
+      AddGadgetItem(#G_BrushSymetry,3, Lang("Hor & Vert"))
+      AddGadgetItem(#G_BrushSymetry,4, Lang("4 views"))
+      SetGadgetState(#G_BrushSymetry,0)
+      i+ub
+      AddSpinGadget(#G_BrushFilter,Brush(Action)\filter, lang("Set the filter Type parameter (if used)"),xa1,h1+i,50,20,0,250,#PB_Spin_Numeric)
+      ;}
+      
+      AddGadgetItem(#G_PanelTool,3,Lang("Col"))
+      ;{ color
+      i =5
+      If FrameGadget(#G_FrameColor,0,h1+3,ScreenX-15,110,Lang("Color"))
+        i+20
+      EndIf   
+      AddSpinGadget(#G_BrushMix, Brush(Action)\mix,lang("Mixing color"), 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
+      AddSpinGadget(#G_BrushVisco, Brush(Action)\Visco,lang("Viscosity"), 5+wb+2,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
+      AddCheckBox(#G_BrushLavage,5+wb*2+4,h1+i,45,20,lang("Wash"),Brush(Action)\Wash,lang("Wash the brush after paint"))
+      i+ub
+      ComboBoxGadget(#G_BrushMixLayer,5,h1+i,70,cbbh); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
+      AddGadgetItem(#G_BrushMixLayer,0, Lang("All above"))
+      AddGadgetItem(#G_BrushMixLayer,1, Lang("Layer Only"))
+      AddGadgetItem(#G_BrushMixLayer,2, Lang("All layers"))
+      ; AddGadgetItem(#G_BrushMixLayer,3, "Custom")
+      GadgetToolTip(#G_BrushMixLayer,Lang("Define the layers to pick the colors"))
+      SetGadgetState(#G_BrushMixLayer,brush(action)\MixLayer)
+      ;ButtonGadget(#G_BrushMixLayerCustom,80,h1+i,20,20,"+")
+      ;GadgetToolTip(#G_BrushMixLayerCustom,"Define the layers to pick the color. Only available if 'custom' is choose to define the layers for color mixing")
+      i+ub
+      
+      ;AddCheckBox(#G_BrushMixTyp,5,h1+i,70,20,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
+      ComboBoxGadget(#G_BrushMixTyp,5,h1+i,70,20); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
+      GadgetToolTip(#G_BrushMixTyp, Lang("Choose the color blending type"))
+      AddGadgetItem(#G_BrushMixTyp,0, Lang("Classic"))
+      AddGadgetItem(#G_BrushMixTyp,1, Lang("Inverse"))
+      AddGadgetItem(#G_BrushMixTyp,2, Lang( "Old"))
+      AddGadgetItem(#G_BrushMixTyp,3, Lang("New"))
+      SetGadgetState(#G_BrushMixTyp,brush(action)\MixType)
+      i+ub + ub
+      
+      If FrameGadget(#G_FrameWater,0,i+h1+3,ScreenX-15,110, Lang("Water"))
+        i+20
         AddSpinGadget(#G_BrushWater, Brush(Action)\Water,"Add water", 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
+        
+      EndIf 
+      
+      ;}
+      
+      ;}
+      
+    Case #Action_Fill
+      ;{ fillarea
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,80,Lang("Options"))
+        i+20
+        AddSpinGadget(#G_ActionY,Brush(action)\Alpha,lang("Set the transparency"),5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        i+ub
+        ; AddSpinGadget(#G_ActionX,Brush(action)\Size,lang("Tolerance"),5,h1+i,wb,20,1,500,#PB_Spin_Numeric)
+      EndIf
+      ;}
+      
+    Case #Action_Box, #Action_Circle, #Action_Line
+      ;{
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
+        i+20
+        Select  action 
+          Case #Action_Box
+            txt1$ = lang("Size of the round")
+          Case #Action_Line
+            txt1$ = lang("Size of the line")
+          Case #Action_Circle
+            txt1$ = lang("Size of the line")
+        EndSelect
+        AddSpinGadget(#G_ActionX,Brush(action)\size,txt1$,5,h1+i,wb,20,1,500,#PB_Spin_Numeric)
+        ; AddSpinGadget(#G_LayerY,Brush(action)\AlphaFG,"Foreground Alpha",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        i+ub+15
+        
+      EndIf
+      If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,50,Lang("Transparency"))
+        i+20          
+        AddSpinGadget(#G_ActionY,Brush(action)\Alpha,lang("Set the transparency"),5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+        If action <> #Action_Line   
+          AddSpinGadget(#G_ShapeParam1,Brush(action)\AlphaFG, lang("Foreground Alpha"),5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+        EndIf   
+        i+ub+15    
+      EndIf
+      
+      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,90,Lang("Options"))
+        i+20 
+        If action = #Action_Line            
+          ;AddCheckBox(#G_LayerXLock,xx,h1+i,58,20,Lang("Proportion"),OptionsIE\lockX,"Keep proportion") : i + 20   
+          ;AddCheckBox(#G_LayerYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
+          ;AddCheckBox(#G_LayerBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
+          ;AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,Lang("Confirm action"),OptionsIE\ConfirmAction,"Confirm action ?")    
+          ComboBoxGadget(#G_ActionTyp,5,h1+i,100,20)
+          AddGadgetItem(#G_ActionTyp,0, Lang("Linear"))
+          AddGadgetItem(#G_ActionTyp,1, Lang("Radial"))
+          AddGadgetItem(#G_ActionTyp,2, Lang("Speed"))
+          SetGadgetState(#G_ActionTyp, Brush(action)\type)
           
-        EndIf 
-        
-        ;}
-            
-        ;}
-        
-      Case #Action_Fill
-        ;{ fillarea
-         If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,80,Lang("Options"))
-           i+20
-           AddSpinGadget(#G_ActionY,Brush(action)\Alpha,"Set the transparency",5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-           i+ub
-           AddSpinGadget(#G_ActionX,Brush(action)\Size,"Tolerance",5,h1+i,wb,20,1,500,#PB_Spin_Numeric)
-        EndIf
-        ;}
-        
-      Case #Action_Box, #Action_Circle, #Action_Line
-        ;{
-        If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
-          i+20
-          Select  action 
-            Case #Action_Box
-              txt1$ = "Size of the round"
-            Case #Action_Line
-              txt1$ = "Size of the line"
-            Case #Action_Circle
-              txt1$ = "Size of the line"
-          EndSelect
-          AddSpinGadget(#G_ActionX,Brush(action)\size,txt1$,5,h1+i,wb,20,1,500,#PB_Spin_Numeric)
-          ; AddSpinGadget(#G_LayerY,Brush(action)\AlphaFG,"Foreground Alpha",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          i+ub+15
-          
-        EndIf
-        If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,50,Lang("Transparency"))
-          i+20          
-          AddSpinGadget(#G_ActionY,Brush(action)\Alpha,"Set the transparency",5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-          If action <> #Action_Line   
-           AddSpinGadget(#G_ShapeParam1,Brush(action)\AlphaFG,"Foreground Alpha",5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-         EndIf   
-         i+ub+15    
-       EndIf
-       
-        If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,90,Lang("Options"))
-          i+20 
-          If action = #Action_Line            
-            ;AddCheckBox(#G_LayerXLock,xx,h1+i,58,20,Lang("Proportion"),OptionsIE\lockX,"Keep proportion") : i + 20   
-            ;AddCheckBox(#G_LayerYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
-            ;AddCheckBox(#G_LayerBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-            ;AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,Lang("Confirm action"),OptionsIE\ConfirmAction,"Confirm action ?")    
-            ComboBoxGadget(#G_ActionTyp,5,h1+i,100,20)
-            AddGadgetItem(#G_ActionTyp,0, Lang("Linear"))
-            AddGadgetItem(#G_ActionTyp,1, Lang("Radial"))
-            AddGadgetItem(#G_ActionTyp,2, Lang("Speed"))
-            
-            
-          Else
-            ; AddCheckBox(#G_ActionW,xx,h1+i,58,20,Lang("Outlined"),OptionsIE\ShapeParam,"Use outlined") : i + 20  
-            AddSpinGadget(#G_ActionH,Brush(action)\ShapeOutSize,"Set the thick of the outline",5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-            ; AddCheckBox(#G_ActionTyp,1,"Radial")
-          EndIf    
-        EndIf
-        ;}
-       
-      Case #Action_Gradient
-       ;{
+        Else
+          ; AddCheckBox(#G_ActionW,xx,h1+i,58,20,Lang("Outlined"),OptionsIE\ShapeParam,"Use outlined") : i + 20  
+          AddSpinGadget(#G_ActionH,Brush(action)\ShapeOutSize,"Set the thick of the outline",5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+          ; AddCheckBox(#G_ActionTyp,1,"Radial")
+        EndIf    
+      EndIf
+      ;}
+      
+    Case #Action_Gradient
+      ;{
       If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Transparency"))
         i+20          
-        AddSpinGadget(#G_ActionX,Brush(action)\Alpha,"Background Alpha",5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-        AddSpinGadget(#G_ActionY,Brush(action)\AlphaFG,"Foreground Alpha",5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionX, Brush(action)\Alpha, lang("Background Alpha"),5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionY, Brush(action)\AlphaFG, lang("Foreground Alpha"),5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
         i+ub+15        
       EndIf
       If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,60,Lang("Gradient"))
         i+20  
-        ComboBoxGadget(#G_ActionTyp,5,h1+i,100,20)
+        ComboBoxGadget(#G_ActionTyp,5,h1+i,100,cbbh)
         AddGadgetItem(#G_ActionTyp,0, Lang("Linear"))
         AddGadgetItem(#G_ActionTyp,1, Lang("Circular"))
         AddGadgetItem(#G_ActionTyp,2, Lang("Elliptic"))
         AddGadgetItem(#G_ActionTyp,3, Lang("Conical"))
         AddGadgetItem(#G_ActionTyp,4, Lang("Boxed"))
+        SetGadgetState(#g_actionTyp, Brush(action)\type)
         i+ub+15
       EndIf
       
       If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,90,Lang("Options"))
         i+20          
-        AddCheckBox(#G_ActionXLock,xx,h1+i,100,20,"Proportion",OptionsIE\lockX,"Keep proportion") : i + 20   
+        AddCheckBox(#G_ActionXLock,xx,h1+i,100,20, lang("Proportion"),OptionsIE\lockX, lang("Keep proportion")) : i + 20   
         ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
         ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+20,20,"Confirm action",OptionsIE\ConfirmAction,"Confirm action ?")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+20,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))    
       EndIf    
+      
+      ;}
+      
+    Case #Action_Transform
+      ;{ 
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
+        i+20
+        AddSpinGadget(#G_ActionX,Layer(Layerid)\w,lang("Layer Width"),5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionY,Layer(Layerid)\h,lang("Layer Height"),5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        i + ub+15
+      EndIf
+      If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,110,Lang("Options"))
+        i+20          
+        AddCheckBox(#G_ActionXLock,xx,h1+i,Len(Lang("Proportion"))*6+5,20, lang("Proportion"),OptionsIE\lockX, lang("Keep proportion")) : i + 20   
+        ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
+        ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))  : i + 20      
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Transform all viewed layers"))*6+5,20, lang("Transform all viewed layers"),OptionsIE\ActionForAllLayers,"")    
+      EndIf    
+      ;}
+      
+    Case #Action_Rotate
+      ;{ 
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Rotation"))
+        i+20
+        AddSpinGadget(#G_ActionX,Layer(Layerid)\Angle, lang("Angle"),5,h1+i,wb,20,-360,360,#PB_Spin_Numeric)
+        ;AddSpinGadget(#G_ActionY,Layer(Layerid)\h,"Layer Height",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        i + ub+15
+      EndIf
+      If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,90,Lang("Options"))
+        i+20          
+        ;AddCheckBox(#G_ActionXLock,xx,h1+i,58,20,Lang("Proportion"),OptionsIE\lockX,"Keep proportion") : i + 20   
+        ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
+        ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?")) : i + 20      
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Rotate all viewed layers"))*6+5,20, lang("Rotate all viewed layers"),OptionsIE\ActionForAllLayers,"")
+      EndIf    
+      ;}
+      
+    Case #Action_Move
+      ;{
+      If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Position"))
+        i+20
         
-        ;}
-        
-      Case #Action_Transform
-        ;{ 
-        If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
-          i+20
-          AddSpinGadget(#G_ActionX,Layer(Layerid)\w,"Layer Width",5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          AddSpinGadget(#G_ActionY,Layer(Layerid)\h,"Layer Height",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          i + ub+15
-        EndIf
-        If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,110,Lang("Options"))
-          i+20          
-          AddCheckBox(#G_ActionXLock,xx,h1+i,Len(Lang("Proportion"))*6+5,20,"Proportion",OptionsIE\lockX,"Keep proportion") : i + 20   
-          ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
-          ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-          AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,"Confirm action",OptionsIE\ConfirmAction,"Confirm action ?")  : i + 20      
-          AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Transform all viewed layers"))*6+5,20,"Transform all viewed layers",OptionsIE\ActionForAllLayers,"")    
-        EndIf    
-          ;}
-        
-      Case #Action_Rotate
-         ;{ 
-        If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Rotation"))
-          i+20
-          AddSpinGadget(#G_ActionX,Layer(Layerid)\Angle,"Angle",5,h1+i,wb,20,-360,360,#PB_Spin_Numeric)
-          ;AddSpinGadget(#G_ActionY,Layer(Layerid)\h,"Layer Height",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          i + ub+15
-        EndIf
-        If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,90,Lang("Options"))
-          i+20          
-          ;AddCheckBox(#G_ActionXLock,xx,h1+i,58,20,Lang("Proportion"),OptionsIE\lockX,"Keep proportion") : i + 20   
-          ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
-          ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-          AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,"Confirm action",OptionsIE\ConfirmAction,"Confirm action ?") : i + 20      
-          AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Rotate all viewed layers"))*6+5,20,"Rotate all viewed layers",OptionsIE\ActionForAllLayers,"")
-        EndIf    
-          ;}
-        
-      Case #Action_Move
-        ;{
-        If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Position"))
-          i+20
-          
-          AddSpinGadget(#G_ActionX,Layer(Layerid)\x,"Layer X position",5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          AddSpinGadget(#G_ActionY,Layer(Layerid)\y,"Layer y Position",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-          i + ub+15
-        EndIf
-        If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,110,Lang("Options"))
-          i+20          
-          AddCheckBox(#G_ActionXLock,xx,h1+i,58,20,"Lock X",OptionsIE\lockX,"Lock X Direction") : i + 20   
-          AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,"Lock Y",OptionsIE\lockY,"Lock Y Direction") : i + 20 
-          ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-          AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,"Confirm action",OptionsIE\ConfirmAction,"Confirm action ?")   : i + 20   
-          AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Move all viewed layers"))*6+5,20,"Move all viewed layers",OptionsIE\ActionForAllLayers,"")    
-        EndIf    
-
-        ;}
-       
-    EndSelect
-    
+        AddSpinGadget(#G_ActionX,Layer(Layerid)\x,lang("Layer X position"),5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionY,Layer(Layerid)\y,lang("Layer y Position"),5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        i + ub+15
+      EndIf
+      If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,110,Lang("Options"))
+        i+20          
+        AddCheckBox(#G_ActionXLock,xx,h1+i,58,20, lang("Lock X"),OptionsIE\lockX, lang("Lock X Direction")) : i + 20   
+        AddCheckBox(#G_ActionYLock,xx,h1+i,58,20, lang("Lock Y"),OptionsIE\lockY, lang("Lock Y Direction")) : i + 20 
+        ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,lang("Confirm action"),OptionsIE\ConfirmAction,lang("Confirm action ?"))   : i + 20   
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Move all viewed layers"))*6+5,20,lang("Move all viewed layers"),OptionsIE\ActionForAllLayers,"")    
+      EndIf    
+      
+      ;}
+      
+    Case #action_pipette
+      ;{ 
+      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,60,Lang("Type"))
+        i+20  
+        ComboBoxGadget(#G_ActionTyp,5,h1+i, 100, cbbh)
+        AddGadgetItem(#G_ActionTyp,0, Lang("Layer only"))
+        AddGadgetItem(#G_ActionTyp,1, Lang("All layers"))
+        ;  AddGadgetItem(#G_ActionTyp,2, Lang("All layers above")) wip, to be finished
+        SetGadgetState(#G_ActionTyp, brush(#action_pipette)\type)
+        GadgetToolTip(#G_ActionTyp, Lang("Define the layers to pick the colors"))
+        i+ub+15
+      EndIf
+      ;}
+      
+    Case #Action_Zoom
+      ;{
+      If FrameGadget(#G_FrameSize, 0, h1+3, ScreenX-15, 50, Lang("Zoom center"))
+        i+20
+        ComboBoxGadget(#G_ActionTyp,5,h1+i, 100, cbbh)
+        AddGadgetItem(#G_ActionTyp,0, Lang("Default (0,0)"))
+        AddGadgetItem(#G_ActionTyp,1, Lang("Zoom on mouse"))
+        AddGadgetItem(#G_ActionTyp,2, Lang("Center of canvas"))
+        SetGadgetState(#G_ActionTyp, brush(#Action_Zoom)\type)
+        GadgetToolTip(#G_ActionTyp, Lang("Define the center for the zoom"))
+        i + ub+15
+      EndIf
+      ;}
+      
+  EndSelect
+  
   CloseGadgetList()
   
   
@@ -1063,7 +1092,7 @@ Procedure CreateToolPanel() ; pour créer les gadgets en fonction de l'outil cho
     Brush(action)\Col\B = Brush(#Action_Brush)\Col\B
     Brush(action)\ColorFG = Brush(#Action_Brush)\ColorFG
   EndIf
-
+  
   
   
   
@@ -1097,12 +1126,12 @@ Procedure IE_GadgetAdd()
   If ContainerGadget(#G_ToolBar,0, -1, W+ScreenX, ToolBarH, #PB_Container_BorderLess)
     
     SetGadgetColor(#G_ToolBar,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
-
+    
     siz = ToolBarH -2
     u = 2
-
+    
     ComboBoxGadget(#G_IE_Type,  xx, (ToolBarH - 24)/2, 70, 22)
-        
+    
     AddGadgetItem(#G_IE_Type, #ToolType_Brush,  Lang("Brush"))
     AddGadgetItem(#G_IE_Type, #ToolType_Pen,    Lang("Pen"))
     AddGadgetItem(#G_IE_Type, #ToolType_Eraser, Lang("Eraser"))
@@ -1116,12 +1145,12 @@ Procedure IE_GadgetAdd()
     AddGadgetItem(#G_IE_Type, #ToolType_Noise,  Lang("Noise") )   
     AddGadgetItem(#G_IE_Type, #ToolType_Pixel,  Lang("Pixel") )   
     AddGadgetItem(#G_IE_Type, #ToolType_Blur,   Lang("Blur"))    
-    AddGadgetItem(#G_IE_Type, #ToolType_Sol,    Lang("Sol") )   
+    AddGadgetItem(#G_IE_Type, #ToolType_Sol,    Lang("Solarize") )   
     AddGadgetItem(#G_IE_Type, #ToolType_Line,   Lang("Line") )   
-
+    
     GadgetToolTip(#G_IE_Type, Lang("Filter of the brush."))
-    SetGadgetState(#G_IE_Type,    Brush(Action)\Type)
-
+    SetGadgetState(#G_IE_Type, Brush(Action)\Type)
+    
     xx + GadgetWidth(#G_IE_Type) +10
     xx = IE_InsertBar(xx)
     
@@ -1144,7 +1173,7 @@ Procedure IE_GadgetAdd()
     IE_btn2(#G_IE_Gradient,   #ico_IE_Gradient,   Lang("Gradient")+" (G)")
     
     xx = IE_InsertBar(xx)
-    IE_btn2(#G_IE_Text,       #ico_IE_Text,         Lang("Text")+" (T)")
+    IE_btn2(#G_IE_Text,       #ico_IE_Text,       Lang("Text")+" (T)")
     
     xx = IE_InsertBar(xx)
     IE_btn2(#G_IE_Eraser,     #ico_IE_Eraser,     Lang("Eraser")+" (E)")
@@ -1154,7 +1183,7 @@ Procedure IE_GadgetAdd()
     IE_btn2(#G_IE_Pipette,    #ico_IE_Pipette,    Lang("Pick color"))
     
     
-        
+    
     xx = IE_InsertBar(xx)
     IE_btn2(#G_IE_Move,       #ico_IE_Move,       Lang("Move tool")+" (V)")
     IE_btn2(#G_IE_Transform,  #ico_IE_Scale,      Lang("Transform tool")+" (Ctrl+T)")
@@ -1163,7 +1192,7 @@ Procedure IE_GadgetAdd()
     IE_btn2(#G_IE_Select,     #ico_IE_Select,     Lang("Selection tool")+" (M)")
     
     IE_btn2(#G_IE_Hand,       #ico_IE_Hand,       Lang("Hand tool") + " (H)")
-    IE_btn2(#G_IE_Zoom,       #ico_IE_Zoom,       Lang("Zoom")+" (Ctrl +/- (Z)")
+    IE_btn2(#G_IE_Zoom,       #ico_IE_Zoom,       Lang("Zoom")+" (Ctrl clic, ctrl +/- ) (Z)")
     
     ; on modifie le bouton du tool actif
     For i =#G_IE_Pen To #G_IE_Zoom
@@ -1179,17 +1208,17 @@ Procedure IE_GadgetAdd()
   
   ; panel tool parameters
   ;If ContainerGadget(#G_Cont_Brush,0,ToolbarH,ScreenX-5,PanelToolsH_IE) 
-    If PanelGadget(#G_PanelTool,0,ToolbarH,ScreenX-5,PanelToolsH_IE) ;h-25)
-      SetGadgetColor(#G_PanelTool,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
-      CloseGadgetList()
-      CreateToolPanel() ; create the panel tool (action dy default = brush, so the panel with the brush parameters are created
-    EndIf
-    ;CloseGadgetList()
+  If PanelGadget(#G_PanelTool,0, ToolbarH, ScreenX, PanelToolsH_IE) ;h-25)
+    SetGadgetColor(#G_PanelTool,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
+    CloseGadgetList()
+    CreateToolPanel() ; create the panel tool (action dy default = brush, so the panel with the brush parameters are created
+  EndIf
+  ;CloseGadgetList()
   ;EndIf
   
   
   ; panel colors
-  If PanelGadget(#G_PanelCol,0,toolbarH+PanelToolsH_IE+5,ScreenX-5, H-25-PanelToolsH_IE)
+  If PanelGadget(#G_PanelCol,0,toolbarH+PanelToolsH_IE+5, ScreenX, H-25-PanelToolsH_IE)
     
     SetGadgetColor(#G_PanelCol,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     AddGadgetItem(#g_PanelCol,0,Lang("Color"))
@@ -1207,20 +1236,18 @@ Procedure IE_GadgetAdd()
     CreateColorSelector()
     
     AddGadgetItem(#g_PanelCol,1,Lang("Gradient"))
-
-
+    
+    
     
     CloseGadgetList()
   EndIf
   
   h = WindowHeight(#WinMain) -50-ToolbarH
-  If SplitterGadget(#G_SplitToolCol,0,ToolbarH, ScreenX-5,h,#G_PanelTool,#G_PanelCol) : EndIf
-
+  If SplitterGadget(#G_SplitToolCol, 0, ToolbarH, ScreenX, h, #G_PanelTool,#G_PanelCol) : EndIf
+  
   
   ; panel layer, options, presets
-  ;If PanelGadget(#G_PanelLayer, w+10,ToolbarH,ScreenX-10,h-25)
-  ;If PanelGadget(#G_PanelLayer, w+10,ToolbarH,ScreenX-10,PanelLayerH_IE)
-  If PanelGadget(#G_PanelLayer,0,0,ScreenX-10,PanelLayerH_IE)
+  If PanelGadget(#G_PanelLayer, 0, 0, ScreenX-5, PanelLayerH_IE)
     
     SetGadgetColor(#G_PanelLayer,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     
@@ -1275,7 +1302,7 @@ Procedure IE_GadgetAdd()
     IE_Btn1(#G_LayerLockPaint,    #ico_LayerLockPaint,  "Lock Paint")  : i+ub
     IE_Btn1(#G_LayerLocked,       #ico_LayerLocked,     "Lock Layer")  : i+ub
     yy + 25
-     i = 5
+    i = 5
     
     
     
@@ -1284,20 +1311,20 @@ Procedure IE_GadgetAdd()
       w1 = 220
     EndIf
     
-     If ScrollAreaGadget(#G_LayerList, i, yy, ScreenX-25, w1-20, ScreenX-45, 600, 10, #PB_ScrollArea_Single) 
-        
-        
-        CloseGadgetList()
-      EndIf      
-      yy+GadgetHeight(#G_LayerList)+5
+    If ScrollAreaGadget(#G_LayerList, i, yy, ScreenX-25, w1-20, ScreenX-45, 600, 10, #PB_ScrollArea_Single) 
+      
+      
+      CloseGadgetList()
+    EndIf      
+    yy+GadgetHeight(#G_LayerList)+5
     
     
     
     ; If ListViewGadget(#G_LayerList, i,yy,ScreenX-30,w1-20) : yy=yy+210 : EndIf
     ;If ScrollAreaGadget(#G_Layer,10,yy,130,w1-20,108,w1)
-      ; ListViewGadget(#G_LayerList, 0,0,108,w1) : yy=yy+210
-      ;CloseGadgetList()
-      ;EndIf
+    ; ListViewGadget(#G_LayerList, 0,0,108,w1) : yy=yy+210
+    ;CloseGadgetList()
+    ;EndIf
     
     wbtn=bw + 1
     
@@ -1324,10 +1351,10 @@ Procedure IE_GadgetAdd()
     AddButonImage(#G_PresetSavePresetAs,xx,10,bw,bw,#ico_Export,#PB_Button_Default,"Export the current preset") : xx+wbtn
     
     If TreeGadget(#G_PresetTG,5,40,ScreenX-20,PanelLayerH_IE-105)
-       OpenPresetBank()
+      OpenPresetBank()
     EndIf
     TextGadget(#G_PresetName,5,45+GadgetHeight(#G_PresetTG),w-20,20, Lang("Brush name"),#PB_Text_Border)
-
+    
     ;}
     
     
@@ -1338,32 +1365,32 @@ Procedure IE_GadgetAdd()
     yy + 20
     If  ListViewGadget(#G_ListPaper,20,yy,ScreenX-50, 80)
       IE_UpdatePaperList()
-       YY+GadgetHeight(#G_ListPaper) +20
+      YY+GadgetHeight(#G_ListPaper) +20
     EndIf
     
     ; Paper alpha
     wp = 30
-    If AddSTringTBGadget(#G_PaperAlphaName,#G_PaperAlpha,#G_PaperAlphaSG,255, "Alpha", "Alpha paper",0,yy,ScreenX-50-wp,wp,0,255)
-;     If TrackBarGadget(#G_PaperAlpha, 20, yy , ScreenX-50-wp, 20, 0, 255)
-;       GadgetToolTip(#G_PaperAlpha,Lang("Alpha paper"))
-;       SetGadgetState(#G_PaperAlpha, 255)
-;       StringGadget(
+    If AddSTringTBGadget(#G_PaperAlphaName,#G_PaperAlpha,#G_PaperAlphaSG, paper\alpha, lang("Alpha"), lang("Alpha paper"),0,yy,ScreenX-50-wp,wp,0,255)
+      ;     If TrackBarGadget(#G_PaperAlpha, 20, yy , ScreenX-50-wp, 20, 0, 255)
+      ;       GadgetToolTip(#G_PaperAlpha,Lang("Alpha paper"))
+      ;       SetGadgetState(#G_PaperAlpha, 255)
+      ;       StringGadget(
       YY+GadgetHeight(#g_paperAlpha)
     EndIf
     
     ; Paper Scale 
-    If AddSTringTBGadget(#G_PaperScaleName,#G_PaperScale,#G_PaperScaleSG,10, "Scale", "Alpha Scale",0,yy,ScreenX-50-wp,wp,1,200)
-
-;     If TrackBarGadget(#G_PaperScale, 20, yy, ScreenX-50-wp, 20, 1, 200)
-;       GadgetToolTip(#G_PaperScale,Lang("Scale paper"))
-;       SetGadgetState(#G_PaperScale, 10)
+    If AddSTringTBGadget(#G_PaperScaleName,#G_PaperScale,#G_PaperScaleSG, paper\scale, lang("Scale"), Lang("Alpha scale"),0,yy,ScreenX-50-wp,wp,1,200)
+      
+      ;     If TrackBarGadget(#G_PaperScale, 20, yy, ScreenX-50-wp, 20, 1, 200)
+      ;       GadgetToolTip(#G_PaperScale,Lang("Scale paper"))
+      ;       SetGadgetState(#G_PaperScale, 10)
       YY+GadgetHeight(#G_PaperScale)
     EndIf
     
     
     If TrackBarGadget(#G_PaperIntensity, 20, yy, ScreenX-50-wp, 20, 1, 1000)
       GadgetToolTip(#G_PaperIntensity, Lang("Intensity paper"))
-      SetGadgetState(#G_PaperIntensity, 100)
+      SetGadgetState(#G_PaperIntensity, paper\intensity)
     EndIf
     
     
@@ -1377,7 +1404,7 @@ Procedure IE_GadgetAdd()
   h - PanelLayerH_IE -25
   
   ;If PanelGadget(#G_PanelSwatch, w+10,ToolbarH+PanelLayerH_IE+5,ScreenX-10,h)
-  If PanelGadget(#G_PanelSwatch, 0,0,ScreenX-10,h)
+  If PanelGadget(#G_PanelSwatch, 0,0,ScreenX-5,h)
     
     SetGadgetColor(#G_PanelSwatch,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     
@@ -1405,7 +1432,7 @@ Procedure IE_GadgetAdd()
       CloseGadgetList()
     EndIf
     
-      
+    
     AddGadgetItem(#G_PanelSwatch,1,Lang("Rough"))
     yy = 5
     i = 5
@@ -1422,7 +1449,7 @@ Procedure IE_GadgetAdd()
         If OptionsIE\RB_Img$ = "" Or LoadImage(#image_RB, OptionsIE\RB_Img$ ) = 0
           ; MessageRequester(Lang("Error"), Lang("Unable to load the roughboard image"))
           
-           If CreateImage(#image_RB, 100,200) = 0            
+          If CreateImage(#image_RB, 100,200) = 0            
             
             MessageRequester(Lang("Error"), Lang("Unable to create the roughboard image"))
             
@@ -1461,8 +1488,8 @@ Procedure IE_GadgetAdd()
   
   
   h = WindowHeight(#WinMain) - 50 - ToolbarH
-  If SplitterGadget(#G_SplitLayerRB,W+10,ToolbarH, ScreenX-10,h,#G_PanelLayer,#G_PanelSwatch)
-     SetGadgetState(#G_SplitLayerRB,PanelLayerH_IE)
+  If SplitterGadget(#G_SplitLayerRB,W+10,ToolbarH, ScreenX-5,h,#G_PanelLayer,#G_PanelSwatch)
+    SetGadgetState(#G_SplitLayerRB,PanelLayerH_IE)
   EndIf
   ; If SplitterGadget(#G_SplitLayerRB,WindowWidth(0)-150,ToolbarH, ScreenX-10,600,#G_PanelLayer,#G_PanelSwatch,#PB_Splitter_Separator) : EndIf
   
@@ -1472,9 +1499,9 @@ Procedure IE_UpdateGadget()
   
   Shared ToolbarH  
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
-
   
-  x = WindowWidth(#WinMain) - ScreenX +10
+  
+  x = WindowWidth(#WinMain) - ScreenX +5
   ; h = WindowHeight(#WinMain) - ToolbarH - PanelLayerH_IE - 50; StatusBarHeight(#Statusbar)
   h = WindowHeight(#WinMain) - ToolbarH - 50; StatusBarHeight(#Statusbar)
   ResizeGadget(#G_SplitLayerRB,x,#PB_Ignore,#PB_Ignore,h)
@@ -1487,7 +1514,7 @@ Procedure IE_UpdateGadget()
   ; on resize le container qui contient le screen
   W = WindowWidth(#WinMain) - ScreenX*2 ; -10
   H = WindowHeight(#WinMain) - StatusBarHeight(#Statusbar)-12 - OptionsIE\ToolbarH -6
-
+  
   ResizeGadget(#G_ContScreen,#PB_Ignore,#PB_Ignore,w, h)
   
 EndProcedure
@@ -1497,7 +1524,7 @@ Procedure IE_SaveSplitter(LayerH,ToolH, BarH)
   PanelToolsH_IE = ToolH
   PanelLayerH_IE = LayerH
   BarAnimH_IE = BarH
-
+  
 EndProcedure
 Procedure UpdateGadgetLayer(id)
   
@@ -1509,7 +1536,7 @@ Procedure UpdateGadgetLayer(id)
   SetGadgetState(#G_LayerLockPaint, Layer(Id)\LockPaint)
   bm = Layer_GetBm(id)          
   SetGadgetState(#G_LayerBM, bm)
-
+  
 EndProcedure
 
 
@@ -1548,7 +1575,7 @@ EndMacro
 
 ; paper
 Procedure IE_UpdatePaperList()
-
+  
   If ExamineDirectory(0, GetCurrentDirectory() + "data\paper\", "*.*")  
     While NextDirectoryEntry(0)
       
@@ -1561,12 +1588,12 @@ Procedure IE_UpdatePaperList()
       
     Wend
     FinishDirectory(0)
-
+    
   EndIf
-
+  
 EndProcedure
 Procedure PaperDraw()
-
+  
   SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
   z.d = OptionsIE\zoom*0.01
   
@@ -1574,10 +1601,10 @@ Procedure PaperDraw()
   ZoomSprite(#Sp_PaperColor,doc\w*z,doc\h*z)
   DisplayTransparentSprite(#Sp_PaperColor,canvasX,canvasY, 255)
   
-;   draw the paper
+  ;   draw the paper
   ZoomSprite(#Sp_Paper,doc\w*z,doc\h*z)
   DisplayTransparentSprite(#Sp_Paper,canvasX,canvasY, GetGadgetState(#G_PaperAlpha))
-
+  
 EndProcedure
 Procedure PaperUpdate(load=0)
   
@@ -1594,27 +1621,27 @@ Procedure PaperUpdate(load=0)
   If IsGadget(#G_paperScale)
     scale = GetGadgetState(#G_paperScale)
     scale = scale /10
-;   Else
-;     Debug "paperscale gadget pas ok"
+    ;   Else
+    ;     Debug "paperscale gadget pas ok"
   EndIf
-;    Debug "paperscale "+StrD(scale)
+  ;    Debug "paperscale "+StrD(scale)
   tempImgPaper = CopyImage(#Img_Paper, #PB_Any)
   
-   w = ImageWidth(#Img_Paper)
-   h = ImageHeight(#Img_Paper)
-   w1= ImageWidth(#Img_Paper)*scale
-   h1 = ImageHeight(#Img_Paper)*scale
-   If w1 > 5000
-     w1= 5000
-   EndIf
-   If h1 > 5000
-     h1= 5000
-   EndIf
-   
-   ResizeImage(tempImgPaper, w1, h1)
+  w = ImageWidth(#Img_Paper)
+  h = ImageHeight(#Img_Paper)
+  w1= ImageWidth(#Img_Paper)*scale
+  h1 = ImageHeight(#Img_Paper)*scale
+  If w1 > 5000
+    w1= 5000
+  EndIf
+  If h1 > 5000
+    h1= 5000
+  EndIf
+  
+  ResizeImage(tempImgPaper, w1, h1)
   w = ImageWidth(tempImgPaper)
   h = ImageHeight(tempImgPaper)
- 
+  
   ; MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
   
   If StartDrawing(SpriteOutput(#Sp_Paper))
@@ -1626,7 +1653,7 @@ Procedure PaperUpdate(load=0)
     DrawingMode(#PB_2DDrawing_AlphaBlend )
     
     For i=0 To (doc\w/w)*z
-    
+      
       
       For j = 0 To (doc\h/h)*z
         ; ZoomSprite(#Sp_Paper,w*z,h*z)
@@ -1634,12 +1661,12 @@ Procedure PaperUpdate(load=0)
         
         ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
         DrawImage(ImageID(tempImgPaper),i*w,j*h)
-       
+        
       Next j 
       
-        
-      Next i       
-  
+      
+    Next i       
+    
     StopDrawing()
     
   EndIf
@@ -1689,7 +1716,7 @@ Procedure PaperInit(load=1)
     EndIf
   EndIf
   
-  ; Create a temporary srptie, for temporary operation (selection, box, circle...)
+  ; Create a temporary sprite, for temporary operation (selection, box, circle...)
   ; puis, je crée le layertempo, un sprite pour les opérations comme sélection, box, cercle, gradient, etc...
   If CreateSprite(#Sp_LayerTempo,doc\w,doc\h,#PB_Sprite_AlphaBlending) 
     If StartDrawing(SpriteOutput(#Sp_LayerTempo))
@@ -1724,7 +1751,7 @@ Procedure UpdateBrushPreview()
     EndIf
     
     If StartDrawing(ImageOutput(#Img_PreviewBrush))
-;       DrawImage(ImageID(#Img_paper),0,0,100,100)
+      ;       DrawImage(ImageID(#Img_paper),0,0,100,100)
       DrawImage(ImageID(#Img_checker),0,0,100,100)
       DrawingMode(#PB_2DDrawing_AlphaBlend)
       Box(0, 0, 100, 100, RGBA(240, 240, 240, 220))
@@ -1741,139 +1768,139 @@ Procedure SetToolParamToGad()
   CreateToolPanel()
   
   ; d'abord, on cache tous les gadgets liés aux paramètres des outils
-;   For i = #G_FirstParamBrush+1 To #G_LastParamBrush-1
-;     If IsGadget(i)
-;       HideGadget(i,1)
-;     EndIf
-;   Next i
-      
+  ;   For i = #G_FirstParamBrush+1 To #G_LastParamBrush-1
+  ;     If IsGadget(i)
+  ;       HideGadget(i,1)
+  ;     EndIf
+  ;   Next i
+  
   ; on update  
   With Brush(Action)
     
     Select Action
-      
-      ; autre dessins
-    Case #Action_Spray
-      
-      
-    Case #Action_Particles
-      
-      
-    Case #Action_Box
-      ;HideGad2(#G_FrameAlpha,0,0)
-      ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
-      
-    Case #Action_Circle
-      ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
-      ;HideGad2(#G_FrameAlpha,0,0)
-      
-      
-    Case #Action_Line
-      ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
-      ;HideGad2(#G_FrameAlpha,0,0)
-      
-    Case #Action_Fill
-      
-      
-    Case #Action_Gradient
-      ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
-      ;HideGad2(#G_FrameAlpha,0,0)
-      
-    Case #Action_Shape
-      
-      
-    Case #Action_Clear
-      
-      
-      ; transformation
-    Case #Action_Move
-      
-      
-    Case #Action_Transform
-      
-      
-    Case #Action_Rotate
-      
-      
-    Case #Action_Select
-      
-      
-      ; Canvas
-    Case #Action_Zoom
-      
-      
-    Case #Action_Hand
-      
-      
-    Case #Action_Text
-      
-      
-    Case #Action_Tampon
-      
-      
-    Case #Action_Pipette
-      
-      
-    Case #Action_brush, #Action_eraser, #Action_Pen
-      
-      ; on réaffiche toutes les options des brosses
-;       For i = #G_FirstParamBrush+1 To #G_LastParamBrush-1
-;         If IsGadget(i)
-;           HideGadget(i,0)
-;         EndIf
-;       Next i
-      
-      ;{ puis on mets à jours les paramètres de l'outil
-      
-      ; size
-      SetGadgetState(#G_BrushSize,\Size)
-      SetGadgetState(#G_BrushSizeH,\sizeH)
-      SetGadgetState(#G_BrushSizeW,\SizeW)
-      SetGadgetState(#G_BrushSizePressure,\Sizepressure)
-      SetGadgetState(#G_BrushSizeMin,\SizeMin)
-      SetGadgetState(#G_BrushSizeRand,\SizeRand)
-      
-      ; alpha
-      SetGadgetState(#G_BrushAlpha,\Alpha)
-      ; SetGadgetState(#G_BrushAlphaMin,\AlphaMin)
-      SetGadgetState(#G_BrushAlphaPressure,\AlphaPressure)
-      SetGadgetState(#G_BrushAlphaRand,\AlphaRand)
-      
-      ; dynamics
-      SetGadgetState(#G_BrushScatter,\Scatter)
-      SetGadgetState(#G_BrushRandRotate,\RandRot)
-      SetGadgetState(#G_BrushRotate,\Rotate)
-      SetGadgetState(#G_BrushRotateAngle,\RotateParAngle)
-      
-      ; stroke
-      SetGadgetState(#G_brushIntensity,\Intensity)
-      SetGadgetState(#G_BrushStroke,\Stroke)
-      SetGadgetState(#G_BrushSymetry,\symetry)
-      SetGadgetState(#G_brushSoftness,\Softness)
-      SetGadgetState(#G_brushHardness,\Hardness)
-      SetGadgetState(#G_BrushPas,\Pas)
-      SetGadgetState(#G_brushTrait,\Trait)
-
-      ; misc
-      SetGadgetState(#G_BrushSymetry,\symetry)
-      ; on update l'image
-      BrushUpdateImage(1,1)
-
-      ; color
-      SetGadgetState(#G_BrushMix,\Mix)
-      SetGadgetState(#G_BrushMixTyp,\MixType)
-      SetGadgetState(#G_BrushMixLayer,\MixLayer)
-      SetGadgetState(#G_BrushVisco,\Visco)
-      ; SetGadgetState(#G_BrushWater,\Water)
-      SetGadgetState(#G_BrushLavage,\Wash)
-      SetGadgetState(#G_BrushWater, \Water)
-      
-      ;}
-      
-      
-      
-  EndSelect
-  
+        
+        ; autre dessins
+      Case #Action_Spray
+        
+        
+      Case #Action_Particles
+        
+        
+      Case #Action_Box
+        ;HideGad2(#G_FrameAlpha,0,0)
+        ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
+        
+      Case #Action_Circle
+        ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
+        ;HideGad2(#G_FrameAlpha,0,0)
+        
+        
+      Case #Action_Line
+        ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
+        ;HideGad2(#G_FrameAlpha,0,0)
+        
+      Case #Action_Fill
+        
+        
+      Case #Action_Gradient
+        ;HideGad2(#G_BrushAlpha,0,Brush(Action)\Alpha)
+        ;HideGad2(#G_FrameAlpha,0,0)
+        
+      Case #Action_Shape
+        
+        
+      Case #Action_Clear
+        
+        
+        ; transformation
+      Case #Action_Move
+        
+        
+      Case #Action_Transform
+        
+        
+      Case #Action_Rotate
+        
+        
+      Case #Action_Select
+        
+        
+        ; Canvas
+      Case #Action_Zoom
+        
+        
+      Case #Action_Hand
+        
+        
+      Case #Action_Text
+        
+        
+      Case #Action_Tampon
+        
+        
+      Case #Action_Pipette
+        
+        
+      Case #Action_brush, #Action_eraser, #Action_Pen
+        
+        ; on réaffiche toutes les options des brosses
+        ;       For i = #G_FirstParamBrush+1 To #G_LastParamBrush-1
+        ;         If IsGadget(i)
+        ;           HideGadget(i,0)
+        ;         EndIf
+        ;       Next i
+        
+        ;{ puis on mets à jours les paramètres de l'outil
+        
+        ; size
+        SetGadgetState(#G_BrushSize,\Size)
+        SetGadgetState(#G_BrushSizeH,\sizeH)
+        SetGadgetState(#G_BrushSizeW,\SizeW)
+        SetGadgetState(#G_BrushSizePressure,\Sizepressure)
+        SetGadgetState(#G_BrushSizeMin,\SizeMin)
+        SetGadgetState(#G_BrushSizeRand,\SizeRand)
+        
+        ; alpha
+        SetGadgetState(#G_BrushAlpha,\Alpha)
+        ; SetGadgetState(#G_BrushAlphaMin,\AlphaMin)
+        SetGadgetState(#G_BrushAlphaPressure,\AlphaPressure)
+        SetGadgetState(#G_BrushAlphaRand,\AlphaRand)
+        
+        ; dynamics
+        SetGadgetState(#G_BrushScatter,\Scatter)
+        SetGadgetState(#G_BrushRandRotate,\RandRot)
+        SetGadgetState(#G_BrushRotate,\Rotate)
+        SetGadgetState(#G_BrushRotateAngle,\RotateParAngle)
+        
+        ; stroke
+        SetGadgetState(#G_brushIntensity,\Intensity)
+        SetGadgetState(#G_BrushStroke,\Stroke)
+        SetGadgetState(#G_BrushSymetry,\symetry)
+        SetGadgetState(#G_brushSoftness,\Softness)
+        SetGadgetState(#G_brushHardness,\Hardness)
+        SetGadgetState(#G_BrushPas,\Pas)
+        SetGadgetState(#G_brushTrait,\Trait)
+        
+        ; misc
+        SetGadgetState(#G_BrushSymetry,\symetry)
+        ; on update l'image
+        BrushUpdateImage(1,1)
+        
+        ; color
+        SetGadgetState(#G_BrushMix,\Mix)
+        SetGadgetState(#G_BrushMixTyp,\MixType)
+        SetGadgetState(#G_BrushMixLayer,\MixLayer)
+        SetGadgetState(#G_BrushVisco,\Visco)
+        ; SetGadgetState(#G_BrushWater,\Water)
+        SetGadgetState(#G_BrushLavage,\Wash)
+        SetGadgetState(#G_BrushWater, \Water)
+        
+        ;}
+        
+        
+        
+    EndSelect
+    
   EndWith
   
   
@@ -1884,13 +1911,13 @@ Procedure UpdateTool(Gad)
     
     OptionsIE\Shape  = 0
     OldAction = Action
-
+    
     For i = #G_IE_Pen To #G_IE_Zoom
       SetGadgetState(i,0)
     Next i
     SetGadgetState(gad,1)
     Action = gad - #G_IE_Pen
-
+    
     ; set layer type
     Select Action
         
@@ -1901,7 +1928,7 @@ Procedure UpdateTool(Gad)
         OptionsIE\LayerTyp = #Layer_TypBitmap
         
     EndSelect
-      
+    
     
     If action <> OldAction
       
@@ -1965,10 +1992,10 @@ Procedure UpdateColorFG()
     Box(0,0,100,100,Brush(Action)\ColorFG)
     StopDrawing()
   EndIf
-;   If StartDrawing(ImageOutput(#ImageColorBG))
-;     Box(0,0,100,100,Brush(Action)\Color)
-;     StopDrawing()
-;   EndIf
+  ;   If StartDrawing(ImageOutput(#ImageColorBG))
+  ;     Box(0,0,100,100,Brush(Action)\Color)
+  ;     StopDrawing()
+  ;   EndIf
   SetGadgetState(#G_BrushColorFG,ImageID(#ImageColorFG))
   SetGadgetState(#G_BrushColorBG,ImageID(#ImageColorBG))
   
@@ -1976,8 +2003,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1421
-; FirstLine = 265
-; Folding = AAAAOAADAAAAAAAwDABAAAEIgBIfBAAAAAeAA9
+; CursorPosition = 2002
+; FirstLine = 46
+; Folding = AAAAOAADAAAAAAAAAAAAAAAACYAAAAAAAAAAAA-
 ; DisableDebugger
 ; EnableUnicode

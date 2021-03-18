@@ -1,10 +1,16 @@
 ﻿
 ; variables
-Global ScreenX.w, ScreenY.w, NewPainting.a, canvasX.w, canvasY.w, ScreenResized
-ScreenX = 165
+Global ScreenX.w, ScreenY.w, NewPainting.a, canvasX.w, canvasY.w, OldCanvasX.w, OldCanvasY.w, CanvasW.w, CanvasH.w, ScreenResized
+; position nof the container-screen
+ScreenX = 175
 ScreenY = 40
 
-Global MouseX_Old.d, MouseY_Old.d, x, y, mx, my, LayerId.a, CanvasW.w, CanvasH.w
+; canvasX, canvasY : position of the canvas (and the layers, grid...)
+; OldCanvasX, OldCanvasY : old position of canvas, need for zoom and pan.
+; NewPainting : needed to know if we have paint again, after moving the canvas for example.
+
+Global MouseX_Old.d, MouseY_Old.d, x, y, mx, my, LayerId.a 
+; mx, my : position of mouse in the canvas-screen
 
 Global blend1,blend2 ; temporary // temporaire
 ; Global xx,yy,StartX1,StartY1

@@ -722,6 +722,7 @@ Repeat
                   Case #G_IE_Type 
                     Brush(Action)\Type = GetGadgetState(#G_IE_Type)
                     
+                    
                   Case #G_brushSmooth
                     Brush(Action)\Smooth = GetGadgetState(#G_brushSmooth)
                     BrushUpdateImage(0,1)
@@ -838,17 +839,16 @@ Repeat
                     BrushUpdateColor()     
                     ;}
                     
-                    ;{ Move, rotate, transform & line, gradient, fillarea for some parameters
+                    ;{ Move, rotate, transform & line, fillarea for some parameters
                     
                   Case #G_ActionXLock, #G_ActionYLock
-                    
                     OptionsIE\lockX = GetGadgetState(#G_ActionXLock)
                     OptionsIE\lockY = GetGadgetState(#G_ActionYLock)
                     
                   Case #G_ShapeParam1  
                     brush(action)\AlphaFG = GetGadgetState(#G_ShapeParam1)
                     
-                  Case #G_ActionX, #G_ActionY
+                  Case #G_ActionX, #G_ActionY ; I use the gadget #G_actionX and #G_actionY for some actions depending of the selected tool.
                     If action = #Action_Move
                       If layer(layerId)\LockMove = 0 And layer(layerid)\View = 1
                         Layer(LayerId)\x = GetGadgetState(#G_ActionX)                      
@@ -877,7 +877,6 @@ Repeat
                       brush(action)\Alpha   = GetGadgetState(#G_ActionX)
                       brush(action)\AlphaFG = GetGadgetState(#G_ActionY)
                     EndIf                  
-                    ; 
                     
                   Case #G_ActionFullLayer
                     OptionsIE\ActionForAllLayers = GetGadgetState(#G_ActionFullLayer)
@@ -888,10 +887,14 @@ Repeat
                     ;}
                     
                     ;{ Box, ellipse, line, gradient
-                    ; voir aussi au-dessus pour d'autres paramètres ! (alpha et size notamment)
+                    ; see before to see other parameters (alpha, size..° // voir aussi au-dessus pour d'autres paramètres ! (alpha et size notamment)
                   Case #G_ActionTyp
-                    OptionsIE\ShapeTyp = GetGadgetState(#G_ActionTyp)
-                    
+                    If action  = #Action_Pipette Or action =#Action_Zoom
+                      brush(action)\type = GetGadgetState(#G_ActionTyp)
+                    Else
+                      OptionsIE\ShapeTyp = GetGadgetState(#G_ActionTyp)
+                    EndIf
+                  
                   Case #G_ActionFullLayer
                     OptionsIE\ShapeFullLayer = GetGadgetState(#G_ActionFullLayer)
                     
@@ -1045,6 +1048,7 @@ Repeat
                     Val = Val(GetGadgetText(#G_PaperScaleSG))
                     If val > 1 And val <200
                       SetGadgetState(#G_PaperScale, val)
+                      paper\scale = val
                       PaperUpdate()
                       ScreenUpdate(0)
                     EndIf
@@ -1052,14 +1056,16 @@ Repeat
                       
                   Case #G_PaperScale
                     SetGadgetText(#G_PaperScaleSG, Str(GetGadgetState(#G_PaperScale)))
+                    paper\scale = GetGadgetState(#G_PaperScale)
                     PaperUpdate()
                     ScreenUpdate(0)
                     
                   Case #G_PaperIntensity
-
+                    paper\intensity = GetGadgetState(#G_PaperIntensity)
                       
                   Case #G_PaperAlpha
                     SetGadgetText(#G_PaperAlphaSG, Str(GetGadgetState(#G_PaperAlpha)))
+                     paper\alpha = GetGadgetState(#G_PaperAlpha)
                     PaperUpdate()
                     ScreenUpdate(0)
                     
@@ -1067,6 +1073,7 @@ Repeat
                     Val = Val(GetGadgetText(#G_PaperAlphaSG))
                     If val >=0 And val <=255
                       SetGadgetState(#G_PaperAlpha, val)
+                       paper\alpha = val
                       PaperUpdate()
                       ScreenUpdate(0)
                     EndIf
@@ -1245,11 +1252,19 @@ Repeat
                 
         Case #WM_MOUSEMOVE
           
+          
         Case #WM_MOUSEWHEEL
           ; Verify if we are not over a gadget, but we are over the canvas-screen (to zoom in/out if its the case)
           If Gad= 0
             If EventType() = -1
-              If EventwParam()>0     ; I should use SetWindowCallback() for crossplatform !!!         
+              
+              If startzoom = 0
+                startzoom = 1
+                OldCanvasX = mx - canvasX
+                OldCanvasY = my - canvasY
+              EndIf
+              
+              If EventwParam()>0     ; I should use SetWindowCallback() or bindevent() for crossplatform !!!         
                 If OptionsIE\zoom <5000
                   OptionsIE\zoom=OptionsIE\zoom +10
                   ScreenZoom()
@@ -1275,6 +1290,7 @@ Repeat
           ; clic = 0
           If Gad =0
             MouseClic = 0
+            startzoom = 0
             
             If MoveCanvas = 0
               
@@ -1294,14 +1310,14 @@ Repeat
             If paint = 1
               paint = 0 
               
-              ;Layer_updateUi(layerId) ; update the gadget-layer current
-;                         
+              ; Layer_updateUi(layerId) ; update the gadget-layer current
+                       
               If (layer(layerid)\MaskAlpha >= 1 And layer(layerid)\MaskAlpha < 3) Or layer(layerid)\typ =#Layer_TypBG Or OptionsIE\SelectAlpha = 1
                 Newpainting = 1
                 ScreenUpdate()
               EndIf
               
-              ; on modifie le tableau des stroke    
+              ; change the stroke array // on modifie le tableau des stroke    
               n = ArraySize(Stroke())
               If n < OptionsIE\Maxundo
                 StrokeId +1
@@ -1314,10 +1330,10 @@ Repeat
                 EndIf              
               EndIf
               
-              ; on sauve pour l'undo
+              ; save for undo // on sauve pour l'undo
               ; ImageForUndo()
               
-              ; on lave le pinceau si besoin
+              ; wash the beush (set the initial color ) // on lave le pinceau si besoin
               If Brush(Action)\Wash
                 Brush(Action)\Color = RGB(Brush(Action)\ColorBG\R,Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B)
                 BrushResetColor()
@@ -1346,7 +1362,7 @@ Repeat
         
   Until event = 0 Or event = #WM_LBUTTONDOWN Or event = #WM_LBUTTONUP
   
-  IncludeFile "loop_mousekeyb.pb"
+  IncludeFile "loop_mousekeyb.pb" ; event paint, erase...
   
   ; confirm exit
   If quit = 1
@@ -1386,8 +1402,8 @@ End
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1320
-; FirstLine = 415
-; Folding = hHQQAAAAvTpPgZAAIAQhB9+j0+
+; CursorPosition = 1253
+; FirstLine = 49
+; Folding = hHTQAAAAuTJJAYCCQAMCC9-G38
 ; EnableXP
 ; EnableUnicode

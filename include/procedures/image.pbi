@@ -3,19 +3,19 @@
 
 ; MOdule by Wilbert
 DeclareModule Premultiply
- 
+  
   ; 32 bits RGBA or BGRA pixel buffer
- 
+  
   Declare PremultiplyPixels(*PixelBuffer32, NumPixels)
   Declare UnpremultiplyPixels(*PixelBuffer32, NumPixels)
- 
+  
 EndDeclareModule
 
 Module Premultiply
- 
+  
   EnableASM
   DisableDebugger
- 
+  
   CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
     Macro rax : eax : EndMacro
     Macro rbx : ebx : EndMacro
@@ -23,7 +23,7 @@ Module Premultiply
     Macro rdx : edx : EndMacro
     Macro rsi : esi : EndMacro
   CompilerEndIf
- 
+  
   Procedure PremultiplyPixels(*PixelBuffer32, NumPixels)
     lea rax, [premultiply.l_premultiplyTable]
     mov rdx, *PixelBuffer32
@@ -50,7 +50,7 @@ Module Premultiply
     pop rsi
     pop rbx   
   EndProcedure
- 
+  
   Procedure UnpremultiplyPixels(*PixelBuffer32, NumPixels)
     lea rax, [premultiply.l_premultiplyTable + 0x10000]
     mov rdx, *PixelBuffer32
@@ -79,7 +79,7 @@ Module Premultiply
     pop rsi
     pop rbx
   EndProcedure
- 
+  
   Procedure FillTable()
     lea rdx, [premultiply.l_premultiplyTable]
     push rbx
@@ -114,13 +114,13 @@ Module Premultiply
     !jnz premultiply.l_filltable1
     pop rbx
   EndProcedure
- 
+  
   FillTable()
- 
+  
   DataSection
     !premultiply.l_premultiplyTable: times 131072 db 0
   EndDataSection
- 
+  
 EndModule
 
 
@@ -130,7 +130,7 @@ Procedure UnPreMultiplyAlpha(image)
   
   ; by Chi, english forum
   
- If StartDrawing(ImageOutput(image))
+  If StartDrawing(ImageOutput(image))
     DrawingMode(#PB_2DDrawing_AllChannels)
     For y=0 To ImageHeight(image)-1
       For x=0 To ImageWidth(image)-1
@@ -149,8 +149,8 @@ EndProcedure
 Procedure ResizeImage2_(image, w, h, mode=#PB_Image_Smooth)
   
   ResizeImage(image, w, h, mode)
-   ; add a brush parameter : usepremul (by defaut = 1)
- ; image = UnPreMultiplyAlpha(image)
+  ; add a brush parameter : usepremul (by defaut = 1)
+  ; image = UnPreMultiplyAlpha(image)
   
   ; ProcedureReturn image
 EndProcedure
@@ -189,39 +189,38 @@ Macro IE_SetImageOutput(Image,a1=0)
     Buffer = DrawingBuffer()
     
     If Buffer <> 0
-    
-    ;Organisation du buffer :
-    pixelFormat = DrawingBufferPixelFormat()
-    ; pixelFormat va te donner une constante car sa peut varier ; Voir la documentation
-    
-    lineLength = DrawingBufferPitch();Longueur d'une ligne
-    
-    If pixelFormat = #PB_PixelFormat_32Bits_BGR | #PB_PixelFormat_ReversedY
       
-      For i = a1 To W-(1+a1) ;Pour chaque ligne
+      ;Organisation du buffer :
+      pixelFormat = DrawingBufferPixelFormat()
+      ; pixelFormat va te donner une constante car sa peut varier ; Voir la documentation
+      
+      lineLength = DrawingBufferPitch();Longueur d'une ligne
+      
+      If pixelFormat = #PB_PixelFormat_32Bits_BGR | #PB_PixelFormat_ReversedY
         
-        For j = a1 To H-(1+a1) ; Pour chaque colonne (donc pour chaque pixel) :
-  
+        For i = a1 To W-(1+a1) ;Pour chaque ligne
+          
+          For j = a1 To H-(1+a1) ; Pour chaque colonne (donc pour chaque pixel) :
+            
 EndMacro
-
+          
 Macro IE_SetImageOutput1(mode=0)
-  
-        Next j
+            
+          Next j
+          
+        Next i
+        
+      EndIf
       
-      Next i
-    
+      StopDrawing()
     EndIf
     
-    StopDrawing()
   EndIf
   
-EndIf
-
-If mode =0
-  ScreenUpdate()
-EndIf
-
-
+  If mode =0
+    ScreenUpdate()
+  EndIf
+  
 EndMacro
 
 
@@ -251,7 +250,7 @@ Macro IE_GetImagePixelColor(img)
     
     StopDrawing()
   EndIf
-
+  
 EndMacro
 
 
@@ -266,7 +265,7 @@ Procedure IE_InvertColor(img, al = 0, col = 1)
     ; Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
     
     DrawingMode(#PB_2DDrawing_AllChannels)
-
+    
     For y = 0 To h - 1
       For x = 0 To w - 1
         
@@ -283,11 +282,11 @@ Procedure IE_InvertColor(img, al = 0, col = 1)
           b =  Blue(pixel(x, y))
           
         EndIf
-      
+        
         If al = 0
           a = alph(x,y) 
           color = RGBA(r,g,b,a)
-                   
+          
         Else
           
           a = 255 - alph(x,y)          
@@ -325,17 +324,17 @@ Procedure IE_ColorBalance1(img, r1, g1, b1, mode= 0)
   r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
   
   ; on effectue l'opération 
-    ;Rouge = Rouge * Echelle + Rouge2 * (1-Echelle)
-    r = r * r2 + r1 *(1-r2) 
-    Check0(r)
-    
-    
-    g = g * g2 + g1 *(1-g2)
-    Check0(g)
-    
-    b = b * b2 + b1 *(1-b2)     
-    Check0(b)
-    
+  ;Rouge = Rouge * Echelle + Rouge2 * (1-Echelle)
+  r = r * r2 + r1 *(1-r2) 
+  Check0(r)
+  
+  
+  g = g * g2 + g1 *(1-g2)
+  Check0(g)
+  
+  b = b * b2 + b1 *(1-b2)     
+  Check0(b)
+  
   
   ; on poke le pixel
   PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
@@ -343,14 +342,14 @@ Procedure IE_ColorBalance1(img, r1, g1, b1, mode= 0)
   PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
   
   
-   IE_SetImageOutput1(1)
+  IE_SetImageOutput1(1)
   
   If mode = 0
     
     ScreenUpdate()
     
   EndIf
-    
+  
   ProcedureReturn img  
 EndProcedure
 
@@ -395,7 +394,7 @@ Procedure IE_ColorBalance(img, r1, g1, b1, mode= 0)
     ElseIf (r+b)/2 < 250
       
       r = r + r1
-    Check(r,255)
+      Check(r,255)
       
       ;                     g = g + g1
       ;                     If g >255
@@ -403,7 +402,7 @@ Procedure IE_ColorBalance(img, r1, g1, b1, mode= 0)
       ;                     EndIf                  
       
       b = b + b1
-    Check(rb,255)
+      Check(rb,255)
       
     ElseIf (g+b)/2 < 250
       
@@ -413,10 +412,10 @@ Procedure IE_ColorBalance(img, r1, g1, b1, mode= 0)
       ;                     EndIf                  
       
       g = g + g1
-    Check(g,255)
+      Check(g,255)
       
       b = b + b1
-    Check(b,255)
+      Check(b,255)
       
       
     EndIf
@@ -433,61 +432,61 @@ Procedure IE_ColorBalance(img, r1, g1, b1, mode= 0)
   
   ;{ old
   
-;   IE_GetImagePixelColor(img)
-;   
-;   ; et on effectue l'operation
-;   If StartDrawing(ImageOutput(img))
-;     
-;     For y = 0 To h - 1
-;       
-;       For x = 0 To w - 1
-;         
-;         
-;         r1 = Red(pixel(x, y)) 
-;         g1 = Green(pixel(x, y))
-;         b1 = Blue(pixel(x, y))
-;         
-;         ;If (r+g+b)/3 < 240 
-;         if (r1+g1+b1)/3 < 240
-;           r1 + r   
-;           If r1 > 255
-;             r1 = 255
-;           EndIf
-;           
-;           g1  + g
-;           If g1 > 255
-;             g1 = 255
-;           EndIf
-;           
-;           g1 + b
-;           If b1 > 255
-;             b1 = 255
-;           EndIf
-;         EndIf
-;         
-;         color = RGB(r1,g1,b1)
-;         Plot(x, y, color)
-;         
-;       Next
-;       
-;     Next
-;     
-;     StopDrawing()
-;     
-;   EndIf
-;}
-
+  ;   IE_GetImagePixelColor(img)
+  ;   
+  ;   ; et on effectue l'operation
+  ;   If StartDrawing(ImageOutput(img))
+  ;     
+  ;     For y = 0 To h - 1
+  ;       
+  ;       For x = 0 To w - 1
+  ;         
+  ;         
+  ;         r1 = Red(pixel(x, y)) 
+  ;         g1 = Green(pixel(x, y))
+  ;         b1 = Blue(pixel(x, y))
+  ;         
+  ;         ;If (r+g+b)/3 < 240 
+  ;         if (r1+g1+b1)/3 < 240
+  ;           r1 + r   
+  ;           If r1 > 255
+  ;             r1 = 255
+  ;           EndIf
+  ;           
+  ;           g1  + g
+  ;           If g1 > 255
+  ;             g1 = 255
+  ;           EndIf
+  ;           
+  ;           g1 + b
+  ;           If b1 > 255
+  ;             b1 = 255
+  ;           EndIf
+  ;         EndIf
+  ;         
+  ;         color = RGB(r1,g1,b1)
+  ;         Plot(x, y, color)
+  ;         
+  ;       Next
+  ;       
+  ;     Next
+  ;     
+  ;     StopDrawing()
+  ;     
+  ;   EndIf
+  ;}
+  
   If mode = 0
     
     ScreenUpdate()
     
   EndIf
-    
+  
   ProcedureReturn img  
 EndProcedure
 
 Procedure IE_Desaturation(img)
-    
+  
   IE_GetImagePixelColor(img)
   
   ; et on effectue l'operation
@@ -517,47 +516,47 @@ EndProcedure
 
 
 ProcedureDLL.i IE_Contrast(img, contrast, brightness, mode=0) ; Constrater la couleur, échelle négative pour diminuer et positive pour augmenter.
-   
-   IE_SetImageOutput(img)
-   
-   Echelle.d  = contrast/100
-   EchelleB.d = brightness/100
-   
-   ; on lit le pixels
-   b = PeekA(Buffer + 4 * i + j * lineLength)    ;Bleu
-   g = PeekA(Buffer + 4 * i + j * lineLength + 1);Vert
-   r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
-   
-   ;    Rouge = Couleur & $FF
-   ;    Vert = Couleur >> 8 & $FF
-   ;    Bleu = Couleur >> 16 & $FF
-   ;    Alpha = Couleur >> 24
-   
-   r = (r * Echelle  + 127 * (1 - Echelle)) * EchelleB
-   g = (g * Echelle  + 127 * (1 - Echelle)) * EchelleB
-   b = (b * Echelle  + 127 * (1 - Echelle)) * EchelleB
-   
-   Check0(r)
-   Check0(g)
-   Check0(b)
-   
-   ; (r | g <<8 | b << 16 | Alpha << 24)
-   
-   ; on poke le pixel
-   PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
-   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
-   PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
-   
-   
-   IE_SetImageOutput1(1)
-   
-   If mode = 0
-     
-     ScreenUpdate()
-     
-   EndIf
-   
-   ProcedureReturn img  
+  
+  IE_SetImageOutput(img)
+  
+  Echelle.d  = contrast/100
+  EchelleB.d = brightness/100
+  
+  ; on lit le pixels
+  b = PeekA(Buffer + 4 * i + j * lineLength)    ;Bleu
+  g = PeekA(Buffer + 4 * i + j * lineLength + 1);Vert
+  r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
+  
+  ;    Rouge = Couleur & $FF
+  ;    Vert = Couleur >> 8 & $FF
+  ;    Bleu = Couleur >> 16 & $FF
+  ;    Alpha = Couleur >> 24
+  
+  r = (r * Echelle  + 127 * (1 - Echelle)) * EchelleB
+  g = (g * Echelle  + 127 * (1 - Echelle)) * EchelleB
+  b = (b * Echelle  + 127 * (1 - Echelle)) * EchelleB
+  
+  Check0(r)
+  Check0(g)
+  Check0(b)
+  
+  ; (r | g <<8 | b << 16 | Alpha << 24)
+  
+  ; on poke le pixel
+  PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
+  PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
+  PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
+  
+  
+  IE_SetImageOutput1(1)
+  
+  If mode = 0
+    
+    ScreenUpdate()
+    
+  EndIf
+  
+  ProcedureReturn img  
 EndProcedure
 
 Procedure IE_Contrast2(img, contrast, brightness, mode=0)
@@ -600,8 +599,8 @@ Procedure IE_Contrast2(img, contrast, brightness, mode=0)
     b = b - contrast
     
   EndIf
-       
-    
+  
+  
   Check(r,255)
   Check2(r,0)
   
@@ -623,7 +622,7 @@ Procedure IE_Contrast2(img, contrast, brightness, mode=0)
     ScreenUpdate()
     
   EndIf
-
+  
   ProcedureReturn img  
 EndProcedure
 
@@ -669,7 +668,7 @@ Procedure IE_Contrast1(img, contrast, brightness, mode=0)
     ScreenUpdate()
     
   EndIf
-
+  
   ProcedureReturn img  
 EndProcedure
 
@@ -687,7 +686,7 @@ Procedure IE_posterize(img,level)
   b = PeekA(Buffer + 4 * i + j * lineLength)    ;Bleu
   g = PeekA(Buffer + 4 * i + j * lineLength + 1);Vert
   r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
-    
+  
   ;r=Round(r/n1,#PB_Round_Down)
   r=r/n1
   r=r*n1
@@ -701,7 +700,7 @@ Procedure IE_posterize(img,level)
   Check0(r)
   Check0(g)
   Check0(b)
-   
+  
   ; on poke le pixel
   PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
@@ -718,7 +717,7 @@ Procedure IE_posterize2(img,n)
   
   
   n1 = 255/n 
-
+  
   If n1 <= 0
     n1 = 1
   EndIf
@@ -728,62 +727,62 @@ Procedure IE_posterize2(img,n)
   
   If w > 0 And h > 0
     
-  Dim OriginalImage(w,h)
+    Dim OriginalImage(w,h)
     
-  If StartDrawing(ImageOutput(img))
-    
-    DrawingMode(#PB_2DDrawing_AlphaBlend)
-    
-    ; on stocke dans un tableau les pixels    
-    For i = 0 To w-1
+    If StartDrawing(ImageOutput(img))
       
-      For j = 0 To h-1
-        
-        ; on stocke la couleur du pixel
-        color = Point(i,j) 
-        a = Alpha(color)
-        
-        r = Red(color)
-        g = Green(color)
-        b = Blue(color)
-        
-        r/n1
-        r*n1 
-        g/n1
-        g*n1
-        b/n1
-        b*n1
-        
-        OriginalImage(i,j) = RGBA(r,g,b,a)
-        
-      Next j
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
       
-    Next i
+      ; on stocke dans un tableau les pixels    
+      For i = 0 To w-1
+        
+        For j = 0 To h-1
+          
+          ; on stocke la couleur du pixel
+          color = Point(i,j) 
+          a = Alpha(color)
+          
+          r = Red(color)
+          g = Green(color)
+          b = Blue(color)
+          
+          r/n1
+          r*n1 
+          g/n1
+          g*n1
+          b/n1
+          b*n1
+          
+          OriginalImage(i,j) = RGBA(r,g,b,a)
+          
+        Next j
+        
+      Next i
+      
+      StopDrawing()
+      
+    EndIf
     
-    StopDrawing()
     
+    ; update l'image 
+    If StartDrawing(ImageOutput(img))  
+      
+      Box(0,0,w,h, RGB(255,255,255))
+      
+      DrawingMode(#PB_2DDrawing_AlphaChannel)
+      Box(0,0,w,h, RGBA(0,0,0,0))
+      
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
+      ; on dessine les pixels sur la nouvelle image
+      For i = 0 To w-1
+        For j = 0 To h-1
+          Plot(i,j,OriginalImage(i,j))                  
+        Next j
+      Next i              
+      StopDrawing()
+    EndIf
   EndIf
   
-  
-  ; update l'image 
-  If StartDrawing(ImageOutput(img))  
-    
-    Box(0,0,w,h, RGB(255,255,255))
-    
-    DrawingMode(#PB_2DDrawing_AlphaChannel)
-    Box(0,0,w,h, RGBA(0,0,0,0))
-    
-    DrawingMode(#PB_2DDrawing_AlphaBlend)
-    ; on dessine les pixels sur la nouvelle image
-    For i = 0 To w-1
-      For j = 0 To h-1
-        Plot(i,j,OriginalImage(i,j))                  
-      Next j
-    Next i              
-    StopDrawing()
-   EndIf
- EndIf
- 
   
   
 EndProcedure
@@ -827,99 +826,99 @@ EndProcedure
 
 ; Procedure par LSI
 ProcedureDLL.i Contraste(Couleur.i, Echelle.f) ; Constrater la couleur, échelle négative pour diminuer et positive pour augmenter.
-   Protected Rouge.i, Vert.i, Bleu.i, Alpha.i
-   
-   Rouge = Couleur & $FF
-   Vert = Couleur >> 8 & $FF
-   Bleu = Couleur >> 16 & $FF
-   Alpha = Couleur >> 24
-   Rouge * Echelle + 127 * (1 - Echelle)
-   Vert * Echelle + 127 * (1 - Echelle)
-   Bleu * Echelle + 127 * (1 - Echelle)
-   
-   If Rouge > 255 : Rouge = 255
-      ElseIf Rouge < 0 : Rouge = 0 : EndIf
-   If Vert > 255 : Vert = 255
-      ElseIf Vert < 0 : Vert = 0 : EndIf
-   If Bleu > 255 : Bleu = 255
-      ElseIf Bleu < 0 : Bleu = 0 : EndIf
-   
-   ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
- EndProcedure
- 
+  Protected Rouge.i, Vert.i, Bleu.i, Alpha.i
+  
+  Rouge = Couleur & $FF
+  Vert = Couleur >> 8 & $FF
+  Bleu = Couleur >> 16 & $FF
+  Alpha = Couleur >> 24
+  Rouge * Echelle + 127 * (1 - Echelle)
+  Vert * Echelle + 127 * (1 - Echelle)
+  Bleu * Echelle + 127 * (1 - Echelle)
+  
+  If Rouge > 255 : Rouge = 255
+    ElseIf Rouge < 0 : Rouge = 0 : EndIf
+  If Vert > 255 : Vert = 255
+    ElseIf Vert < 0 : Vert = 0 : EndIf
+  If Bleu > 255 : Bleu = 255
+    ElseIf Bleu < 0 : Bleu = 0 : EndIf
+  
+  ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
+EndProcedure
+
 ProcedureDLL.i Lumiere(Couleur.i, Echelle.f) ; Eclaicir ou foncer une couleur
-   Protected Rouge.i, Vert.i, Bleu.i, Alpha.i
-   
-   Rouge = Couleur & $FF
-   Vert = Couleur >> 8 & $FF
-   Bleu = Couleur >> 16 & $FF
-   Alpha = Couleur >> 24
-   Rouge * Echelle
-   Vert * Echelle
-   Bleu * Echelle
-   
-   If Rouge > 255 : Rouge = 255 : EndIf
-   If Vert > 255 : Vert = 255 : EndIf
-   If Bleu > 255 : Bleu = 255 : EndIf
-   
-   ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
+  Protected Rouge.i, Vert.i, Bleu.i, Alpha.i
+  
+  Rouge = Couleur & $FF
+  Vert = Couleur >> 8 & $FF
+  Bleu = Couleur >> 16 & $FF
+  Alpha = Couleur >> 24
+  Rouge * Echelle
+  Vert * Echelle
+  Bleu * Echelle
+  
+  If Rouge > 255 : Rouge = 255 : EndIf
+  If Vert > 255 : Vert = 255 : EndIf
+  If Bleu > 255 : Bleu = 255 : EndIf
+  
+  ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
 EndProcedure
 
 ProcedureDLL.i Niveau(Couleur.i, Minimum.i, Maximum.i) ; Changer les niveaux de blanc et de noir de la couleur
-   Protected Rouge.i, Vert.i, Bleu.i, Alpha.i, a.f, b.f
-   
-   If Maximum - Minimum < 0
-     m = 1
-   Else
-     m = Maximum - Minimum
-   EndIf
-   a = 255 / m
-   b = -a * Minimum
-   
-   Rouge = Couleur & $FF
-   Vert = Couleur >> 8 & $FF
-   Bleu = Couleur >> 16 & $FF
-   Alpha = Couleur >> 24
-   Rouge * a + b
-   Vert * a + b
-   Bleu * a + b
-   
-   If Rouge > 255 : Rouge = 255
-      ElseIf Rouge < 0 : Rouge = 0 : EndIf
-   If Vert > 255 : Vert = 255
-      ElseIf Vert < 0 : Vert = 0 : EndIf
-   If Bleu > 255 : Bleu = 255
-      ElseIf Bleu < 0 : Bleu = 0 : EndIf
-   
-   ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
+  Protected Rouge.i, Vert.i, Bleu.i, Alpha.i, a.f, b.f
+  
+  If Maximum - Minimum < 0
+    m = 1
+  Else
+    m = Maximum - Minimum
+  EndIf
+  a = 255 / m
+  b = -a * Minimum
+  
+  Rouge = Couleur & $FF
+  Vert = Couleur >> 8 & $FF
+  Bleu = Couleur >> 16 & $FF
+  Alpha = Couleur >> 24
+  Rouge * a + b
+  Vert * a + b
+  Bleu * a + b
+  
+  If Rouge > 255 : Rouge = 255
+    ElseIf Rouge < 0 : Rouge = 0 : EndIf
+  If Vert > 255 : Vert = 255
+    ElseIf Vert < 0 : Vert = 0 : EndIf
+  If Bleu > 255 : Bleu = 255
+    ElseIf Bleu < 0 : Bleu = 0 : EndIf
+  
+  ProcedureReturn (Rouge | Vert <<8 | Bleu << 16 | Alpha << 24)
 EndProcedure
 
 ProcedureDLL TSL(Teinte.i, Saturation.i, Luminosite.i) ; TSL (Teinte, Saturation, Luminosité) ; renvoye la couleur au format RGB
-   Protected fTeinte.f, Minimum.i, Maximum.i, Difference.i, i.i, Rouge.i, Vert.i, Bleu.i
-   fTeinte = 6*Teinte/240
-   If Luminosite =< 120
-      Maximum = Round((255*Luminosite*(1+Saturation/240)/240), #PB_Round_Nearest)
-      Minimum = Round((255*Luminosite*(1-Saturation/240)/240), #PB_Round_Nearest)
-   Else
-      Maximum = Round((255*(Luminosite*(1-Saturation/240)/240+Saturation/240)), #PB_Round_Nearest)
-      Minimum = Round((255*(Luminosite*(1+Saturation/240)/240-Saturation/240)), #PB_Round_Nearest)
-   EndIf
-   Difference = Maximum-Minimum
-   i = Round(fTeinte, #PB_Round_Nearest)
-   If i = 0
-      Rouge = Maximum : Vert = Minimum+fTeinte*Difference : Bleu = Minimum
-   ElseIf i = 1
-      Rouge = Minimum + (2-fTeinte)*Difference : Vert = Maximum : Bleu = Minimum
-   ElseIf i = 2
-      Rouge = Minimum : Vert = Maximum : Bleu = Minimum+(fTeinte-2)*Difference
-   ElseIf i = 3
-      Rouge = Minimum : Vert = Minimum+(4-fTeinte)*Difference : Bleu = Maximum
-   ElseIf i = 4
-      Rouge = Minimum + (fTeinte-4)*Difference : Vert = Minimum : Bleu = Maximum
-   Else
-      Rouge = Maximum : Vert = Minimum : Bleu = Minimum+(6-fTeinte)*Difference
-   EndIf
-   ProcedureReturn RGB(Rouge,Vert,Bleu)
+  Protected fTeinte.f, Minimum.i, Maximum.i, Difference.i, i.i, Rouge.i, Vert.i, Bleu.i
+  fTeinte = 6*Teinte/240
+  If Luminosite =< 120
+    Maximum = Round((255*Luminosite*(1+Saturation/240)/240), #PB_Round_Nearest)
+    Minimum = Round((255*Luminosite*(1-Saturation/240)/240), #PB_Round_Nearest)
+  Else
+    Maximum = Round((255*(Luminosite*(1-Saturation/240)/240+Saturation/240)), #PB_Round_Nearest)
+    Minimum = Round((255*(Luminosite*(1+Saturation/240)/240-Saturation/240)), #PB_Round_Nearest)
+  EndIf
+  Difference = Maximum-Minimum
+  i = Round(fTeinte, #PB_Round_Nearest)
+  If i = 0
+    Rouge = Maximum : Vert = Minimum+fTeinte*Difference : Bleu = Minimum
+  ElseIf i = 1
+    Rouge = Minimum + (2-fTeinte)*Difference : Vert = Maximum : Bleu = Minimum
+  ElseIf i = 2
+    Rouge = Minimum : Vert = Maximum : Bleu = Minimum+(fTeinte-2)*Difference
+  ElseIf i = 3
+    Rouge = Minimum : Vert = Minimum+(4-fTeinte)*Difference : Bleu = Maximum
+  ElseIf i = 4
+    Rouge = Minimum + (fTeinte-4)*Difference : Vert = Minimum : Bleu = Maximum
+  Else
+    Rouge = Maximum : Vert = Minimum : Bleu = Minimum+(6-fTeinte)*Difference
+  EndIf
+  ProcedureReturn RGB(Rouge,Vert,Bleu)
 EndProcedure
 
 Procedure GreyLevel(r,g,b)
@@ -961,8 +960,8 @@ Procedure IE_WinBalCol()
     
     ImageGadget(#IE_BalColNormal, 10,       yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
     ImageGadget(#IE_BalColNew,    w1 + 20,  yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
-                
-   
+    
+    
     
     yy + H1 + 10
     
@@ -979,45 +978,45 @@ Procedure IE_WinBalCol()
     
     Repeat
       
-       event = WaitWindowEvent(10)
+      event = WaitWindowEvent(10)
       
       
-       Select event
-           
-         Case #PB_Event_Gadget
-           
-           Select EventGadget()
-               
-             Case #IE_BalColRed, #IE_BalColGreen, #IE_BalColBlue
-               r1 = GetGadgetState(#IE_BalColRed)
-               g1 = GetGadgetState(#IE_BalColGreen)
-               b1 = GetGadgetState(#IE_BalColBlue)                            
-               temp = CopyImage(ImageTransf, #PB_Any)               
-               IE_ColorBalance(temp, r1, g1, b1)               
-               SetGadgetState(#IE_BalColNew, ImageID(temp))
-               If temp > #Img_Max
-                 FreeImage2(temp)
-               EndIf
-                              
-             Case #IE_BalColOk                
-               IE_ColorBalance(Layer(LayerID)\Image, r1, g1, b1)
-               If ImageTransf > #Img_Max
-                 FreeImage2(ImageTransf)
-               EndIf
-               NewPainting = 1
-               ScreenUpdate()
-               quit = 1
-               
-           EndSelect
-           
-         Case #PB_Event_CloseWindow
-           quit = 1
+      Select event
+          
+        Case #PB_Event_Gadget
+          
+          Select EventGadget()
+              
+            Case #IE_BalColRed, #IE_BalColGreen, #IE_BalColBlue
+              r1 = GetGadgetState(#IE_BalColRed)
+              g1 = GetGadgetState(#IE_BalColGreen)
+              b1 = GetGadgetState(#IE_BalColBlue)                            
+              temp = CopyImage(ImageTransf, #PB_Any)               
+              IE_ColorBalance(temp, r1, g1, b1)               
+              SetGadgetState(#IE_BalColNew, ImageID(temp))
+              If temp > #Img_Max
+                FreeImage2(temp)
+              EndIf
+              
+            Case #IE_BalColOk                
+              IE_ColorBalance(Layer(LayerID)\Image, r1, g1, b1)
+              If ImageTransf > #Img_Max
+                FreeImage2(ImageTransf)
+              EndIf
+              NewPainting = 1
+              ScreenUpdate()
+              quit = 1
+              
+          EndSelect
+          
+        Case #PB_Event_CloseWindow
+          quit = 1
           
       EndSelect
       
       
     Until quit = 1
-       
+    
     CloseWindow(#Win_Contrast)
     
   EndIf
@@ -1058,7 +1057,7 @@ Procedure IE_WinPosterize()
     Repeat
       
       event = WaitWindowEvent(10)
-            
+      
       Select event
           
         Case #PB_Event_Gadget
@@ -1114,7 +1113,7 @@ Procedure IE_WinPosterize()
       
       
     Until quit =1
-        
+    
     
     CloseWindow(#Win_Contrast)
     
@@ -1139,8 +1138,8 @@ Procedure IE_WinContrast()
     
     ImageGadget(#IE_BalColNormal, 10,       yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
     ImageGadget(#IE_BalColNew,    w1 + 20,  yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
-                
-   
+    
+    
     
     yy + H1 + 10
     
@@ -1177,57 +1176,57 @@ Procedure IE_WinContrast()
           
           Select EventGadget()
               
-                Case #IE_ContrastSG, #IE_ContrastTB, #IE_BrightnessSG, #IE_BrightnessTB                
-                              
-                  If EventGadget = #IE_ContrastSG
-                    contrast = Val(GetGadgetText(#IE_ContrastSG))
-                  Else
-                    contrast = GetGadgetState(#IE_ContrastTB) 
-                  EndIf
-                  If contrast> 200
-                    contrast = 200
-                  EndIf
-                  If contrast < 0
-                    contrast = 0
-                  EndIf                  
-                  SetGadgetText(#IE_ContrastSG, Str(contrast))
-                  SetGadgetState(#IE_ContrastTB, contrast)
-                                  
-                  If EventGadget = #IE_BrightnessSG
-                    brightness = Val(GetGadgetText(#IE_ContrastSG))
-                  Else
-                    brightness = GetGadgetState(#IE_BrightnessTB) 
-                  EndIf
-                   If brightness> 200
-                    brightness = 200
-                  EndIf
-                  If brightness < 0
-                    brightness = 0
-                  EndIf 
-                  SetGadgetText(#IE_BrightnessSG, Str(brightness))
-                  SetGadgetState(#IE_BrightnessTB, brightness)
-                
-                
-                
-                temp = CopyImage(ImageTransf, #PB_Any)
-                temp = IE_Contrast(temp, contrast, brightness,1)
-                
-                SetGadgetState(#IE_BalColNew, ImageID(temp))
-                If temp > #Img_Max
-                  FreeImage2(temp)
-                EndIf
-               
-                
-              Case #IE_ContrastOk  
-                IE_Contrast(Layer(LayerID)\Image, contrast, brightness)
-                If ImageTransf > #Img_Max
-                  FreeImage2(ImageTransf)
-                EndIf
-                NewPainting = 1
-                ScreenUpdate()
-                quit = 1
-                
-          
+            Case #IE_ContrastSG, #IE_ContrastTB, #IE_BrightnessSG, #IE_BrightnessTB                
+              
+              If EventGadget = #IE_ContrastSG
+                contrast = Val(GetGadgetText(#IE_ContrastSG))
+              Else
+                contrast = GetGadgetState(#IE_ContrastTB) 
+              EndIf
+              If contrast> 200
+                contrast = 200
+              EndIf
+              If contrast < 0
+                contrast = 0
+              EndIf                  
+              SetGadgetText(#IE_ContrastSG, Str(contrast))
+              SetGadgetState(#IE_ContrastTB, contrast)
+              
+              If EventGadget = #IE_BrightnessSG
+                brightness = Val(GetGadgetText(#IE_ContrastSG))
+              Else
+                brightness = GetGadgetState(#IE_BrightnessTB) 
+              EndIf
+              If brightness> 200
+                brightness = 200
+              EndIf
+              If brightness < 0
+                brightness = 0
+              EndIf 
+              SetGadgetText(#IE_BrightnessSG, Str(brightness))
+              SetGadgetState(#IE_BrightnessTB, brightness)
+              
+              
+              
+              temp = CopyImage(ImageTransf, #PB_Any)
+              temp = IE_Contrast(temp, contrast, brightness,1)
+              
+              SetGadgetState(#IE_BalColNew, ImageID(temp))
+              If temp > #Img_Max
+                FreeImage2(temp)
+              EndIf
+              
+              
+            Case #IE_ContrastOk  
+              IE_Contrast(Layer(LayerID)\Image, contrast, brightness)
+              If ImageTransf > #Img_Max
+                FreeImage2(ImageTransf)
+              EndIf
+              NewPainting = 1
+              ScreenUpdate()
+              quit = 1
+              
+              
           EndSelect
           
         Case #PB_Event_CloseWindow
@@ -1237,11 +1236,11 @@ Procedure IE_WinContrast()
       
     Until quit =1
     
-   
+    
     
     CloseWindow(#Win_Contrast)
     
-   
+    
     
     
     
@@ -1270,31 +1269,31 @@ Procedure IE_WinLevel()
     SetGadgetState(#IE_ContrastTB,0)
     
     ButtonGadget(#IE_ContrastOk,WindowWidth(#Win_Level)/2-30,WindowHeight(#Win_Level)-30,60,20,lang("Ok"))
-
-;     Repeat
-;       
-;       event = WaitWindowEvent(10)
-;       
-;       Select event
-;           
-;         Case #PB_Event_Gadget
-;           
-;           Select EventGadget()
-;               
-;            
-;               
-;           EndSelect
-;           
-;         Case #PB_Event_CloseWindow
-;           quit = 1
-;           
-;       EndSelect
-;       
-;     Until quit = 1
-;     
-;     
-;     CloseWindow(#Win_Contrast)
-;     OptionsIE\Shape=0
+    
+    ;     Repeat
+    ;       
+    ;       event = WaitWindowEvent(10)
+    ;       
+    ;       Select event
+    ;           
+    ;         Case #PB_Event_Gadget
+    ;           
+    ;           Select EventGadget()
+    ;               
+    ;            
+    ;               
+    ;           EndSelect
+    ;           
+    ;         Case #PB_Event_CloseWindow
+    ;           quit = 1
+    ;           
+    ;       EndSelect
+    ;       
+    ;     Until quit = 1
+    ;     
+    ;     
+    ;     CloseWindow(#Win_Contrast)
+    ;     OptionsIE\Shape=0
     
   EndIf
   
@@ -1314,7 +1313,7 @@ Procedure MirorImage(Img,mirorH=1)
   Height = ImageHeight(Img)
   
   NewImg = CreateImage(#PB_Any, Width, Height, 32, #PB_Image_Transparent)
-
+  
   If mirorH = 1 ; miroir horizontal
     
     If NewImg
@@ -1339,7 +1338,7 @@ Procedure MirorImage(Img,mirorH=1)
     
   Else ; miroir vertical
     
-     If NewImg
+    If NewImg
       
       If StartDrawing(ImageOutput(NewImg))
         DrawingMode(#PB_2DDrawing_AlphaBlend)
@@ -1366,9 +1365,9 @@ Procedure MirorImage(Img,mirorH=1)
     Newpainting = 1
     ScreenUpdate(0)
   EndIf
-
-EndProcedure
   
+EndProcedure
+
 ; Rotation
 Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'un angle en ° - rotation of an image, in degres.
   
@@ -1377,9 +1376,9 @@ Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'
   
   Protected bmi.BITMAPINFO, bmi2.BITMAPINFO, hdc.l, NewImageID, Mem, n, nn, bm.BITMAP
   
-;   If IsImage(NewImageID)
-;     FreeImage(NewImageID)
-;   EndIf
+  ;   If IsImage(NewImageID)
+  ;     FreeImage(NewImageID)
+  ;   EndIf
   
   
   Angle = Angle * #PI / 180 ; On convertit en radian
@@ -1398,17 +1397,17 @@ Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'
   bmi\bmiHeader\biBitCount = 32
   
   bmi2\bmiHeader\biSize = SizeOf(BITMAPINFOHEADER)
-;   Select Mode
-;     Case 1
-;       bmi2\bmiHeader\biWidth = bm\bmWidth
-;       bmi2\bmiHeader\biHeight = bm\bmHeight
-;     Case 2
-      bmi2\bmiHeader\biWidth = Round(Sqr(bm\bmWidth * bm\bmWidth + bm\bmHeight * bm\bmHeight), 1)
-      bmi2\bmiHeader\biHeight = bmi2\bmiHeader\biWidth
-;     Default
-;       bmi2\bmiHeader\biWidth = Round(bm\bmWidth * Abs(Cos) + bm\bmHeight * Abs(Sin), 1)
-;       bmi2\bmiHeader\biHeight = Round(bm\bmHeight * Abs(Cos) + bm\bmWidth * Abs(Sin), 1)
-;   EndSelect
+  ;   Select Mode
+  ;     Case 1
+  ;       bmi2\bmiHeader\biWidth = bm\bmWidth
+  ;       bmi2\bmiHeader\biHeight = bm\bmHeight
+  ;     Case 2
+  bmi2\bmiHeader\biWidth = Round(Sqr(bm\bmWidth * bm\bmWidth + bm\bmHeight * bm\bmHeight), 1)
+  bmi2\bmiHeader\biHeight = bmi2\bmiHeader\biWidth
+  ;     Default
+  ;       bmi2\bmiHeader\biWidth = Round(bm\bmWidth * Abs(Cos) + bm\bmHeight * Abs(Sin), 1)
+  ;       bmi2\bmiHeader\biHeight = Round(bm\bmHeight * Abs(Cos) + bm\bmWidth * Abs(Sin), 1)
+  ;   EndSelect
   bmi2\bmiHeader\biPlanes = 1
   bmi2\bmiHeader\biBitCount = 32
   
@@ -1419,7 +1418,7 @@ Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'
       hdc = CreateCompatibleDC_(GetDC_(ImageID)) ; windows only
       If hdc
         GetDIBits_(hdc, ImageID, 0, bm\bmHeight, Mem, @bmi, #DIB_RGB_COLORS) ; on envoie la liste dans l'image / windows only
-        DeleteDC_(hdc) ; windows only
+        DeleteDC_(hdc)                                                       ; windows only
       EndIf
       
       CX1 = bm\bmWidth - 1
@@ -1549,7 +1548,7 @@ Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'
     FreeMemory(Mem)
     
     ; NewImageID = UnPreMultiplyAlpha(NewImageID)
-
+    
   EndIf
   
   ProcedureReturn NewImageID
@@ -1618,7 +1617,7 @@ Procedure cb4(x,y,top,bottom)
   If((x1+y1)%3)
     ProcedureReturn top
   EndIf
- 
+  
   ProcedureReturn bottom
 EndProcedure
 Procedure cb3(x,y,top,bottom)
@@ -1643,11 +1642,11 @@ Procedure cb_isometric(x,y,top,bottom)
   EndIf
 EndProcedure
 Procedure cb2(x,y,top,bottom)
- 
+  
   If((x+y)%(#thickness*2)>=#thickness)
     ProcedureReturn top
   EndIf
- 
+  
   ProcedureReturn bottom
 EndProcedure
 
@@ -1658,16 +1657,16 @@ EndProcedure
 
 ;{ filtre, mask...
 Procedure Filtre_MaskAlpha(x, y, CouleurSource, CouleurDestination)
-   ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
- EndProcedure
- 
+  ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
+EndProcedure
+
 Procedure Filtre_AlphaSel(x, y, CouleurSource, CouleurDestination)
-   ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
+  ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
 EndProcedure
 
 Procedure Filtre_MelangeAlpha2(x, y, CouleurSource, CouleurDestination) ;; filter To mix alpha for the eraser tool
-   ; By Le Soldat inconnu
-   ; modif by blendman
+                                                                        ; By Le Soldat inconnu
+                                                                        ; modif by blendman
   If Alpha(CouleurDestination)-Alpha(CouleurSource)>=0    
     ProcedureReturn RGBA(Red(CouleurDestination), Green(CouleurDestination), Blue(CouleurDestination), Alpha(CouleurDestination)-Alpha(CouleurSource))
   Else
@@ -1676,8 +1675,8 @@ Procedure Filtre_MelangeAlpha2(x, y, CouleurSource, CouleurDestination) ;; filte
 EndProcedure
 
 Procedure FiltreMelangeAlpha2(x, y, SourceColor, TargetColor) ; filter To mix alpha for the eraser tool
-  ; By Le Soldat inconnu
-  ; modif by blendman
+                                                              ; By Le Soldat inconnu
+                                                              ; modif by blendman
   If Alpha(TargetColor) - Alpha(SourceColor) >= 0    
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha(TargetColor)-Alpha(SourceColor))
   Else
@@ -1725,9 +1724,9 @@ Procedure FilterLight(x, y, SourceColor, TargetColor)
   If A > 255
     A= 255
   ElseIf A = 0
-     A = Alpha(TargetColor) 
+    A = Alpha(TargetColor) 
   EndIf
-   ;A = Alpha(TargetColor) 
+  ;A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
 
@@ -1750,12 +1749,12 @@ Procedure FilterColor(x, y, SourceColor, TargetColor)
     B = (B+B1)
   EndIf  
   
-;   A = Alpha(SourceColor) * Alpha(TargetColor) 
-;   If A > 255
-;     A= 255
-;   ElseIf A = 0
-;      A = Alpha(TargetColor) 
-;   EndIf
+  ;   A = Alpha(SourceColor) * Alpha(TargetColor) 
+  ;   If A > 255
+  ;     A= 255
+  ;   ElseIf A = 0
+  ;      A = Alpha(TargetColor) 
+  ;   EndIf
   A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
@@ -1778,12 +1777,12 @@ Procedure FilterMagicWitch(x, y, SourceColor, TargetColor)
     B+B1/2
   EndIf  
   
-;   A = Alpha(SourceColor) * Alpha(TargetColor) 
-;   If A > 255
-;     A= 255
-;   ElseIf A = 0
-;      A = Alpha(TargetColor) 
-;   EndIf
+  ;   A = Alpha(SourceColor) * Alpha(TargetColor) 
+  ;   If A > 255
+  ;     A= 255
+  ;   ElseIf A = 0
+  ;      A = Alpha(TargetColor) 
+  ;   EndIf
   A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
@@ -1808,14 +1807,14 @@ Procedure FilterDark(x, y, SourceColor, TargetColor)
   
   ProcedureReturn RGBA(R,G,B,A)  
 EndProcedure
-  
+
 Procedure FilterRed(x, y, SourceColor, TargetColor)
-    ; Ne modifie que la composante rouge de la Source
-    ProcedureReturn RGBA(Red(SourceColor), Green(TargetColor), Blue(TargetColor), Alpha(TargetColor))
-  EndProcedure
- 
-  
-  
+  ; Ne modifie que la composante rouge de la Source
+  ProcedureReturn RGBA(Red(SourceColor), Green(TargetColor), Blue(TargetColor), Alpha(TargetColor))
+EndProcedure
+
+
+
 Procedure FiltreSmudge(x, y, SourceColor, TargetColor) 
   
   If Alpha(TargetColor) - Alpha(SourceColor) >= 0  
@@ -1858,26 +1857,26 @@ EndProcedure
 Procedure FilterLine(x, y, SourceColor, TargetColor)
   
   ; If Alpha(SourceColor)>0
-    u.a = 15
-    v = Brush(action)\Filter
-    If (x+y)%u<=6
-      ProcedureReturn TargetColor
-    EndIf
-    xn=x+v; Random(u)-Random(u)
-    yn=y+v; Random(u)-Random(u)
-    If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight()
-      ProcedureReturn TargetColor
-    EndIf    
-    ProcedureReturn Point(xn,yn)
+  u.a = 15
+  v = Brush(action)\Filter
+  If (x+y)%u<=6
+    ProcedureReturn TargetColor
+  EndIf
+  xn=x+v; Random(u)-Random(u)
+  yn=y+v; Random(u)-Random(u)
+  If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight()
+    ProcedureReturn TargetColor
+  EndIf    
+  ProcedureReturn Point(xn,yn)
   ; EndIf
   
 EndProcedure
 
 Procedure PixelFilterCallback(x, y, SourceColor, TargetColor)
-   #pixelSize=5
-   xn=#pixelSize*(x/#pixelSize)
-   yn=#pixelSize*(y/#pixelSize)
-   ProcedureReturn Point(xn,yn)
+  #pixelSize=5
+  xn=#pixelSize*(x/#pixelSize)
+  yn=#pixelSize*(y/#pixelSize)
+  ProcedureReturn Point(xn,yn)
 EndProcedure
 
 Procedure SetBlurRadius(radius)
@@ -1895,72 +1894,72 @@ Procedure BlurFilter(x, y, SourceColor, TargetColor)
   Shared BlurLayer()
   
   Protected.w r, g, b
-   For yn=y - BlurRadius To y + BlurRadius
-      For xn=x - BlurRadius To x + BlurRadius
-         If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight() ;Or (xn=x And yn=y)
-            Continue
-         EndIf
-         
-         If Not BlurLayer(xn, yn)
-            BlurLayer(xn, yn)=Point(xn, yn)
-         EndIf
-         cn=BlurLayer(xn, yn)
-         d=Sqr((xn-x)*(xn-x)+(yn-y)*(yn-y))
-         k.f=BlurFactor;Cos((d/(1+BlurRadius))*0.5*#PI)
-         ak.f=Alpha(cn)/ 255         
-         r + Red(cn) * BlurFactor * ak
-         g + Green(cn) * BlurFactor * ak
-         b + Blue(cn) * BlurFactor * ak
-      Next
-   Next
-   
-;    
-   If Alpha(TargetColor) - Alpha(SourceColor) < 0  
-     res=RGBA(r, g, b, Alpha(TargetColor)-Alpha(SourceColor))
-   Else
+  For yn=y - BlurRadius To y + BlurRadius
+    For xn=x - BlurRadius To x + BlurRadius
+      If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight() ;Or (xn=x And yn=y)
+        Continue
+      EndIf
+      
+      If Not BlurLayer(xn, yn)
+        BlurLayer(xn, yn)=Point(xn, yn)
+      EndIf
+      cn=BlurLayer(xn, yn)
+      d=Sqr((xn-x)*(xn-x)+(yn-y)*(yn-y))
+      k.f=BlurFactor;Cos((d/(1+BlurRadius))*0.5*#PI)
+      ak.f=Alpha(cn)/ 255         
+      r + Red(cn) * BlurFactor * ak
+      g + Green(cn) * BlurFactor * ak
+      b + Blue(cn) * BlurFactor * ak
+    Next
+  Next
+  
+  ;    
+  If Alpha(TargetColor) - Alpha(SourceColor) < 0  
+    res=RGBA(r, g, b, Alpha(TargetColor)-Alpha(SourceColor))
+  Else
     res=RGBA(r, g, b, Alpha(TargetColor))
   EndIf
-   res=RGBA(r, g, b, Alpha(TargetColor))
-   
-   ProcedureReturn res
+  res=RGBA(r, g, b, Alpha(TargetColor))
+  
+  ProcedureReturn res
 EndProcedure
 
 Procedure BlurFilterSpace(x, y, SourceColor, TargetColor)
-   Global BlurRadius
-   Global BlurFactor.f
-   Shared BlurLayer()
-   
-   Protected.w r, g, b
-   For yn=y - BlurRadius To y + BlurRadius
-      For xn=x - BlurRadius To x + BlurRadius
-         If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight() ;Or (xn=x And yn=y)
-            Continue
-         EndIf
-         
-         If Not BlurLayer(xn, yn)
-            BlurLayer(xn, yn)=Point(xn, yn)
-         EndIf
-         cn=BlurLayer(xn, yn)
-         ;d=Sqr((xn-x)*(xn-x)+(yn-y)*(yn-y))
-         ;k.f=BlurFactor;Cos((d/(1+BlurRadius))*0.5*#PI)
-         ak.f=Alpha(cn) / 255         
-         r + Red(cn) * BlurFactor * ak
-         g + Green(cn) * BlurFactor * ak
-         b + Blue(cn) * BlurFactor * ak
-      Next
-   Next
-   
-   
+  Global BlurRadius
+  Global BlurFactor.f
+  Shared BlurLayer()
+  
+  Protected.w r, g, b
+  For yn=y - BlurRadius To y + BlurRadius
+    For xn=x - BlurRadius To x + BlurRadius
+      If xn<0 Or xn>=OutputWidth() Or yn<0 Or yn>=OutputHeight() ;Or (xn=x And yn=y)
+        Continue
+      EndIf
+      
+      If Not BlurLayer(xn, yn)
+        BlurLayer(xn, yn)=Point(xn, yn)
+      EndIf
+      cn=BlurLayer(xn, yn)
+      ;d=Sqr((xn-x)*(xn-x)+(yn-y)*(yn-y))
+      ;k.f=BlurFactor;Cos((d/(1+BlurRadius))*0.5*#PI)
+      ak.f=Alpha(cn) / 255         
+      r + Red(cn) * BlurFactor * ak
+      g + Green(cn) * BlurFactor * ak
+      b + Blue(cn) * BlurFactor * ak
+    Next
+  Next
+  
+  
   If Alpha(TargetColor) - Alpha(SourceColor) >= 0  
-     res=RGBA(r, g, b, Alpha(TargetColor)-Alpha(SourceColor))
-     res=RGBA(r, g, b, Alpha(SourceColor))
-     res=RGBA(r, g, b, ak)
-   Else
+    res=RGBA(r, g, b, Alpha(TargetColor)-Alpha(SourceColor))
+    res=RGBA(r, g, b, Alpha(SourceColor))
+    res=RGBA(r, g, b, ak)
+  Else
     res=RGBA(r, g, b, 0)
   EndIf
-   
-   
-   ProcedureReturn res
+  
+  
+  ProcedureReturn res
 EndProcedure
 
 Procedure solEffect(x,y,sourceColor,targetColor)
@@ -2113,7 +2112,7 @@ Procedure bm_ColorLight(x,y,SourceColor,TargetColor)
 EndProcedure
 
 Procedure bm_Dissolve(x, y, SourceColor, TargetColor)
-
+  
 EndProcedure
 
 Procedure bm_difference(x, y, SourceColor, TargetColor)
@@ -2151,11 +2150,11 @@ Macro hardlight(col)
     col = 255 - ( ( 2 * ( 255 - bottom ) * ( 255 - top ) ) / 255 )
   EndIf
   ; other
-;   If top < 128 
-;   col = (bottom*top) /128
-; Else
-;   col = 255 - ((255-bottom) * (255-top) /128);
-; EndIf
+  ;   If top < 128 
+  ;   col = (bottom*top) /128
+  ; Else
+  ;   col = 255 - ((255-bottom) * (255-top) /128);
+  ; EndIf
 EndMacro
 
 Procedure bm_hardlight(x, y, SourceColor, TargetColor)
@@ -2196,7 +2195,7 @@ EndProcedure
 Procedure SetBm(i,sprite=1)
   
   DrawingMode(#PB_2DDrawing_AlphaBlend)  
-
+  
   ; bm sprite
   If Sprite = 1
     
@@ -2215,7 +2214,7 @@ Procedure SetBm(i,sprite=1)
         Box(0,0,doc\w,doc\h,RGBA(127,127,127,255))
         
     EndSelect
-  
+    
   Else
     ; bm image
     Select layer(i)\bm
@@ -2246,8 +2245,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2141
-; FirstLine = 225
-; Folding = 9-fAAAAAAAAHAAAAAAEAMDgACAAAAAAAAAAQ-x-QA-
+; CursorPosition = 222
+; FirstLine = 19
+; Folding = 5DIAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-
 ; EnableXP
 ; EnableUnicode

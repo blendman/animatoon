@@ -30,12 +30,12 @@ Procedure BrushChangeColor(change=0,color=-1)
     EndIf
     
     
-   
+    
     
     
     If StartDrawing(ImageOutput(#BrushCopy))  
       
-     
+      
       For i = 0 To w-1
         For j = 0 To h-1
           DrawingMode(#PB_2DDrawing_AlphaChannel)
@@ -44,7 +44,7 @@ Procedure BrushChangeColor(change=0,color=-1)
           If a >0
             
             ; à revoir !!! c'est cool, ca fait un fondu vers du noise (diminution alpha et taille !!
-           ; a - Random(a*0.02,0)
+            ; a - Random(a*0.02,0)
             
             If Brush(Action)\Intensity>=0
               If a < Brush(Action)\intensity           
@@ -55,7 +55,7 @@ Procedure BrushChangeColor(change=0,color=-1)
                 a = 255+Brush(Action)\intensity
               EndIf
             EndIf
-        
+            
             If a < (0 + Brush(Action)\Hardness)
               a = 0
             EndIf 
@@ -65,43 +65,43 @@ Procedure BrushChangeColor(change=0,color=-1)
             
             ; test ajout de grain
             ;If a >0
-              ;a - a*0.01 ; Random(a*0.1,0)
-           ; EndIf
+            ;a - a*0.01 ; Random(a*0.1,0)
+            ; EndIf
             
           EndIf
           
-         
+          
           
           DrawingMode(#PB_2DDrawing_Default)
           Plot(i,j,RGB(Red(colorQ), Green(colorQ), Blue(colorQ)))         
-
+          
           DrawingMode(#PB_2DDrawing_AllChannels)
           
           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), a))  
           
-;           ; test ajout de grain
-;           DrawingMode(#PB_2DDrawing_AlphaClip)
-;           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
+          ;           ; test ajout de grain
+          ;           DrawingMode(#PB_2DDrawing_AlphaClip)
+          ;           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
           
         Next j
       Next i     
       
-     
       
-;        ; TEST add noise
-;         DrawingMode(#PB_2DDrawing_AlphaClip)
-;         For i= 0 To sw
-;           For j=0 To sh
-;             gris = Random(50,0)
-;             Box(i, j, 1,1,RGBA(gris, gris, gris, 150))
-;           Next j
-;         Next
+      
+      ;        ; TEST add noise
+      ;         DrawingMode(#PB_2DDrawing_AlphaClip)
+      ;         For i= 0 To sw
+      ;           For j=0 To sh
+      ;             gris = Random(50,0)
+      ;             Box(i, j, 1,1,RGBA(gris, gris, gris, 150))
+      ;           Next j
+      ;         Next
       
       StopDrawing()
     EndIf 
     
   EndIf
-    
+  
 EndProcedure
 Procedure BrushUpdateColor() 
   
@@ -168,40 +168,40 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   ;If Brush(Action)\OldW <> sw Or Brush(Action)\OldH <> sh ; on va resize que si on change la taille W ou H ^^
   ResizeImage(#BrushCopy,sw,sh,1-Brush(Action)\Smooth) ; in images.pbi
- 
   
-    Brush(Action)\OldW = sw 
-    Brush(Action)\OldH = sh
+  
+  Brush(Action)\OldW = sw 
+  Brush(Action)\OldH = sh
+  
+  ; If Brush(Action)\Smooth; pour pallier le bug du smooth :( 
+  If StartDrawing(ImageOutput(#BrushCopy))
+    DrawingMode(#PB_2DDrawing_AlphaClip)
+    Box(0,0,sw,sh,RGBA(Red(Brush(Action)\colorQ),Green(Brush(Action)\colorQ),Blue(Brush(Action)\colorQ),255))
     
-    ; If Brush(Action)\Smooth; pour pallier le bug du smooth :( 
-      If StartDrawing(ImageOutput(#BrushCopy))
-        DrawingMode(#PB_2DDrawing_AlphaClip)
-        Box(0,0,sw,sh,RGBA(Red(Brush(Action)\colorQ),Green(Brush(Action)\colorQ),Blue(Brush(Action)\colorQ),255))
-        
-        ;       
-        ;; ATTENTION A REVOIR !
-        
-;         ; TEST add noise
-;         DrawingMode(#PB_2DDrawing_AlphaChannel)
-;         For i= 0 To sw-1
-;           For j=0 To sh-1
-;             a = Alpha(Point(i,j))
-;             gris = Random(50,0)
-;             If a > 0
-;               a - Random(a*0.8, a*0.5)
-; ;               Box(i, j, 1,1,RGBA(gris, gris, gris, a))
-;               Plot(i,j, RGBA(gris, gris, gris, a))
-;             EndIf
-;           Next j
-;         Next
-        
-        
-        StopDrawing()
-      EndIf
-   ; EndIf
+    ;       
+    ;; ATTENTION A REVOIR !
     
+    ;         ; TEST add noise
+    ;         DrawingMode(#PB_2DDrawing_AlphaChannel)
+    ;         For i= 0 To sw-1
+    ;           For j=0 To sh-1
+    ;             a = Alpha(Point(i,j))
+    ;             gris = Random(50,0)
+    ;             If a > 0
+    ;               a - Random(a*0.8, a*0.5)
+    ; ;               Box(i, j, 1,1,RGBA(gris, gris, gris, a))
+    ;               Plot(i,j, RGBA(gris, gris, gris, a))
+    ;             EndIf
+    ;           Next j
+    ;         Next
+    
+    
+    StopDrawing()
+  EndIf
+  ; EndIf
+  
   ;EndIf
-
+  
   Brush(Action)\CenterX = Sw/2
   Brush(Action)\CenterY = Sh/2
   Brush(Action)\w = sw
@@ -213,7 +213,7 @@ Procedure BrushUpdateImage(load=0,color=0)
     FreeImage(tmp)
     RotateSprite(#Sp_BrushCopy,Brush(Action)\rotate,#PB_Absolute)
   EndIf
-    
+  
   ZoomSprite(#Sp_BrushCopy,w,h)
   
   If load = 1    
@@ -230,14 +230,14 @@ Procedure BrushMixColor(color1,color2,mix.d=0)
 EndProcedure
 Procedure BrushSet()
   
-;    Select Brush(Action)\tool
-;     Case 0, 1
-;       ;CurrentColor = RGBA(Red(CurrentColor), Blue(CurrentColor),Green(CurrentColor), Brush(Action)\alpha)               
-;       CurrentColor = RGBA(Red(CurrentColor), Green(CurrentColor),Blue(CurrentColor), Brush(Action)\alpha * Brush(Action)\alphaTimer/100)               
-;     Case 2
-;       ;CurrentColor = RGB(Red(CurrentColor), Blue(CurrentColor),Green(CurrentColor))
-;       CurrentColor = RGB(Red(CurrentColor), Green(CurrentColor),Blue(CurrentColor))
-;   EndSelect
+  ;    Select Brush(Action)\tool
+  ;     Case 0, 1
+  ;       ;CurrentColor = RGBA(Red(CurrentColor), Blue(CurrentColor),Green(CurrentColor), Brush(Action)\alpha)               
+  ;       CurrentColor = RGBA(Red(CurrentColor), Green(CurrentColor),Blue(CurrentColor), Brush(Action)\alpha * Brush(Action)\alphaTimer/100)               
+  ;     Case 2
+  ;       ;CurrentColor = RGB(Red(CurrentColor), Blue(CurrentColor),Green(CurrentColor))
+  ;       CurrentColor = RGB(Red(CurrentColor), Green(CurrentColor),Blue(CurrentColor))
+  ;   EndSelect
   
 EndProcedure
 
@@ -253,7 +253,7 @@ Procedure BrushGetMixColor(mx,my)
   ry = my
   
   color1 = RGB(brush(action)\Col\R,brush(action)\Col\G,brush(action)\Col\B)
-
+  
   If MixWithImg = 0
     
     If StartDrawing(ScreenOutput())
@@ -292,7 +292,7 @@ Procedure BrushBlend(mx,my)
   Brush(Action)\Color = Color
   
   ;If specialfx                     
-    Brush(Action)\colorQ = color
+  Brush(Action)\colorQ = color
   ;EndIf
   
   ProcedureReturn Color
@@ -322,13 +322,13 @@ Procedure BrushCheckMixInverse(mx,my)
       
       ;Color = ColorBlending(ColorNext,colorCur, Brush(Action)\mix*0.01)
       Color = ColorBlending(colorCur,ColorNext, Brush(Action)\mix*0.01)
-     
+      
       BrushChangeColor(1,color)
       Brush(Action)\ColorOld = Color
       Brush(Action)\ColorNext = BrushGetMixColor(mx,my) ; on sauvegarde la prochaine couleur
       
       ;If specialfx                     
-        Brush(Action)\colorQ = color
+      Brush(Action)\colorQ = color
       ;EndIf
       
       ; BrushChangeColor(1,color)
@@ -363,14 +363,14 @@ EndProcedure
 Procedure BrushCheckMixClassic(mx,my)
   
   ; pour mélanger les couleurs;
-;   Brush(Action)\ColRnd = couleur random
-;   Brush(Action)\OldCol = ancienne couleur
-;   Brush(Action)\NewCol = nouvelle couleur (celle vers laquelle on va aller)
-;   Brush(Action)\ColTmp = couleur temporaire (la couleur actuelle du mélange) = blendcolor(oldcol, newcol, melange)
+  ;   Brush(Action)\ColRnd = couleur random
+  ;   Brush(Action)\OldCol = ancienne couleur
+  ;   Brush(Action)\NewCol = nouvelle couleur (celle vers laquelle on va aller)
+  ;   Brush(Action)\ColTmp = couleur temporaire (la couleur actuelle du mélange) = blendcolor(oldcol, newcol, melange)
   
   
   If Brush(Action)\mix > 0 ; on vérifie si on doit les mélanger
-        
+    
     If Brush(Action)\mix <=101 ; si le mix est au max, on prend juste la nouvelle couleur
       
       
@@ -405,39 +405,39 @@ Procedure BrushCheckMixClassic(mx,my)
         
         ; If colorValue < 0 And alpha > 0
         ;If Alpha > 0
-          
-          tx.d = Brush(Action)\mix/(Brush(Action)\Visco+1) ; le taux de mélange
-          a = Brush(Action)\ViscoCur									
-          u.d = (100-(Brush(Action)\mix - a*tx))*0.01 ; le % de la couleur ancienne
-          v.d = (Brush(Action)\mix - a*tx)*0.01       ; le % de la nouvelle couleur
-          
-          ; on garde les anciens paramètres
-          Brush(Action)\OldCol\R = Brush(Action)\Col\R 
-          Brush(Action)\OldCol\G = Brush(Action)\Col\G
-          Brush(Action)\OldCol\B = Brush(Action)\Col\B
-          
-          Brush(Action)\NewCol\R = Red(colorValue) ;//SetMaximum(GetColorR(colorValue)*v# + Brush(Action)\Col\R *u#,255)
-          Brush(Action)\NewCol\G = Green(colorValue) ;//SetMaximum(GetColorG(colorValue)*v# + Brush(Action)\Col\G *u#,255)
-          Brush(Action)\NewCol\B = Blue(colorValue)  ;//SetMaximum(GetColorB(colorValue)*v# + Brush(Action)\Col\B *u#,255)
-          
-          ; et on mélange pour les nouveaux :)
-          Brush(Action)\Col\R = SetMaximum(Brush(Action)\NewCol\R*v + Brush(Action)\oldCol\R *u,255)
-          Brush(Action)\Col\G = SetMaximum(Brush(Action)\NewCol\G*v + Brush(Action)\oldCol\G *u,255)
-          Brush(Action)\Col\B = SetMaximum(Brush(Action)\NewCol\B*v + Brush(Action)\oldCol\B *u,255)
-          
-          ; Debug RGB(Brush(Action)\Col\R,Brush(Action)\Col\G,Brush(Action)\Col\B)
-          
-          ; 										// Brush(Action)\NewCol\R = Brush(Action)\Col\R
-          ; 										// Brush(Action)\NewCol\G = Brush(Action)\Col\G
-          ; 										// Brush(Action)\NewCol\B = Brush(Action)\Col\B
-          
+        
+        tx.d = Brush(Action)\mix/(Brush(Action)\Visco+1) ; le taux de mélange
+        a = Brush(Action)\ViscoCur									
+        u.d = (100-(Brush(Action)\mix - a*tx))*0.01 ; le % de la couleur ancienne
+        v.d = (Brush(Action)\mix - a*tx)*0.01       ; le % de la nouvelle couleur
+        
+        ; on garde les anciens paramètres
+        Brush(Action)\OldCol\R = Brush(Action)\Col\R 
+        Brush(Action)\OldCol\G = Brush(Action)\Col\G
+        Brush(Action)\OldCol\B = Brush(Action)\Col\B
+        
+        Brush(Action)\NewCol\R = Red(colorValue) ;//SetMaximum(GetColorR(colorValue)*v# + Brush(Action)\Col\R *u#,255)
+        Brush(Action)\NewCol\G = Green(colorValue) ;//SetMaximum(GetColorG(colorValue)*v# + Brush(Action)\Col\G *u#,255)
+        Brush(Action)\NewCol\B = Blue(colorValue)  ;//SetMaximum(GetColorB(colorValue)*v# + Brush(Action)\Col\B *u#,255)
+        
+        ; et on mélange pour les nouveaux :)
+        Brush(Action)\Col\R = SetMaximum(Brush(Action)\NewCol\R*v + Brush(Action)\oldCol\R *u,255)
+        Brush(Action)\Col\G = SetMaximum(Brush(Action)\NewCol\G*v + Brush(Action)\oldCol\G *u,255)
+        Brush(Action)\Col\B = SetMaximum(Brush(Action)\NewCol\B*v + Brush(Action)\oldCol\B *u,255)
+        
+        ; Debug RGB(Brush(Action)\Col\R,Brush(Action)\Col\G,Brush(Action)\Col\B)
+        
+        ; 										// Brush(Action)\NewCol\R = Brush(Action)\Col\R
+        ; 										// Brush(Action)\NewCol\G = Brush(Action)\Col\G
+        ; 										// Brush(Action)\NewCol\B = Brush(Action)\Col\B
+        
         ;EndIf
-          
-          
+        
+        
       EndIf
       
-    ;{ mix 100%
-    ;{ à conserver pour après  
+      ;{ mix 100%
+      ;{ à conserver pour après  
     ElseIf plustard = 1 ; Brush(Action)\mix = 100 
       
       If Brush(Action)\ViscoCur > 0
@@ -512,13 +512,13 @@ Procedure BrushCheckMixClassic(mx,my)
   ProcedureReturn color_new
 EndProcedure
 Procedure BrushCheckMixOld(mx,my)
-    
+  
   u = Brush(Action)\color
   Color = RGB(Red(u),Green(u),Blue(u))
-
+  
   u = BrushGetMixColor(mx,my) 
   Color1 = RGB(Red(u),Green(u),Blue(u))
-
+  
   ; Brush(Action)\colorQ = BrushMixColor(color1,Color) avec le 1)                    
   Color = BrushMixColor(Color1,color)
   
@@ -547,8 +547,8 @@ Procedure BrushCheckMixOld(mx,my)
   ;Else
   ;color = Brush(Action)\colorQ
   ;EndIf
- 
-      
+  
+  
   ProcedureReturn color
 EndProcedure
 Procedure BrushCheckMixNew(mx,my)
@@ -582,7 +582,7 @@ Procedure BrushCheckMixNew(mx,my)
     ;color = Brush(Action)\colorQ
     ;EndIf
   EndIf
-      
+  
   ProcedureReturn color
 EndProcedure
 
@@ -621,7 +621,7 @@ Procedure.s GetParentItemText(gadget)
     While curSubLevel<=GetGadgetItemAttribute(gadget, ItemToWalk-i,#PB_Tree_SubLevel)
       i+1
     Wend
-     
+    
     ParentNumber.l = ItemToWalk-i
     
     ParentText.s   = GetGadgetItemText(gadget, ParentNumber, 0)
@@ -652,7 +652,7 @@ Procedure OpenPreset(file$,brush$="")
       \SizeMin  = ReadPreferenceInteger("size_min",1)
       \sizeRndFactor = ReadPreferenceInteger("brushsizeRndfactor",0)
       \Sizepressure = ReadPreferenceInteger("sizepressure",0)
-
+      
       ; ROTATION
       \rotate         = ReadPreferenceInteger("rotate",0)
       \randRot        = ReadPreferenceInteger("randRot",0) 
@@ -672,7 +672,7 @@ Procedure OpenPreset(file$,brush$="")
       ; COLOR
       ;\Color = ReadPreferenceInteger("color",-1)
       ;If \color >=0
-        ;\ColorQ = \color        
+      ;\ColorQ = \color        
       ;EndIf 
       
       ; DIFFUSION
@@ -709,8 +709,8 @@ Procedure OpenPreset(file$,brush$="")
         ; SetColor()
       EndIf
       \MixType = ReadPreferenceInteger("mixtyp",2)
-       
-       ; THE BRUSH
+      
+      ; THE BRUSH
       \image$ = ReadPreferenceString("image","aquarelle01.jpg")      
       \BrushDir$ = ReadPreferenceString("brushdir","blendman")
       OptionsIE\DirBrush$ = \BrushDir$
@@ -764,7 +764,7 @@ Procedure OpenPreset(file$,brush$="")
     SetGadgetState(#G_brushSmooth,\Smooth)
     SetGadgetState(#G_brushIntensity,\Intensity)
   EndWith
-
+  
 EndProcedure
 Procedure OpenPresetBank()
   
@@ -892,8 +892,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 478
-; FirstLine = 258
-; Folding = +vx95P9-PCBlox
+; CursorPosition = 891
+; FirstLine = 865
+; Folding = --------------
 ; EnableXP
 ; EnableUnicode

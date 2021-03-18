@@ -2,7 +2,7 @@
 
 ; Menu
 Procedure AddMenu(clear=0)
-    
+  
   If CreateMenu(#Menu_Main,WindowID(#WinMain))
     
     ;{ menu 
@@ -83,10 +83,10 @@ Procedure AddMenu(clear=0)
     ;MenuItem(#Menu_SelContract,   Lang("Contract"))
     ;MenuItem(#Menu_SelInverse,    Lang("Inverse"))
     ;MenuBar()
-;     OpenSubMenu(Lang("Selection"))
-;     MenuItem(#Menu_SelectExtend,  Lang("Extend"))
-;     CloseSubMenu()
-
+    ;     OpenSubMenu(Lang("Selection"))
+    ;     MenuItem(#Menu_SelectExtend,  Lang("Extend"))
+    ;     CloseSubMenu()
+    
     ; IMAGE
     MenuTitle(Lang("Image")) 
     OpenSubMenu(Lang("Adjustement"))
@@ -115,8 +115,8 @@ Procedure AddMenu(clear=0)
     MenuItem(#menu_Rotate270,     Lang("Rotation 270"))
     MenuItem(#menu_RotateFree,    Lang("Rotation free"))
     CloseSubMenu()
-   
-   
+    
+    
     
     ; LAYER
     MenuTitle(Lang("Layer"))
@@ -155,39 +155,39 @@ Procedure AddMenu(clear=0)
     MenuItem(#menu_IE_Offset,      Lang("Offset"))
     CloseSubMenu()
     
-
+    
     If plugin = 1
-    OpenSubMenu(lang("Plugins"))
-    
-    If ExamineDirectory(0,"./data/Plugins/Filters/","*.dll")
-      While NextDirectoryEntry(0)
-        If DirectoryEntryType(0) = #PB_DirectoryEntry_File
-          pluginFile.s = DirectoryEntryName(0)
-          
-          lib = OpenLibrary(#PB_Any,"./data/plugins/Filters/"+pluginFile)
-          If lib
-            ; OptionsIE\nbPlugins + 1
-            AddElement(Ani_Plugins())
-            Ani_Plugins()\lib= lib
+      OpenSubMenu(lang("Plugins"))
+      
+      If ExamineDirectory(0,"./data/Plugins/Filters/","*.dll")
+        While NextDirectoryEntry(0)
+          If DirectoryEntryType(0) = #PB_DirectoryEntry_File
+            pluginFile.s = DirectoryEntryName(0)
             
-            n =ListSize(Ani_Plugins())
-            Ani_Plugins()\menuId= n
-            Ani_Plugins()\name$ = RemoveString(pluginFile,".dll")
+            lib = OpenLibrary(#PB_Any,"./data/plugins/Filters/"+pluginFile)
+            If lib
+              ; OptionsIE\nbPlugins + 1
+              AddElement(Ani_Plugins())
+              Ani_Plugins()\lib= lib
+              
+              n =ListSize(Ani_Plugins())
+              Ani_Plugins()\menuId= n
+              Ani_Plugins()\name$ = RemoveString(pluginFile,".dll")
+              
+              ; AddElement(*aP\pluginLibrary())
+              ; *aP\pluginLibrary() = lib
+              MenuItem(#Menu_Last +n , Ani_Plugins()\name$)
+            Else
+              MessageRequester(Lang("Error"), Lang("Unable To load the dll")+" "+pluginFile)
+            EndIf 
             
-            ; AddElement(*aP\pluginLibrary())
-            ; *aP\pluginLibrary() = lib
-            MenuItem(#Menu_Last +n , Ani_Plugins()\name$)
-          Else
-            MessageRequester(Lang("Error"), Lang("Unable To load the dll")+" "+pluginFile)
-          EndIf 
-          
-          
-        EndIf
-      Wend 
-      FinishDirectory(0)
-    EndIf 
-    
-    CloseSubMenu()
+            
+          EndIf
+        Wend 
+        FinishDirectory(0)
+      EndIf 
+      
+      CloseSubMenu()
     EndIf
     
     
@@ -247,7 +247,7 @@ Procedure AddMenu(clear=0)
     
   EndIf
   
-
+  
 EndProcedure
 
 Procedure AddLogError(error, info$)
@@ -280,16 +280,16 @@ Procedure UpdateLanguageUI()
   ; to update the langage for the Interface
   
   ; I need to update the menu (change the lang)
-;   SetMenuTitleText(#Menu_Main, 0, Lang("File"))
-;   SetMenuTitleText(#Menu_Main, 1, Lang("Edit"))
-;   SetMenuTitleText(#Menu_Main, 2, Lang("View"))
-;   SetMenuTitleText(#Menu_Main, 3, Lang("Selection"))
-;   SetMenuTitleText(#Menu_Main, 4, Lang("Image"))
-;   SetMenuTitleText(#Menu_Main, 5, Lang("Layer"))
-;   SetMenuTitleText(#Menu_Main, 6, Lang("Filters"))
-;   SetMenuTitleText(#Menu_Main, 7, Lang("Actions"))
-;   SetMenuTitleText(#Menu_Main, 8, Lang("Help"))
-
+  ;   SetMenuTitleText(#Menu_Main, 0, Lang("File"))
+  ;   SetMenuTitleText(#Menu_Main, 1, Lang("Edit"))
+  ;   SetMenuTitleText(#Menu_Main, 2, Lang("View"))
+  ;   SetMenuTitleText(#Menu_Main, 3, Lang("Selection"))
+  ;   SetMenuTitleText(#Menu_Main, 4, Lang("Image"))
+  ;   SetMenuTitleText(#Menu_Main, 5, Lang("Layer"))
+  ;   SetMenuTitleText(#Menu_Main, 6, Lang("Filters"))
+  ;   SetMenuTitleText(#Menu_Main, 7, Lang("Actions"))
+  ;   SetMenuTitleText(#Menu_Main, 8, Lang("Help"))
+  
   FreeMenu(#Menu_Main) 
   RemoveKeyboardShortcut(#WinMain, #PB_Shortcut_All )
   
@@ -310,7 +310,7 @@ Procedure.a GetFileExist(filename$)
   Directory$ = GetPathPart(filename$)
   name$ = GetFilePart(filename$)
   
-   If ExamineDirectory(0, Directory$, "*.*")  
+  If ExamineDirectory(0, Directory$, "*.*")  
     While NextDirectoryEntry(0)
       If DirectoryEntryType(0) = #PB_DirectoryEntry_File
         If DirectoryEntryName(0) = name$
@@ -348,7 +348,7 @@ Procedure ChangeCursor(load=0)
     EndIf
     
   EndWith
-
+  
 EndProcedure
 Procedure InitScreen()
   
@@ -368,281 +368,342 @@ Procedure InitScreen()
     ClosePreferences()
     
   EndIf
-
+  
 EndProcedure
 
 ; options
 Procedure OpenOptions()
   
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
-
+  
   If OpenPreferences("Pref.ini")
     
-    PreferenceGroup("General")
     
-    ;{ options
-    
-    With OptionsIE
+    If ExaminePreferenceGroups()
       
-      ; theme and color
-      \Theme$         = ReadPreferenceString("Theme","data\Themes\Animatoon")
-      c = -1; RGB(100,100,100)
-      \ThemeColor     = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
-      \ThemeGadCol    = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
-      \ThemeMenuCol   = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
-      \ThemeStaCol    = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
-      \ThemeTBCol     = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
-      
-      ; set the UI color      
-      SetWindowColor(#WinMain, OptionsIE\ThemeColor)
-      
-
-      ; Options
-      \zoom           = ReadPreferenceInteger("Zoom",       100)
-      \ConfirmExit    = ReadPreferenceInteger("ConfirmExit",   1)
-      \autosaveAtExit = ReadPreferenceInteger("autosaveAtExit",   0)
-      \autosave       = ReadPreferenceInteger("autosave",   1)
-      \AutosaveTime   = ReadPreferenceInteger("autosaveTime",   10)
-      If \AutosaveTime <= 0
-        \AutosaveTime = 1
-      EndIf
-      
-      \Maxundo        = ReadPreferenceInteger("Maxundo",    16)
-      If \Maxundo > 32
-        \Maxundo = 32
-      EndIf
-      \SaveImageRT = 1
-      
-      \SpriteQuality  = ReadPreferenceInteger("Filtering",  1)
-      
-      ; view
-      \Statusbar      = ReadPreferenceInteger("Statusbar",  1)
-      
-      \Grid           = ReadPreferenceInteger("Grid",       1)
-      \GridW          = ReadPreferenceInteger("GridW",      32)
-      \GridH          = ReadPreferenceInteger("GridH",      32)
-      \GridColor      = ReadPreferenceInteger("GridColor",  0)
-      
-      
-      ; UI
-      \AreaBGColor    = ReadPreferenceInteger("AreaBGColor",  RGB(120,120,120))
-      PanelLayerW_IE  = ReadPreferenceInteger("PanelLayerW", 150)
-      ScreenX = PanelLayerW_IE +10
-      PanelLayerH_IE  = ReadPreferenceInteger("PanelLayerH", 400)
-      PanelToolsW_IE  = ReadPreferenceInteger("PanelToolsW", 160)
-      PanelToolsH_IE  = ReadPreferenceInteger("PanelToolsH", 300)
-      
-      
-      ; optimisation, realtime, fps
-      \DelayMax         = ReadPreferenceInteger("DelayMax", 15) 
-      \Delay            = \DelayMax
-      
-      ; toolbar
-      \ToolbarH       = ReadPreferenceInteger("ToolbarH",     36)
-      \ToolInfoH      = ReadPreferenceInteger("ToolInfoH",    36)
-      \ToolbarFileY   = ReadPreferenceInteger("ToolbarFileY",  0)
-      \ToolbarFileX   = ReadPreferenceInteger("ToolbarFileX",  -2)
-      \ToolbarFile    = ReadPreferenceInteger("ToolbarFile",   1)
-      
-      \ToolbarToolY   = ReadPreferenceInteger("ToolbarToolY",  36)
-      \ToolbarToolX   = ReadPreferenceInteger("ToolbarToolX",  -2)
-      \ToolbarTool    = ReadPreferenceInteger("ToolbarTool",    1)
-      
-      If \ToolbarToolY > 36
-        \ToolbarToolY = 36        
-      EndIf
-      If \ToolbarFileY > 36
-        \ToolbarFileY = 36        
-      EndIf
-      
-      If \ToolbarFileY < \ToolbarH And \ToolbarToolY < OptionsIE\ToolbarH
+      While NextPreferenceGroup()
         
-        \ToolInfoH = 0        
-                
-      Else
+        pgn$ = PreferenceGroupName()
         
-        \ToolInfoH = OptionsIE\ToolbarH
-        
-      EndIf
-      
-      ; bordure
-      \BordureX  = ReadPreferenceInteger("BordureX",      50)
-      \BordureY  = ReadPreferenceInteger("BordureY",      50)
-      BarAnimH_IE         = ReadPreferenceInteger("BarAnimH",     80)
-      
-      ; options
-      \paper$       = ReadPreferenceString("Paper", "paper1.png")
-      paper\alpha   = ReadPreferenceInteger("PaperAlpha", 255)
-      paper\scale   = ReadPreferenceInteger("PaperScale", 10)
-      paper\intensity   = ReadPreferenceInteger("PaperIntensity", 10)
-      
-      ; Document by default ?
-      \ImageW       = ReadPreferenceInteger("ImageW", 1024)
-      \ImageH       = ReadPreferenceInteger("ImageH", 768)
-      
-      ; colors
-      
-      ; directories
-      \DirPattern$  = ReadPreferenceString("DirPattern", "data\Presets\Patterns\")
-      \DirPreset$   = ReadPreferenceString("DirPresets", "data\Presets\Bank\Blendman\")
-      \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
-      \RB_Img$      = ReadPreferenceString("RB_img", GetCurrentDirectory() + "data\Presets\RoughBoard\rb.png") 
-      \Swatch$      = ReadPreferenceString("Swatch", GetCurrentDirectory() + "data\Presets\Swatch\Tango.gpl") 
-      \SwatchColumns = ReadPreferenceInteger("SwatchColumns", 7) 
-      If \SwatchColumns < 3
-        \SwatchColumns = 6
-      EndIf
-      
-      \PathOpen$  = ReadPreferenceString("PathOpen", GetCurrentDirectory() +"save\")
-      \PathSave$  = ReadPreferenceString("PathSave", GetCurrentDirectory() + "save\")
-
-      
-      \Version$ = "6"
-      ; GM = 1, Construct = 2, PB-canvas = 3, pb_teo = 4, agk = 5, pb_screen = 6, pb_openGL = 7
-      
-    EndWith
-    doc\w = OptionsIE\ImageW
-    doc\h = OptionsIE\ImageH
-    ;}
-    
-        
-    ;{ tool (brush, eraser, pen, gradient)
-    
-    ; gradient
-    PreferenceGroup("Gradient")
-    With brush(#Action_Gradient)
-      \Color    = ReadPreferenceInteger("GradientBG",    RGB(255, 255, 255))
-      \ColorBG\R = Red(\Color)
-      \ColorBG\G = Green(\Color)
-      \ColorBG\B = Blue(\Color)
-      \alpha = ReadPreferenceInteger("GradientBGAlpha",    255)
-      \AlphaFG = ReadPreferenceInteger("GradientFGAlpha",    255)
-      \ColorFG  = ReadPreferenceInteger("GradientFG",    0)
-      \Type     = ReadPreferenceInteger("GradientType",  0)
-    EndWith
-    
-    
-    
-    For i = 0 To 2 
-      ; on réouvre les tools brush, eraser et pen, 
-      ; pour les autres, je les sauvegarder plus tard, lorsque j'aurai créer leur propres paramètres
-      Select  i 
+        If pgn$ = "General"
           
-        Case 0
-          theaction = #action_brush
-          PreferenceGroup("Brush")
-
-        Case 1 ; eraser
-          theaction = #Action_Eraser
-          PreferenceGroup("Eraser")
+          ;{ options
           
-        Case 2 ; pen
-          theaction = #Action_Pen
-          PreferenceGroup("Pen")
-          
-      EndSelect
-      
-      With Brush(theaction)
-        
-        
-        \Id  = ReadPreferenceInteger("BrushImage", 1)
-        If \Id <=0
-          \Id=1
-        EndIf
-        \BrushNum  = ReadPreferenceInteger("BrushNum", 0)
-        \BrushForm = ReadPreferenceInteger("BrushForm", 0)
-        
-        \BrushDir$ = ReadPreferenceString("BrushDir", "data\Presets\Brush\blendman\")
-        If ExamineDirectory(0, \brushDir$, "*.png")
-          
-          While NextDirectoryEntry(0)
-            If DirectoryEntryType(0) = #PB_DirectoryEntry_File
-              \BrushNumMax +1
+          With OptionsIE
+            
+            ; theme and color
+            \Theme$         = ReadPreferenceString("Theme","data\Themes\Animatoon")
+            c = -1; RGB(100,100,100)
+            \ThemeColor     = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
+            \ThemeGadCol    = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
+            \ThemeMenuCol   = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
+            \ThemeStaCol    = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
+            \ThemeTBCol     = c ; ReadPreferenceInteger("ThemeColor",RGB(150,150,150))
+            
+            ; set the UI color      
+            SetWindowColor(#WinMain, OptionsIE\ThemeColor)
+            
+            
+            ; Options
+            \zoom           = ReadPreferenceInteger("Zoom",       100)
+            \ConfirmExit    = ReadPreferenceInteger("ConfirmExit",   1)
+            \autosaveAtExit = ReadPreferenceInteger("autosaveAtExit",   0)
+            \autosave       = ReadPreferenceInteger("autosave",   1)
+            \AutosaveTime   = ReadPreferenceInteger("autosaveTime",   10)
+            If \AutosaveTime <= 0
+              \AutosaveTime = 1
             EndIf
-          Wend        
-          FinishDirectory(0)        
-          \BrushNumMax -1 
+            
+            \Maxundo        = ReadPreferenceInteger("Maxundo",    16)
+            If \Maxundo > 32
+              \Maxundo = 32
+            EndIf
+            \SaveImageRT = 1
+            
+            \SpriteQuality  = ReadPreferenceInteger("Filtering",  1)
+            
+            ; view
+            \Statusbar      = ReadPreferenceInteger("Statusbar",  1)
+            
+            \Grid           = ReadPreferenceInteger("Grid",       1)
+            \GridW          = ReadPreferenceInteger("GridW",      32)
+            \GridH          = ReadPreferenceInteger("GridH",      32)
+            \GridColor      = ReadPreferenceInteger("GridColor",  0)
+            
+            
+            ; UI
+            \AreaBGColor    = ReadPreferenceInteger("AreaBGColor",  RGB(120,120,120))
+            PanelLayerW_IE  = ReadPreferenceInteger("PanelLayerW", 150)
+            PanelLayerH_IE  = ReadPreferenceInteger("PanelLayerH", 400)
+            PanelToolsW_IE  = ReadPreferenceInteger("PanelToolsW", 165)
+            ScreenX = PanelToolsW_IE +10
+            PanelToolsH_IE  = ReadPreferenceInteger("PanelToolsH", 300)
+            
+            
+            ; optimisation, realtime, fps
+            \DelayMax         = ReadPreferenceInteger("DelayMax", 15) 
+            \Delay            = \DelayMax
+            
+            ; toolbar
+            \ToolbarH       = ReadPreferenceInteger("ToolbarH",     36)
+            \ToolInfoH      = ReadPreferenceInteger("ToolInfoH",    36)
+            \ToolbarFileY   = ReadPreferenceInteger("ToolbarFileY",  0)
+            \ToolbarFileX   = ReadPreferenceInteger("ToolbarFileX",  -2)
+            \ToolbarFile    = ReadPreferenceInteger("ToolbarFile",   1)
+            
+            \ToolbarToolY   = ReadPreferenceInteger("ToolbarToolY",  36)
+            \ToolbarToolX   = ReadPreferenceInteger("ToolbarToolX",  -2)
+            \ToolbarTool    = ReadPreferenceInteger("ToolbarTool",    1)
+            
+            If \ToolbarToolY > 36
+              \ToolbarToolY = 36        
+            EndIf
+            If \ToolbarFileY > 36
+              \ToolbarFileY = 36        
+            EndIf
+            
+            If \ToolbarFileY < \ToolbarH And \ToolbarToolY < OptionsIE\ToolbarH
+              
+              \ToolInfoH = 0        
+              
+            Else
+              
+              \ToolInfoH = OptionsIE\ToolbarH
+              
+            EndIf
+            
+            ; border // bordure
+            \BordureX  = ReadPreferenceInteger("BordureX",      50)
+            \BordureY  = ReadPreferenceInteger("BordureY",      50)
+            BarAnimH_IE         = ReadPreferenceInteger("BarAnimH",     80)
+            
+            ; options background paper
+            \paper$       = ReadPreferenceString("Paper", "paper1.png")
+            paper\alpha   = ReadPreferenceInteger("PaperAlpha", 255)
+            paper\scale   = ReadPreferenceInteger("PaperScale", 10)
+            paper\intensity   = ReadPreferenceInteger("PaperIntensity", 10)
+            
+            ; Document by default ?
+            \ImageW       = ReadPreferenceInteger("ImageW", 1024)
+            \ImageH       = ReadPreferenceInteger("ImageH", 768)
+            
+            ; colors
+            
+            ; directories
+            \DirPattern$  = ReadPreferenceString("DirPattern", "data\Presets\Patterns\")
+            \DirPreset$   = ReadPreferenceString("DirPresets", "data\Presets\Bank\Blendman\")
+            \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
+            \RB_Img$      = ReadPreferenceString("RB_img", GetCurrentDirectory() + "data\Presets\RoughBoard\rb.png") 
+            \Swatch$      = ReadPreferenceString("Swatch", GetCurrentDirectory() + "data\Presets\Swatch\Tango.gpl") 
+            \SwatchColumns = ReadPreferenceInteger("SwatchColumns", 7) 
+            If \SwatchColumns < 3
+              \SwatchColumns = 6
+            EndIf
+            
+            \PathOpen$  = ReadPreferenceString("PathOpen", GetCurrentDirectory() +"save\")
+            \PathSave$  = ReadPreferenceString("PathSave", GetCurrentDirectory() + "save\")
+            
+            
+            \Version$ = "6"
+            ; GM = 1, Construct = 2, PB-canvas = 3, pb_teo = 4, agk = 5, pb_screen = 6, pb_openGL = 7
+            
+          EndWith
+          doc\w = OptionsIE\ImageW
+          doc\h = OptionsIE\ImageH
+          ;}
+          
+        Else
+          
+          ;{ tool (brush, eraser, pen, gradient....)
+          
+          ;     ; gradient
+          ;     PreferenceGroup("Gradient")
+          ;     With brush(#Action_Gradient)
+          ;       \Color    = ReadPreferenceInteger("GradientBG",    RGB(255, 255, 255))
+          ;       \ColorBG\R = Red(\Color)
+          ;       \ColorBG\G = Green(\Color)
+          ;       \ColorBG\B = Blue(\Color)
+          ;       \alpha = ReadPreferenceInteger("GradientBGAlpha",    255)
+          ;       \AlphaFG = ReadPreferenceInteger("GradientFGAlpha",    255)
+          ;       \ColorFG  = ReadPreferenceInteger("GradientFG",    0)
+          ;       \Type     = ReadPreferenceInteger("GradientType",  0)
+          ;     EndWith
+          
+          
+          If pgn$ = "Brush" Or pgn$ = "Eraser" Or pgn$ = "Pen"
+            
+            ; first I load the paint and eraser tool parameters
+            For i = 0 To 2 
+              
+              ; we open the tools parameters (brush, pen...)
+              ; on réouvre les tools brush, eraser et pen, 
+              ; pour les autres, je les sauvegarder plus tard, lorsque j'aurai créer leur propres paramètres
+              Select  i 
+                  
+                Case 0
+                  theaction = #action_brush
+                  PreferenceGroup("Brush")
+                  
+                Case 1 ; eraser
+                  theaction = #Action_Eraser 
+                  PreferenceGroup("Eraser")
+                  
+                Case 2 ; pen
+                  theaction = #Action_Pen 
+                  PreferenceGroup("Pen")
+                  
+              EndSelect
+              
+              With Brush(theaction)
+                
+                
+                \Id  = ReadPreferenceInteger("BrushImage", 1)
+                If \Id <=0
+                  \Id=1
+                EndIf
+                \BrushNum  = ReadPreferenceInteger("BrushNum", 0)
+                \BrushForm = ReadPreferenceInteger("BrushForm", 0)
+                
+                \BrushDir$ = ReadPreferenceString("BrushDir", "data\Presets\Brush\blendman\")
+                If ExamineDirectory(0, \brushDir$, "*.png")
+                  
+                  While NextDirectoryEntry(0)
+                    If DirectoryEntryType(0) = #PB_DirectoryEntry_File
+                      \BrushNumMax +1
+                    EndIf
+                  Wend        
+                  FinishDirectory(0)        
+                  \BrushNumMax -1 
+                  
+                EndIf
+                
+                ; size
+                \Size      = ReadPreferenceInteger("size",     15)
+                \SizeW     = ReadPreferenceInteger("sizeW",     100)
+                \SizeH     = ReadPreferenceInteger("sizeH",     100)
+                \SizeMin   = ReadPreferenceInteger("sizeMin",   0)
+                \Sizepressure = ReadPreferenceInteger("sizePressure",1)
+                
+                ; dynamincs
+                \Scatter   = ReadPreferenceInteger("Scatter",  0)
+                \rotate    = ReadPreferenceInteger("rotate",   0)
+                \randRot   = ReadPreferenceInteger("randrotate", 360)
+                \RotateParAngle   = ReadPreferenceInteger("rotateangle", 1)
+                
+                ; alpha
+                \Alpha     = ReadPreferenceInteger("alpha",    255)
+                \alphaMax = \Alpha
+                \AlphaBlend= ReadPreferenceInteger("alphablend",255)
+                \AlphaFG   = ReadPreferenceInteger("alphaFG",  255)
+                \AlphaPressure   = ReadPreferenceInteger("alphaPressure",  0)
+                \AlphaRand = ReadPreferenceInteger("alpharand",  0)
+                
+                ; color
+                \Color    = ReadPreferenceInteger("color",    1)
+                Brush(Action)\ColorBG\R = Red(Brush(Action)\Color)
+                Brush(Action)\ColorBG\G = Green(Brush(Action)\Color)
+                Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color)
+                
+                ;If \color  = 0
+                ;\Color   = 1
+                ;EndIf 
+                \ColorFG    = ReadPreferenceInteger("colorFG",    1)
+                ;If \ColorFG = 0
+                ; \ColorFG   = 1
+                ;EndIf 
+                
+                \mix      = ReadPreferenceInteger("mixing",  50)
+                \MixType  = ReadPreferenceInteger("mixtyp",  0)
+                \MixLayer = ReadPreferenceInteger("mixlayer",  0)
+                
+                ; \Mix       = \mixing/100
+                \Visco    = ReadPreferenceInteger("visco",  3)
+                \Wash   = ReadPreferenceInteger("wash", 1)
+                \Wash   = ReadPreferenceInteger("lavage", 1)
+                \Water    = ReadPreferenceInteger("water",  0)
+                
+                
+                ; parameters
+                \pas      = ReadPreferenceInteger("pas",      50)
+                \Type     = ReadPreferenceInteger("type",     0)
+                \Trait    = ReadPreferenceInteger("trait",    1)
+                \Smooth   = ReadPreferenceInteger("smooth",   0)
+                \Hardness = ReadPreferenceInteger("hardness", 0)
+                
+                
+                ; shape
+                \ShapeOutline = ReadPreferenceInteger("ShapeOutline",  0)
+                \ShapeOutSize = ReadPreferenceInteger("ShapeOutSize",  1)
+                \ShapePlain   = ReadPreferenceInteger("ShapePlain",    1)
+                \ShapeType    = ReadPreferenceInteger("ShapeType",     0)
+                \RoundX       = ReadPreferenceInteger("RoundX",        5)
+                \RoundY       = ReadPreferenceInteger("RoundY",        5)
+                
+                ; spray
+                \Spray        = ReadPreferenceInteger("Spray",        10)
+                \NbSpray      = ReadPreferenceInteger("NbSpray",      15)
+                
+                
+              EndWith
+              
+            Next i
+            
+          Else
+            
+            ; for old version of pref.ini
+            For i = #Action_Spray To #Action_Text
+              If i <> #Action_Eraser
+                brush(i)\Alpha = 255
+                brush(i)\AlphaFG = 255
+              EndIf
+            Next i
+            
+            ; then I load the other tool parameters
+            tool$ = "Pen,Brush,Spray,Stamp,Particles,Line,Box,Circle,Shape,Gradient,Fill,Text,Eraser,Clear,Pickcolor,Select,Move,Transform,Rotate,Hand,Zoom"
+            
+            For i = #Action_Spray To #Action_Zoom 
+              
+              If i <> #Action_Eraser
+                
+                theaction  = i
+                
+                If pgn$ = (StringField(tool$,i+1,","))
+                  
+                  With Brush(theaction)
+                    \Size         = ReadPreferenceInteger("size",         15)
+                    \Type         = ReadPreferenceInteger("type",         0)
+                    \Alpha        = ReadPreferenceInteger("alpha",        255)
+                    \alphaMax = \Alpha
+                    \AlphaBlend   = ReadPreferenceInteger("alphablend",    255)
+                    \AlphaFG      = ReadPreferenceInteger("alphaFG",       255)
+                    \Color    = ReadPreferenceInteger("color",    1)
+                    \ColorBG\R = Red(\Color)
+                    \ColorBG\G = Green(\Color)
+                    \ColorBG\B = Blue(\Color)
+                    \ColorFG    = ReadPreferenceInteger("colorFG",    1)
+                    \ShapeOutline = ReadPreferenceInteger("ShapeOutline",  0)
+                    \ShapeOutSize = ReadPreferenceInteger("ShapeOutSize",  1)
+                    \ShapePlain   = ReadPreferenceInteger("ShapePlain",    1)
+                    \ShapeType    = ReadPreferenceInteger("ShapeType",     0)
+                    \RoundX       = ReadPreferenceInteger("RoundX",        5)
+                    \RoundY       = ReadPreferenceInteger("RoundY",        5)          
+                  EndWith
+                  
+                EndIf
+                
+              EndIf
+              
+            Next
+            
+          EndIf
+          
+          ;}
           
         EndIf
         
-        ; size
-        \Size      = ReadPreferenceInteger("size",     15)
-        \SizeW     = ReadPreferenceInteger("sizeW",     100)
-        \SizeH     = ReadPreferenceInteger("sizeH",     100)
-        \SizeMin   = ReadPreferenceInteger("sizeMin",   0)
-        \Sizepressure = ReadPreferenceInteger("sizePressure",1)
-        
-        ; dynamincs
-        \Scatter   = ReadPreferenceInteger("Scatter",  0)
-        \rotate    = ReadPreferenceInteger("rotate",   0)
-        \randRot   = ReadPreferenceInteger("randrotate", 360)
-        \RotateParAngle   = ReadPreferenceInteger("rotateangle", 1)
-        
-        ; alpha
-        \Alpha     = ReadPreferenceInteger("alpha",    255)
-        \alphaMax = \Alpha
-        \AlphaBlend= ReadPreferenceInteger("alphablend",255)
-        \AlphaFG   = ReadPreferenceInteger("alphaFG",  255)
-        \AlphaPressure   = ReadPreferenceInteger("alphaPressure",  0)
-        \AlphaRand = ReadPreferenceInteger("alpharand",  0)
-        
-        ; color
-        \Color    = ReadPreferenceInteger("color",    1)
-        Brush(Action)\ColorBG\R = Red(Brush(Action)\Color)
-        Brush(Action)\ColorBG\G = Green(Brush(Action)\Color)
-        Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color)
-        
-        ;If \color  = 0
-          ;\Color   = 1
-        ;EndIf 
-        \ColorFG    = ReadPreferenceInteger("colorFG",    1)
-        ;If \ColorFG = 0
-          ; \ColorFG   = 1
-        ;EndIf 
-        
-        \mix      = ReadPreferenceInteger("mixing",  50)
-        \MixType  = ReadPreferenceInteger("mixtyp",  0)
-        \MixLayer = ReadPreferenceInteger("mixlayer",  0)
-        
-        ; \Mix       = \mixing/100
-        \Visco    = ReadPreferenceInteger("visco",  3)
-        \Wash   = ReadPreferenceInteger("wash", 1)
-        \Wash   = ReadPreferenceInteger("lavage", 1)
-        \Water    = ReadPreferenceInteger("water",  0)
-        
-        
-        ; parameters
-        \pas      = ReadPreferenceInteger("pas",      50)
-        \Type     = ReadPreferenceInteger("type",     0)
-        \Trait    = ReadPreferenceInteger("trait",    1)
-        \Smooth   = ReadPreferenceInteger("smooth",   0)
-        \Hardness = ReadPreferenceInteger("hardness", 0)
-        
-        
-        ; shape
-        \ShapeOutline = ReadPreferenceInteger("ShapeOutline",  0)
-        \ShapeOutSize = ReadPreferenceInteger("ShapeOutSize",  1)
-        \ShapePlain   = ReadPreferenceInteger("ShapePlain",    1)
-        \ShapeType    = ReadPreferenceInteger("ShapeType",     0)
-        \RoundX       = ReadPreferenceInteger("RoundX",        5)
-        \RoundY       = ReadPreferenceInteger("RoundY",        5)
-        
-        ; spray
-        \Spray        = ReadPreferenceInteger("Spray",        10)
-        \NbSpray      = ReadPreferenceInteger("NbSpray",      15)
-        
-        
-      EndWith
+      Wend
       
-    Next i
-   
-    ; temporary !!
-    For i = #Action_Spray To #Action_Text
-      brush(i)\Alpha = 255
-      brush(i)\AlphaFG = 255
-    Next i
-    ;}
-        
+    EndIf
     
     ClosePreferences()
     
@@ -657,14 +718,20 @@ EndProcedure
 Procedure WriteDefaultOption()
   
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
-    
+  
   WritePreferenceString("Lang",  OptionsIE\Lang$)
- 
+  
   PreferenceGroup("General")
-     
+  
   With OptionsIE
     
     WritePreferenceString("Paper",          \Paper$)
+    WritePreferenceInteger("PaperAlpha",      paper\alpha)
+    WritePreferenceInteger("PaperScale",      paper\scale)
+    WritePreferenceInteger("PaperIntensity",  paper\intensity)
+    WritePreferenceInteger("Papercolor",      paper\Color)
+    
+    
     WritePreferenceInteger("SwatchColumns",  \SwatchColumns)
     
     WritePreferenceString("Theme",  \Theme$)
@@ -700,121 +767,152 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("autosaveAtExit",  \autosaveAtExit)
     WritePreferenceInteger("ConfirmExit",  \ConfirmExit)
     WritePreferenceInteger("Filtering",     \SpriteQuality)
-
+    
     
     
   EndWith
   
   ; SAve the position and size for some gadgets // on sauve ensuite les positions et tailles de certains gagets
-    WritePreferenceInteger("PanelLayerH", PanelLayerH_IE)
-    WritePreferenceInteger("PanelToolsH", PanelToolsH_IE)
-;       PanelLayerW_IE  = ReadPreferenceInteger("PanelLayerW", 150)
-;       PanelLayerH_IE  = ReadPreferenceInteger("PanelLayerH", 400)
-;       PanelToolsW_IE  = ReadPreferenceInteger("PanelToolsW", 150)
-;       PanelToolsH_IE  = ReadPreferenceInteger("PanelToolsH", 300)
+  WritePreferenceInteger("PanelLayerH", PanelLayerH_IE)
+  WritePreferenceInteger("PanelToolsH", PanelToolsH_IE)
+  ;       PanelLayerW_IE  = ReadPreferenceInteger("PanelLayerW", 150)
+  ;       PanelLayerH_IE  = ReadPreferenceInteger("PanelLayerH", 400)
+  ;       PanelToolsW_IE  = ReadPreferenceInteger("PanelToolsW", 150)
+  ;       PanelToolsH_IE  = ReadPreferenceInteger("PanelToolsH", 300)
+  
+  
+  ;{ tools options
+  
+  ; gradient color, alpha and type
+  ;     PreferenceGroup("Gradient")
+  ;     With brush(#Action_Gradient)
+  ;       WritePreferenceInteger("GradientBG", \Color)
+  ;       WritePreferenceInteger("GradientFG", \ColorFG)
+  ;       WritePreferenceInteger("GradientType", \Type)
+  ;       WritePreferenceInteger("GradientBGAlpha", \alpha)
+  ;       WritePreferenceInteger("GradientFGAlpha", \AlphaFG)
+  ;     EndWith
+  
+  
+  ;  save the paint tools parameters // puis on sauve les outils (brush, eraser et pen pour le moment, plus tard les autres
+  For i = 0 To 2
     
+    Select  i 
+      Case 0
+        theaction = #action_brush
+        PreferenceGroup("Brush")
+        
+      Case 1 ;  eraser
+        theaction = #Action_Eraser
+        PreferenceGroup("Eraser")
+        
+      Case 2 ;  pen
+        theaction = #Action_Pen
+        PreferenceGroup("Pen")
+        
+    EndSelect
     
-    ; tools options
-    
-    ; gradient color, alpha and type
-    PreferenceGroup("Gradient")
-    With brush(#Action_Gradient)
-      WritePreferenceInteger("GradientBG", \Color)
-      WritePreferenceInteger("GradientFG", \ColorFG)
-      WritePreferenceInteger("GradientType", \Type)
-      WritePreferenceInteger("GradientBGAlpha", \alpha)
-      WritePreferenceInteger("GradientFGAlpha", \AlphaFG)
+    With brush(theaction)
+      
+      WritePreferenceInteger("BrushImage",\Id)
+      WritePreferenceInteger("BrushNum",  \BrushNum)
+      WritePreferenceInteger("BrushForm", \BrushForm)
+      WritePreferenceString("BrushDir",   RemoveString(\BrushDir$, GetCurrentDirectory()))
+      
+      ; size
+      WritePreferenceInteger("size",    \Size)
+      WritePreferenceInteger("sizeW",   \SizeW)
+      WritePreferenceInteger("sizeH",   \SizeH)
+      WritePreferenceInteger("sizeMin", \SizeMin)
+      WritePreferenceInteger("sizePressure", \Sizepressure)
+      
+      ; alpha
+      WritePreferenceInteger("alpha",     \Alpha)
+      WritePreferenceInteger("alphablend",\AlphaBlend)
+      WritePreferenceInteger("alphaFG",   \AlphaFG)
+      WritePreferenceInteger("alphaPressure", \AlphaPressure)
+      WritePreferenceInteger("alpharand", \AlphaRand)
+      
+      ; colors
+      WritePreferenceInteger("visco",   \Visco)
+      WritePreferenceInteger("mixing",  \Mix)
+      WritePreferenceInteger("mixtyp",  \MixType)
+      WritePreferenceInteger("mixlayer",  \MixLayer)
+      WritePreferenceInteger("wash",  \wash)
+      WritePreferenceInteger("lavage",  \wash)
+      WritePreferenceInteger("water",   \Water)
+      WritePreferenceInteger("color",   \Color)
+      WritePreferenceInteger("colorFG", \ColorFG)
+      
+      ; dynamnics
+      WritePreferenceInteger("scatter",   \Scatter)
+      WritePreferenceInteger("randrotate",\randRot)
+      WritePreferenceInteger("rotate",    \Rotate)
+      WritePreferenceInteger("rotateangle",\RotateParAngle)
+      
+      ; parameters
+      WritePreferenceInteger("pas",       \pas)
+      WritePreferenceInteger("type",      \Type)
+      WritePreferenceInteger("trait",     \Trait)
+      WritePreferenceInteger("smooth",    \Smooth)
+      WritePreferenceInteger("hardness",  \Hardness)
+      
+      ; shape
+      WritePreferenceInteger("ShapeOutline", \ShapeOutline)
+      WritePreferenceInteger("ShapeOutSize", \ShapeOutSize)
+      WritePreferenceInteger("ShapePlain",   \ShapePlain)
+      WritePreferenceInteger("ShapeType",    \ShapeType)
+      WritePreferenceInteger("RoundX",       \RoundX)
+      WritePreferenceInteger("RoundY",       \RoundY)
+      
     EndWith
     
+  Next i
+  
+  
+  
+  ; then I save the other tool parameters
+  tool$ = "Pen,Brush,Spray,Stamp,Particles,Line,Box,Circle,Shape,Gradient,Fill,Text,Eraser,Clear,Pickcolor,Select,Move,Transform,Rotate,Hand,Zoom"
+  
+  For i = #Action_Spray To #Action_Zoom 
     
-    ;puis on sauve les outils (brush, eraser et pen pour le moment, plus tard les autres
-    For i = 0 To 2
+    If i <> #Action_Eraser
+      theaction  = i
+      PreferenceGroup(StringField(tool$,i+1,","))
       
-      Select  i 
-        Case 0
-          theaction = #action_brush
-          PreferenceGroup("Brush")
-          
-        Case 1 ;  eraser
-          theaction = #Action_Eraser
-          PreferenceGroup("Eraser")
-          
-        Case 2 ;  pen
-          theaction = #Action_Pen
-          PreferenceGroup("Pen")
-            
-       EndSelect
-       
-       With brush(theaction)
-         
-         
-         WritePreferenceInteger("BrushImage",\Id)
-         WritePreferenceInteger("BrushNum",  \BrushNum)
-         WritePreferenceInteger("BrushForm", \BrushForm)
-         WritePreferenceString("BrushDir",   RemoveString(\BrushDir$, GetCurrentDirectory()))
-         
-         ; size
-         WritePreferenceInteger("size",    \Size)
-         WritePreferenceInteger("sizeW",   \SizeW)
-         WritePreferenceInteger("sizeH",   \SizeH)
-         WritePreferenceInteger("sizeMin", \SizeMin)
-         WritePreferenceInteger("sizePressure", \Sizepressure)
-         
-         ; alpha
-         WritePreferenceInteger("alpha",     \Alpha)
-         WritePreferenceInteger("alphablend",\AlphaBlend)
-         WritePreferenceInteger("alphaFG",   \AlphaFG)
-         WritePreferenceInteger("alphaPressure", \AlphaPressure)
-         WritePreferenceInteger("alpharand", \AlphaRand)
-         
-         ; colors
-         WritePreferenceInteger("visco",   \Visco)
-         WritePreferenceInteger("mixing",  \Mix)
-         WritePreferenceInteger("mixtyp",  \MixType)
-         WritePreferenceInteger("mixlayer",  \MixLayer)
-         WritePreferenceInteger("wash",  \wash)
-         WritePreferenceInteger("lavage",  \wash)
-         WritePreferenceInteger("water",   \Water)
-         WritePreferenceInteger("color",   \Color)
-         WritePreferenceInteger("colorFG", \ColorFG)
-         
-         ; dynamnics
-         WritePreferenceInteger("scatter",   \Scatter)
-         WritePreferenceInteger("randrotate",\randRot)
-         WritePreferenceInteger("rotate",    \Rotate)
-         WritePreferenceInteger("rotateangle",\RotateParAngle)
-         
-         ; parameters
-         WritePreferenceInteger("pas",       \pas)
-         WritePreferenceInteger("type",      \Type)
-         WritePreferenceInteger("trait",     \Trait)
-         WritePreferenceInteger("smooth",    \Smooth)
-         WritePreferenceInteger("hardness",  \Hardness)
-         
-         ; shape
-         WritePreferenceInteger("ShapeOutline", \ShapeOutline)
-         WritePreferenceInteger("ShapeOutSize", \ShapeOutSize)
-         WritePreferenceInteger("ShapePlain",   \ShapePlain)
-         WritePreferenceInteger("ShapeType",    \ShapeType)
-         WritePreferenceInteger("RoundX",       \RoundX)
-         WritePreferenceInteger("RoundY",       \RoundY)
-         
-       EndWith
-       
-     Next i
-     
-     
-     
-     
+      With Brush(theaction)
+        WritePreferenceInteger("size", \Size)
+        WritePreferenceInteger("type", \Type)
+        WritePreferenceInteger("alpha", \Alpha)
+        WritePreferenceInteger("alphablend", \AlphaBlend)
+        WritePreferenceInteger("alphaFG", \AlphaFG)
+        WritePreferenceInteger("color", \Color)
+        WritePreferenceInteger("colorFG", \ColorFG)
+        WritePreferenceInteger("ShapeOutline", \ShapeOutline)
+        WritePreferenceInteger("ShapeOutSize", \ShapeOutSize)
+        WritePreferenceInteger("ShapePlain", \ShapePlain)
+        WritePreferenceInteger("ShapeType", \ShapeType)
+        WritePreferenceInteger("RoundX", \RoundX)
+        WritePreferenceInteger("RoundY", \RoundY)          
+      EndWith
+      
+    EndIf
+    
+  Next
+  
+  ;}
+  
+  
+  
 EndProcedure
 Procedure SaveOptions()
+  
+  If OpenPreferences("Pref.ini")
     
-   If OpenPreferences("Pref.ini")
-     
-     WriteDefaultOption()
-     
+    WriteDefaultOption()
+    
     ClosePreferences()
-           
+    
   Else
     
     If CreatePreferences("Pref.ini")
@@ -826,23 +924,23 @@ Procedure SaveOptions()
     EndIf
     
   EndIf
-   
+  
 EndProcedure
 Procedure CreateOptionsFile()
   
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
   
-  PanelToolsW_IE = 170
+  PanelToolsW_IE = 180
   PanelToolsH_IE = 287
   PanelLayerW_IE = 155
   PanelLayerH_IE = 379
   ToolbarToolX = 174
   
-
+  
   If CreatePreferences("Pref.ini")
     
     
-     WriteDefaultOption()
+    WriteDefaultOption()
     ClosePreferences()
   EndIf
   
@@ -878,7 +976,7 @@ Procedure Doc_Open()
     
     Layer_FreeAll()
     ; ClearGadgetItems(#G_LayerList)
-
+    
     DocName$  = GetFilePart(File$, #PB_FileSystem_NoExtension)
     DocPath$  = GetPathPart(File$)
     Ext$      = LCase(GetExtensionPart(File$))
@@ -896,11 +994,11 @@ Procedure Doc_Open()
         Else
           
           If Index  = 4 ; new file format : *.ani
-            ;{ ; new file format : *.ani
+                        ;{ ; new file format : *.ani
             Debug "on dépacke le fichier " +  File$
-                        
+            
             UseZipPacker()
-                        
+            
             ZipFile$ = File$
             Debug ZipFile$
             ;Ne gérant pas la destination de la décompression on va créer un dossier de destination
@@ -973,7 +1071,7 @@ Procedure Doc_Open()
             SetCurrentDirectory(CurentDir$)
             ; puis On ouvre le fichier texte
             Filemain$ = Directory$ + "/"+Filemain$
-      ;}
+            ;}
           Else
             pack = 2
             Filemain$ = File$
@@ -993,6 +1091,7 @@ Procedure Doc_Open()
                 
                 line$ = ReadString(0)
                 info$ = StringField(line$, 1, "|")
+                
                 Debug info$
                 Select info$
                     
@@ -1005,8 +1104,15 @@ Procedure Doc_Open()
                     EndIf
                     
                     
+                  Case "Background"; info about the background (paper..)
+                    OptionsIE\Paper$ = StringField(line$, 2, "|")
+                    paper\alpha = Val(StringField(line$, 3, "|"))
+                    paper\scale = Val(StringField(line$, 3, "|"))
+                    paper\intensity = Val(StringField(line$, 3, "|"))
+                    paper\Color = Val(StringField(line$, 3, "|"))
                     
-                  Case "Image"; les informations liées à l'image
+                    
+                  Case "Image";  informations on the document
                     
                     doc\W = Val(StringField(line$, 2, "|"))
                     doc\H = Val(StringField(line$, 3, "|"))
@@ -1060,8 +1166,8 @@ Procedure Doc_Open()
                       \FontStyle = Val(StringField(line$, 25, "|"))
                       
                       \FontID = LoadFont(#PB_Any,\FontName$,\FontSize,\FontStyle)
-                    
-                    
+                      
+                      
                       If VersionDoc < VersionTeo 
                         imageloaded$ = DocPath$+DocName$+"_"+\name$+".png"         
                       Else                        
@@ -1069,12 +1175,12 @@ Procedure Doc_Open()
                       EndIf
                       
                       temp =  LoadImage(#PB_Any, imageloaded$)
-;                       If pack <> 2 And pack >=1
-;                         Debug "on supprime le fichier : "+imageloaded$
-;                         ;DeleteFile(imageloaded$)
-;                       EndIf
+                      ;                       If pack <> 2 And pack >=1
+                      ;                         Debug "on supprime le fichier : "+imageloaded$
+                      ;                         ;DeleteFile(imageloaded$)
+                      ;                       EndIf
                       
-                     
+                      
                       
                       If temp = 0
                         reponse = MessageRequester("Error", "unable to load the image " + imageloaded$ + ".png. Do you want To open by yourself ?",#PB_MessageRequester_YesNo)     
@@ -1105,10 +1211,10 @@ Procedure Doc_Open()
                 EndSelect
                 
               Wend
-             
+              
               
             EndIf
-             ; on ferme le fichier
+            ; on ferme le fichier
             CloseFile(0)
             ; supprime le dossier temporaire
             If pack >= 1 And pack <> 2
@@ -1184,10 +1290,10 @@ Procedure Doc_Save()
   If p$<>"" 
     
     
-   
+    
     If GetFileExist(p$) = #True
-      rep = MessageRequester(Lang("Info"), Lang("The file exist. Save over it ?"), #PB_MessageRequester_YesNo)
-      If rep = 6
+      rep = MessageRequester(Lang("Info"), Lang("The file already exists. Do you want to overwrite it ?"), #PB_MessageRequester_YesNo)
+      If rep = #PB_MessageRequester_Yes
         ok = 1
       EndIf
     Else
@@ -1216,48 +1322,49 @@ Procedure Doc_Save()
         w_exp = Doc\W
         h_exp = Doc\H
         
-      
+        
         temp = CreateImage(#PB_Any, w_exp, h_exp, 32, #PB_Image_Transparent)
         
-        ; je dois convertir les calques pour prendre en comte les blendmodes 
+        ; I need to convert layers, to get the blendmode // je dois convertir les calques pour prendre en comte les blendmodes 
         For i =0 To Nb
           Layer_ConvertToBm(i)
         Next i
         
         
         ; puis, je dessine tout sur une image temporaire, avant de la sauver et de la supprimer en mémoire.
-        If StartDrawing(ImageOutput(temp))
-          
-          DrawingMode(#PB_2DDrawing_AlphaChannel)
-          Box(0, 0, w_exp, h_exp,RGBA(0,0,0,0))
-          DrawingMode(#PB_2DDrawing_AlphaBlend)
-          
-          For i = 0 To nb
-            
-            If Layer(i)\View
-              Layer_Bm2(i) ; pour définir le drawingmode / blendmode
-              ; j'utilise layer()\Imagetemp et non layer()\image car je dois prendre en comtpe le blendmode.
-              DrawAlphaImage(ImageID(Layer(i)\ImageTemp), 0, 0,Layer(i)\Alpha ) 
-            EndIf
-            
-          Next
-          
-          StopDrawing()
-          
-        EndIf 
+        ;         If StartDrawing(ImageOutput(temp))
+        ;           
+        ;           DrawingMode(#PB_2DDrawing_AlphaChannel)
+        ;           Box(0, 0, w_exp, h_exp,RGBA(0,0,0,0))
+        ;           DrawingMode(#PB_2DDrawing_AlphaBlend)
+        ;           
+        ;           For i = 0 To nb
+        ;             
+        ;             If Layer(i)\View
+        ;               Layer_Bm2(i) ; pour définir le drawingmode / blendmode
+        ;                            ; j'utilise layer()\Imagetemp et non layer()\image car je dois prendre en comtpe le blendmode.
+        ;               DrawAlphaImage(ImageID(Layer(i)\ImageTemp), 0, 0,Layer(i)\Alpha ) 
+        ;             EndIf
+        ;             
+        ;           Next
+        ;           
+        ;           StopDrawing()
+        ;           
+        ;         EndIf 
+        
         
         File$ = RemoveString(p$,".ani")
+        ; in old version, I was saving an image with all layers
+        ;         nom$ = Name$ +".png"
+        ;         SaveImage(temp, nom$, #PB_ImagePlugin_PNG)
+        ;         AddPackFile(0, nom$, nom$)
+        ;         
+        ;         ; puis, on supprime les images créées, pour libérer de la mémoire.
+        ;         FreeImage2(temp)
+        ;         ; result = DeleteFile(nom$,#PB_FileSystem_Force)
+        ;         FileToDelete$(0) = nom$
         
-        nom$ = Name$ +".png"
-        SaveImage(temp, nom$, #PB_ImagePlugin_PNG)
-        AddPackFile(0, nom$, nom$)
-        
-        ; puis, on supprime les images créées, pour libérer de la mémoire.
-        FreeImage2(temp)
-        ; result = DeleteFile(nom$,#PB_FileSystem_Force)
-        FileToDelete$(0) = nom$
-        
-        ; puis, on supprime les images temporaire
+        ; delete the temprorary layer // puis, on supprime les images temporaire
         For i =0 To ArraySize(layer())
           FreeImage2(layer(i)\ImageTemp)
         Next i
@@ -1285,6 +1392,7 @@ Procedure Doc_Save()
           
           WriteStringN(0, "; Made By Animatoon ")
           WriteStringN(0, "Version|"+ OptionsIE\Version$+ "|")
+          WriteStringN(0, "Background|"+ OptionsIE\Paper$+ "|"+Str(paper\alpha)+ "|"+Str(paper\scale)+ "|"+Str(paper\intensity)+ "|"+Str(paper\Color))
           
           image$ = "Image|"+Str(Doc\W)+"|"+Str(Doc\H)+"|"+Str(Nb)+"|"+Str(OptionsIE\Zoom)+"|"+Str(CanvasX)+"|"+Str(CanvasY)+"|"
           WriteStringN(0, Image$)
@@ -1340,8 +1448,8 @@ Procedure Doc_Save()
     
     
   EndIf 
-    
- 
+  
+  
 EndProcedure
 Procedure ExportImage(auto=0)
   
@@ -1367,7 +1475,7 @@ Procedure ExportImage(auto=0)
           FreeSprite2(#Sp_CopyForsave)
         EndIf 
       EndIf
-    
+      
     Next i  
   EndIf
   
@@ -1427,7 +1535,7 @@ Procedure.s ExportOnImage()
     
     result$ = RemoveString(filename$,ext$)
     SaveImage(#ImageExport, filename$,format)
-        
+    
     ; puis, on supprime les images temporaire
     For i =0 To ArraySize(layer())
       FreeImage2(layer(i)\ImageTemp)
@@ -1448,26 +1556,26 @@ Procedure.i CaptureScreenToImage(x.i, y.i, width.i, height.i)
   srcDC = CreateDC_("DISPLAY", "", "", dm)
   trgDC = CreateCompatibleDC_(srcDC)
   BMPHandle = CreateCompatibleBitmap_(srcDC, width, height)
- 
+  
   RedrawWindow_(#Null,#Null,#Null,#RDW_INVALIDATE)
- 
+  
   SelectObject_( trgDC, BMPHandle)
   BitBlt_( trgDC, 0, 0, width, height, srcDC, x, y, #SRCCOPY)
- 
+  
   DeleteDC_( trgDC)
   ReleaseDC_( BMPHandle, srcDC)
- 
+  
   TmpImage.i = CreateImage(#PB_Any, width, height)
   If StartDrawing(ImageOutput(TmpImage))
     DrawImage(BMPHandle, 0, 0)
     StopDrawing()
   EndIf
-
+  
   DeleteDC_(trgDC)
   ReleaseDC_(BMPHandle, srcDC)
- 
+  
   ProcedureReturn TmpImage
- 
+  
 EndProcedure
 Procedure MakeScreenshot(x,y,Width,Height,File.s) 
   hImage = CreateImage(#PB_Any,Width,Height,32)
@@ -1493,7 +1601,7 @@ Procedure File_SaveImage()
   ; ce qu'on voit à l'écran, puis tout coller ensuite en une seule grosse image 
   ; si c'est plus gros que la taille de l'écran ^^
   name$ = ExportOnImage()
-
+  
   If name$ = ""
     name$ = "Img_"+Str(Random(1000000))+"_"
   Else
@@ -1515,7 +1623,7 @@ Procedure File_SaveImage()
   
   OldCanvasX = CanvasX
   OldCanvasY = CanvasY
- 
+  
   OldZoom = OptionsIE\Zoom
   OptionsIE\Zoom = 100
   
@@ -1527,7 +1635,7 @@ Procedure File_SaveImage()
   
   
   ;Debug "nbre de partie : "+Str(NbPartX)+"*"+Str(NbPartY)+"="+Str(NbPart)
-
+  
   u=0
   For i = 0 To NbPartX
     For j = 0 To NbPartY
@@ -1536,7 +1644,7 @@ Procedure File_SaveImage()
       H = ScreenHeight()
       CheckIfInf2(doc\w,w)
       CheckIfInf2(doc\h,h)
-
+      
       ; on va déplacer tous les calques en même temps, pour avoir toutes les parties de l'écran au complet :)
       CanvasX = - i*W
       CanvasY = - j*H
@@ -1544,15 +1652,15 @@ Procedure File_SaveImage()
       ;Debug "position du canvas : "+Str(CanvasX)+"/"+Str(CanvasY)
       ; puis, j'update le screen
       ClearScreen(RGB(120,120,120)) ; on efface tout
-      ; the paper
-      PaperDraw() ; je met le paper ?
-            
+                                    ; the paper
+      PaperDraw()                   ; je met le paper ?
+      
       Layer_DrawAll(); tous les calques
       FlipBuffers(): ; affiche l'ecran
       
-;       If IsImage(#Img_saveImage) = 0
-;         CreateImage(#Img_saveImage, W,H,32,#PB_Image_Transparent)
-;       EndIf
+      ;       If IsImage(#Img_saveImage) = 0
+      ;         CreateImage(#Img_saveImage, W,H,32,#PB_Image_Transparent)
+      ;       EndIf
       
       
       GrabSprite(#Sp_ToSaveImage,0,0,w,h)
@@ -1599,33 +1707,33 @@ Procedure File_SaveImage()
       MessageRequester("error","unable to save the part of the image screen !"+savefile$)
     EndIf
     
-   ; puis on libère la mémoire
+    ; puis on libère la mémoire
     FreeImage(#Img_saveImage)
-
+    
     
   Else
     MessageRequester("Error", "unable to create the final image")
-  
+    
   EndIf
-
+  
   For i = 0 To NbPart
-     FreeImage2(TempoImg(i))
+    FreeImage2(TempoImg(i))
   Next i
   
   FreeArray(TempoImg())
   
   ; on supprime l'image temporaire
   DeleteFile("sprite__0__0.png")
-
+  
   
   ; et on rétablit le screen tel qu'il était
   CanvasX = OldCanvasX
   CanvasY = OldCanvasY
   
- 
+  
   OptionsIE\Zoom = OldZoom
   ScreenUpdate()
-
+  
   
 EndProcedure
 
@@ -1653,10 +1761,10 @@ Procedure AutoSaveThreaded(Parameter) ; with thread
     
     ; si elle n'a pas changé, on revérifie toutes les 10 s
     Delay(10000) ; mettre un délai ici pour éviter de bouffer le tps processeur
-    ;Debug "autosave"
+                 ;Debug "autosave"
     
   ForEver
-
+  
 EndProcedure
 
 Procedure AutoSave()
@@ -1678,55 +1786,55 @@ Procedure AutoSave()
         ; First, examine if directories exists // d'abord on vérifie que le dossier "save existe
         saveDir$ = GetCurrentDirectory()+"save\"
         If ExamineDirectory(0, GetCurrentDirectory(), "")
-;           If IsDirectory(0) = 0
-;             If CreateDirectory(saveDir$) = 0
-;               MessageRequester(LAng("Error"), lang("Unable to create the 'save' directory."))
-;               saveDir$ = GetCurrentDirectory()
-;             EndIf
-;           EndIf
-            While NextDirectoryEntry(0)
-              If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
-                If DirectoryEntryName(0) = "save";"autosave"
-                  trouve = 1
-                EndIf
+          ;           If IsDirectory(0) = 0
+          ;             If CreateDirectory(saveDir$) = 0
+          ;               MessageRequester(LAng("Error"), lang("Unable to create the 'save' directory."))
+          ;               saveDir$ = GetCurrentDirectory()
+          ;             EndIf
+          ;           EndIf
+          While NextDirectoryEntry(0)
+            If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
+              If DirectoryEntryName(0) = "save";"autosave"
+                trouve = 1
               EndIf
-            Wend 
-
+            EndIf
+          Wend 
+          
           FinishDirectory(0)
         EndIf
         
         If trouve = 0
           If CreateDirectory(saveDir$) = 0
-              MessageRequester(Lang("Error"), lang("Unable to create the 'save' directory."))
-              saveDir$ = GetCurrentDirectory()
-            EndIf
-         EndIf
+            MessageRequester(Lang("Error"), lang("Unable to create the 'save' directory."))
+            saveDir$ = GetCurrentDirectory()
+          EndIf
+        EndIf
         
         ;Debug GetCurrentDirectory()
         ;Debug saveDir$
         
         ; create autosave if needed
         autosaveDir$ = saveDir$;+"autosave\"
-         ;Debug autosaveDir$
-;         If ExamineDirectory(0, autosaveDir$, "")
-;           If IsDirectory(0) = 0
-;             If CreateDirectory(autosaveDir$) = 0
-;               MessageRequester(LAng("Error"), lang("Unable to create the 'autosave' directory."))
-;               autosaveDir$ =  GetCurrentDirectory()
-;             
-;             EndIf
-;           Else
-;             While NextDirectoryEntry(0)
-;               If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
-;                 If
-;                 EndIf
-;               EndIf
-;             Wend 
-;           EndIf
-;           FinishDirectory(0)
-;         Else
-;           Debug "erreur examinedirectory "+
-;         EndIf
+                               ;Debug autosaveDir$
+                               ;         If ExamineDirectory(0, autosaveDir$, "")
+                               ;           If IsDirectory(0) = 0
+                               ;             If CreateDirectory(autosaveDir$) = 0
+                               ;               MessageRequester(LAng("Error"), lang("Unable to create the 'autosave' directory."))
+                               ;               autosaveDir$ =  GetCurrentDirectory()
+                               ;             
+                               ;             EndIf
+                               ;           Else
+                               ;             While NextDirectoryEntry(0)
+                               ;               If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
+                               ;                 If
+                               ;                 EndIf
+                               ;               EndIf
+                               ;             Wend 
+                               ;           EndIf
+                               ;           FinishDirectory(0)
+                               ;         Else
+                               ;           Debug "erreur examinedirectory "+
+                               ;         EndIf
         
         
         ; Debug autosaveDir$
@@ -1743,10 +1851,10 @@ Procedure AutoSave()
             
             theAutosavedir$ = autosaveDir$ ; GetCurrentDirectory() + "save\autosave\"
             If SaveImage(layer(i)\Image,  theAutosavedir$+"AutoSave_"+Date$+"_"+layer(i)\Name$+"_"+Str(i)+".png",#PB_ImagePlugin_PNG)
-             ; Debug LAng("ok save image layer "+layer(i)\Name$)
+              ; Debug LAng("ok save image layer "+layer(i)\Name$)
             Else
-             ; Debug LAng("Error") +" /"+ lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$)
-             ; add a log error !!
+              ; Debug LAng("Error") +" /"+ lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$)
+              ; add a log error !!
               AddLogError(1, lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$))
             EndIf
             AddLogError(1, lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$))
@@ -1815,7 +1923,7 @@ Procedure Edit_Select(selectAll=1)
   OptionsIE\Selection = selectAll
   
   OptionsIE\SelectAlpha = 0
-                         
+  
   OptionsIE\SelectionX = 0
   OptionsIE\SelectionY = 0
   OptionsIE\SelectionW = doc\w
@@ -1828,17 +1936,17 @@ EndProcedure
 Procedure ResizeDoc(canvas=0)
   
   ; If OpenWindow(#Win_ResizeDoc,
-    w = Val(InputRequester("Width","New Width of the Document", ""))
-    h = Val(InputRequester("Height","New Height of the Document", ""))
-    oldW = doc\w
-    oldH = doc\h
+  w = Val(InputRequester("Width","New Width of the Document", ""))
+  h = Val(InputRequester("Height","New Height of the Document", ""))
+  oldW = doc\w
+  oldH = doc\h
   
   If w*h >= 3000*3000
     rep = MessageRequester("Info","The new size will be big. Continue ?",#PB_MessageRequester_YesNo)
   Else 
     ok = 1
   EndIf
-   
+  
   If rep = #PB_MessageRequester_Yes Or ok =1
     
     ok =0
@@ -1990,7 +2098,7 @@ Procedure ResizeDoc(canvas=0)
     ;Debug "New size : "+Str(doc\w)+"/"+Str(doc\h)
     
   EndIf
-
+  
 EndProcedure
 Procedure CropDoc()
   
@@ -2019,15 +2127,15 @@ Procedure CropDoc()
     StatusBarProgress(#Statusbar, 3, 5)
     
     ; on crée des images temporaires, on va dessiner dessus chaque calque image et calque BM
+    
+    For i=0 To n
       
-      For i=0 To n
-        
-        StatusBarProgress(#Statusbar, 3, (i+1)*10,0,0,n1)
-        
-        tmp = GrabImage(layer(i)\Image,#PB_Any,x,y,w1,h1)
-        tmpBM = GrabImage(layer(i)\ImageBM,#PB_Any,x,y,w1,h1)
-        
-        If Tmp > 0 And TmpBm > 0
+      StatusBarProgress(#Statusbar, 3, (i+1)*10,0,0,n1)
+      
+      tmp = GrabImage(layer(i)\Image,#PB_Any,x,y,w1,h1)
+      tmpBM = GrabImage(layer(i)\ImageBM,#PB_Any,x,y,w1,h1)
+      
+      If Tmp > 0 And TmpBm > 0
         FreeImage2(layer(i)\Image)
         FreeImage2(layer(i)\ImageBM)
         
@@ -2082,12 +2190,12 @@ Procedure CropDoc()
         
         Layer_Update(i)
         ;Debug "size : " +Str(ImageWidth(layer(layerid)\Image))+"/"+Str(ImageHeight(layer(layerId)\Image))
-         ; on supprime les images temporaires
+        ; on supprime les images temporaires
         FreeImage2(Tmp)
         FreeImage2(TmpBm)
-        EndIf
-        
-      Next i 
+      EndIf
+      
+    Next i 
     
     ; puis, on met à jour
     NewPainting = 1
@@ -2095,18 +2203,18 @@ Procedure CropDoc()
     ScreenUpdate(1)
     StatusBarProgress(#Statusbar, 3, n1,0,0,n1)
     IE_StatusBarUpdate()
-
+    
     
   EndIf
   
   
-   OptionsIE\SelectionX =0
-   OptionsIE\SelectionY =0
-   OptionsIE\Selection =0
-   OptionsIE\SelectionW =0
-   OptionsIE\SelectionH =0
-   DisableMenuItem(0, #menu_Crop, 1)
-   
+  OptionsIE\SelectionX =0
+  OptionsIE\SelectionY =0
+  OptionsIE\Selection =0
+  OptionsIE\SelectionW =0
+  OptionsIE\SelectionH =0
+  DisableMenuItem(0, #menu_Crop, 1)
+  
   
 EndProcedure
 
@@ -2121,57 +2229,57 @@ Procedure TrimDoc(img,crop=0)
   
   If StartDrawing(ImageOutput(img))
     DrawingMode(#PB_2DDrawing_AlphaBlend)
-  ; on calcule x et Y et W et H pour recadrer l'image avec en enlevant les bordures alpha.
-  For u=0 To 3    
-    For i =0 To w-1
-      For j=0 To h-1
-        
-        col=Point(i,j)        
-        If Alpha(col) >0
+    ; on calcule x et Y et W et H pour recadrer l'image avec en enlevant les bordures alpha.
+    For u=0 To 3    
+      For i =0 To w-1
+        For j=0 To h-1
           
-          Select u 
-              
-            Case 0 ; x
-              If i < x(0)
-                x(0) = i
-                If i=0
-                  Break
-                EndIf
-              EndIf 
-              
-            Case 1 ; y
-              If j < x(1)
-                x(1) = j
-                If j=0
-                  Break
-                EndIf
-              EndIf 
-              
-            Case 2 ; w
-              If i > x(2)
-                x(2) = i
-                If i=w-1
-                  Break
-                EndIf                
-              EndIf 
-              
-            Case 3 ; h
-              If j > x(3)
-                x(3) = j
-                If j=h-1
-                  Break
-                EndIf                
-              EndIf 
-              
-          EndSelect
-        EndIf
-        
+          col=Point(i,j)        
+          If Alpha(col) >0
+            
+            Select u 
+                
+              Case 0 ; x
+                If i < x(0)
+                  x(0) = i
+                  If i=0
+                    Break
+                  EndIf
+                EndIf 
+                
+              Case 1 ; y
+                If j < x(1)
+                  x(1) = j
+                  If j=0
+                    Break
+                  EndIf
+                EndIf 
+                
+              Case 2 ; w
+                If i > x(2)
+                  x(2) = i
+                  If i=w-1
+                    Break
+                  EndIf                
+                EndIf 
+                
+              Case 3 ; h
+                If j > x(3)
+                  x(3) = j
+                  If j=h-1
+                    Break
+                  EndIf                
+                EndIf 
+                
+            EndSelect
+          EndIf
+          
+        Next
       Next
     Next
-  Next
-  StopDrawing()
-EndIf
-
+    StopDrawing()
+  EndIf
+  
   If crop=0
     tempimg = GrabImage(img,#PB_Any,x(0),x(1),x(2)-x(0),x(3)-x(1))  
     ProcedureReturn tempimg 
@@ -2184,7 +2292,7 @@ EndIf
   EndIf
   
   
- 
+  
 EndProcedure
 ;}
 
@@ -2192,16 +2300,15 @@ EndProcedure
 
 Procedure SelectionSet()
   
+  ; not finished
   
   If StartDrawing(ImageOutput(layer(layerId)\Image))
-    
-    
     
     
     StopDrawing()
   EndIf
   
-    
+  
 EndProcedure
 
 
@@ -2209,9 +2316,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 609
-; FirstLine = 90
-; Folding = CECgBoCj7BAAAAAAAAAAAIAAAAAAAAAAAAA+
+; CursorPosition = 2305
+; Folding = AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA9
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

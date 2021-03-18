@@ -78,7 +78,7 @@ LoadImage(#ico_LayerDown,     OptionsIE\Theme$ +"\icones\down.png")
 LoadImage(#ico_LayerMask,     OptionsIE\Theme$ +"\layerbtn3.jpg")
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 28
+; CursorPosition = 10
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

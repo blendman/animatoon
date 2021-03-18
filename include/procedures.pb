@@ -2,7 +2,7 @@
 ; procedure animation v6 - 06/2015 - pb 5.30LTS
 
 ; declare
-XIncludeFile "procedures\declare.pbi"
+; XIncludeFile "procedures\declare.pbi"
 
 
 ;{ util
@@ -30,7 +30,7 @@ Procedure ImageLoad2(nb,file$,w=25,h=25)
   Else
     ProcedureReturn Result
   EndIf
-
+  
 EndProcedure
 Procedure CreateImage2(img,w,h,img$,d=24,t=0)
   
@@ -56,7 +56,7 @@ Procedure DrawTextEx(x.f,y.f,text$, couleur.l=0, lineHeight.w=19)
   Protected nbLine.i=1 ; il y a au moins une ligne
   newtxt${#MaxTxt} = text$
   nbLine + CountString(newtxt$,Chr(13)) ; Nombre de "saut" , au moins 1 
-   For i = 1 To nbLine
+  For i = 1 To nbLine
     Line$ = StringField(newtxt$,i,Chr(13)) ; on découpe entre les chr(10)
     DrawText(x, y + ( (i-1)*lineHeight), Line$, couleur);,$0,$FFFFFF) ; On affiche , et on ajuste suivant l'itérateur 'i' et la hauteur de ligne
   Next
@@ -168,7 +168,7 @@ Procedure CreateSelection()
       DrawingMode(#PB_2DDrawing_Outlined)
       ; la sélection
       ;If OptionsIE\Selection = 1
-         Box(0,0,OptionsIE\SelectionW,OptionsIE\SelectionH,RGBA(255,0,0,255))
+      Box(0,0,OptionsIE\SelectionW,OptionsIE\SelectionH,RGBA(255,0,0,255))
       ;EndIf
       StopDrawing()
     EndIf
@@ -204,10 +204,10 @@ EndMacro
 Procedure ScreenDraw()
   
   z.d = OptionsIE\zoom * 0.01
-
-    ; on update le screen
+  
+  ; on update le screen
   ClearScreen(RGB(120,120,120))
-
+  
   ; the paper
   PaperDraw() ; in 
   
@@ -220,8 +220,8 @@ Procedure ScreenDraw()
   Layer_DrawBorder(LayerId) 
   DrawUtil()
   
- 
-
+  
+  
 EndProcedure
 Procedure SetAlphaMask()
   
@@ -238,7 +238,7 @@ Procedure SetAlphaMask()
       DrawAlphaImage(ImageID(#Img_AlphaSel),0,0)  
       DrawingMode(#PB_2DDrawing_AlphaClip)
     EndIf
-  
+    
     If (layer(layerid)\MaskAlpha >= 1 And layer(layerid)\MaskAlpha < 3)
       ; DrawingMode(#PB_2DDrawing_AlphaChannel)
       DrawAlphaImage(ImageID(Layer(i)\ImageAlpha),0,0)    
@@ -246,7 +246,7 @@ Procedure SetAlphaMask()
       ;DrawingMode(#PB_2DDrawing_CustomFilter)
       ;CustomFilterCallback(@Filtre_MaskAlpha())
       
-    ;Else
+      ;Else
       ;DrawingMode(#PB_2DDrawing_AlphaBlend)
     EndIf
     
@@ -258,7 +258,7 @@ Procedure SetAlphaMask()
       
       If layer(layerid)\Bm = #Bm_Normal
         DrawingMode(#PB_2DDrawing_CustomFilter)
-       CustomFilterCallback(@Filtre_MaskAlpha())
+        CustomFilterCallback(@Filtre_MaskAlpha())
       Else
         DrawingMode(#PB_2DDrawing_AlphaClip)
       EndIf
@@ -269,7 +269,7 @@ Procedure SetAlphaMask()
   EndIf
   
 EndProcedure
-  
+
 Procedure ScreenUpdate(updateLayer=0)
   
   z.d = OptionsIE\zoom * 0.01
@@ -332,7 +332,7 @@ Procedure ScreenUpdate(updateLayer=0)
             Layer_DrawImg(LayerId, alpha)
             
           Case #bm_overlay;, #Bm_LinearBurn
-            ;Box(0,0,w,h,RGBA(0,0,0,255))
+                          ;Box(0,0,w,h,RGBA(0,0,0,255))
             Box(0,0,w,h,RGBA(60,60,60,255))
             ;DrawAlphaImage(ImageID(Layer(LayerId)\ImageBM),0,0,layer(layerid)\alpha)
             ; SetAlphaMask()
@@ -356,11 +356,14 @@ Procedure ScreenUpdate(updateLayer=0)
   
   ScreenDraw()  
   
-  ; on affiche l'ecran
+  ; show the screen / on affiche l'ecran
   FlipBuffers()
   
 EndProcedure
 Procedure ScreenZoom()
+  
+  ; zoom on the screen
+  z.d = OptionsIE\zoom * 0.01
   
   IE_StatusBarUpdate()
   BrushUpdateImage(0,1)
@@ -378,10 +381,35 @@ Procedure ScreenZoom()
     
   EndIf
   
-  ScreenDraw()
   
-  FlipBuffers():; affiche l'ecran
-
+  ; then check the zoom type
+  Select brush(#Action_Zoom)\Type
+      
+    Case 0 
+      ; by default in 0, 0
+      
+      
+    Case 1 
+      ; zoom on mouse --- WIP !!! don't work :(
+      CanvasX = mx - OldCanvasX
+      CanvasY = my - OldCanvasY
+      ; CanvasX = OldCanvasX + ((mx - OldCanvasX)* (Z - 1.0) + (Z * Abs(CanvasX))) * -1 
+      ; CanvasY = OldCanvasY + ((my - OldCanvasY)* (Z - 1.0) + (Z * Abs(CanvasY))) * -1
+      
+      ; Vx = x + ((Mx - x) * (ZFactor - 1.0) + (ZFactor * Abs(Vx))) * -1
+      ; Vy = Y + ((My - y) * (ZFactor - 1.0) + (ZFactor * Abs(Vy))) * -1
+      
+      
+    Case 2 
+      ; zoom on center of the canvas
+      CanvasX = ScreenWidth()/2 - (doc\w*z)/2
+      CanvasY = ScreenHeight()/2 - (doc\h*z)/2
+      
+  EndSelect
+  
+  ScreenDraw()
+  FlipBuffers() ; show the screen // affiche l'ecran
+  
 EndProcedure
 Procedure ResizeScreen(w,h)
   
@@ -391,11 +419,11 @@ Procedure ResizeScreen(w,h)
   CanvasH = h
   
   For i = 0 To ArraySize(layer())
-      FreeSprite2(layer(i)\Sprite)
+    FreeSprite2(layer(i)\Sprite)
   Next i
   
   FreeSprite2(#Sp_Paper)
-    
+  
   ; on ferme l'écran
   CloseScreen()
   
@@ -440,15 +468,13 @@ CompilerEndIf
 
 
 
-
-
 XIncludeFile "procedures\window.pbi"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 105
-; FirstLine = 40
-; Folding = wgBA5Z35-
+; CursorPosition = 392
+; FirstLine = 59
+; Folding = AABAAAQCw
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

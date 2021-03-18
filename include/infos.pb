@@ -22,19 +22,12 @@
 
 ; URGENT
 ; - brush fondu alpha et size
-; - pipette option : all, layer only, all above
-
-
-; BUGS - urgent
-
-
-
 
 ; BUGS
 ; - cadre selection bug avec zoom
 ; - gradient linear AR
 ; - bug UI à l'ouverture suivante, quand on déplace les splitters en Y (swatch par exemple)
-; - revoir la création et loading des images si erreur ! 
+; - revoir la création et loading des images si erreur ! (init.pb)
 ; - dans gadgets.pbi : parfois, on est pas dans la surface pour faire point() : (bug debugger)
 ; Brush(Action)\color  = Point(x,y) et  Brush(Action)\ColorFG  = Point(x,y) 
 ; - bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
@@ -54,13 +47,15 @@
 ; TOOLS
 ; - bug linear gradient !!
 ; - add pattern tool (tampon)
-; - add a kind ot pattern-tool grey level + color // 
+; - add a kind ot pattern stamp ( grey level + color, to add a kind of texture during the painting) // 
 ; (ajouter sorte de tampon (niveau de gris) + couleur, pour peindre de l'aquarelle (texture) avec une couleur.)
+; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY  and IE_Options\confirmaction....
 
 ; PAPER
 ; - add a paper editor
 ; - AR !!!! paper scale : ok when change trackbar paperScale
-; ok 0.586- add a color background (white for the moment)
+; ok 0.589 - option save/load paper parameters (pref.ini)
+; ok 0.586 - add a color background (white for the moment)
 
 ; IMAGEs
 ; - Level is'nt good // niveau ne fonctionne pas très bien, voir en temps réel et mettre plus d'info sur les trackbar (on ne sait pas ce que c'est)
@@ -81,17 +76,45 @@
 
 
 
+; 18/03/2021 0.589 (revision 0)
+; // new
+; - add 2 zoom types : on mouse (very wip), center of the screen
+; - add pickcolor gadgets option : layer only, all layers
+; - UsePickColorTogetColor(mx, my) : to pick the color (picker or with alt +clic if tool = brush/pen
+; // Changes
+; - autosave : use an internal name to not create lots of images copie when autosave.
+; - define by default some tools parameters (in structures.pb)
+; - when save, there is no more an image with all layers in the zip (.ani)
+; - change FillArea2() by FillArea() because fillarea2() is too long to work (need to be changed) And do some crash. 
+; (I have To check what is the issue).
+; // fixes
+; - fixe langage for some gadgets (didn't use lang("keyword") but only "keyword")
+; - option (pref.ini) : save parameters for the other tools than pen/brush/eraser/gradient.
+; - option : load parameters for the other tools.
+; - save the paper parameters (alpha, scale, intensity, color) in the pref.ini
+; - save the paper parameters (alpha, scale, intensity, color) in the doc (SaveDoc())
+; - Load the paper parameters (alpha, scale, intensity, color) in the doc (OpenDoc())
+; - fixe bugs in loadoption, with group 
+; - in paper gadget (option panel) : the alpha, scale, intensity wasn't updated after loading option file (pref.ini)
+; - in paper gadget (option panel) : the alpha, scale, intensity wasn't saved
+; - some fix in panal width (tool, colors, options, swatch..)
+
+
 ; 17/03/2021 0.588 (revision 7)
 ; // Changes
-; - if we change the langage (file/preference), the menu is updated with the new langage.
+; - if we change the langage (file/preference), the menu is now updated with the new langage.
 ; - change max() by SetMaximum() (max() should be "get the max of two args", not "set")
 ; // fixes
 ; - bug with Setting langage in Window Preference
 ; - fix langage missing For some gadgets
+; - fix langage missing For statusbar
 ; - WindowPref() didn't change the chosen langage
 ; - when we have not a pref.ini file, animatoon crash. Need to create a "basic" pref.ini file before to launch the program, with some options.
-; - define options and some brush paramters by default
+; - define options and some brush parameters by default
 ; - when animatoon does'nt find the roughboard image, now it create a new image with white background.
+; // github
+; - create a repository for animatoon, with all source files (+data files)
+
 
 
 ; 16/03/2021 0.588 (revision 6)
@@ -635,7 +658,7 @@
 ; - qd on bougeait un layer et qu'on en sélectionnait un autre, il appliquait le changement (x,y) au layer sélectionné.
 ; - bug : qd on ouvrait un document avec des layers avec bm screen ou overlay, etc.. les layers n'étaient pas mis à jour tout de suite
 ; test
- ; - wheel mouse (marche avec mousewheel(), mais il faut examinemouse()
+; - wheel mouse (marche avec mousewheel(), mais il faut examinemouse()
 
 
 ; 15/06/2015 0.255
@@ -1392,8 +1415,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 41
-; FirstLine = 24
-; Folding = G-
+; CursorPosition = 80
+; FirstLine = 63
+; Folding = C+
 ; EnableXP
 ; EnableUnicode

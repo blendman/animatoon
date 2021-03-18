@@ -4,30 +4,30 @@
 
 Structure LOGCONTEXTA
   lcName.b[40];
-  lcOptions.l;
-  lcStatus.l;
-  lcLocks.l;
-  lcMsgBase.l;
-  lcDevice.l;
-  lcPktRate.l;
-  lcPktData.l;
-  lcPktMode.l;
+  lcOptions.l ;
+  lcStatus.l  ;
+  lcLocks.l   ;
+  lcMsgBase.l ;
+  lcDevice.l  ;
+  lcPktRate.l ;
+  lcPktData.l ;
+  lcPktMode.l ;
   lcMoveMask.l;
   lcBtnDnMask.l;
   lcBtnUpMask.l;
-  lcInOrgX.l;
-  lcInOrgY.l;
-  lcInOrgZ.l;
-  lcInExtX.l;
-  lcInExtY.l;
-  lcInExtZ.l;
-  lcOutOrgX.l;
-  lcOutOrgY.l;
-  lcOutOrgZ.l;
-  lcOutExtX.l;
-  lcOutExtY.l;
-  lcOutExtZ.l;
-  lcSensX.l;
+  lcInOrgX.l   ;
+  lcInOrgY.l   ;
+  lcInOrgZ.l   ;
+  lcInExtX.l   ;
+  lcInExtY.l   ;
+  lcInExtZ.l   ;
+  lcOutOrgX.l  ;
+  lcOutOrgY.l  ;
+  lcOutOrgZ.l  ;
+  lcOutExtX.l  ;
+  lcOutExtY.l  ;
+  lcOutExtZ.l  ;
+  lcSensX.l    ;
   
   lcSensY.l;
   lcSensZ.l;
@@ -102,11 +102,11 @@ EndStructure
 #PK_Z                 = $0200 ;/* z axis */
 #PK_NORMAL_PRESSURE   = $0400 ;/* normal Or tip pressure */
 #PK_TANGENT_PRESSURE  = $0800 ;/* tangential Or barrel pressure */
-;}
+                              ;}
 
 ;}
 
-;utile
+; utile
 Structure Vector2f
   x.f : y.f
 EndStructure
@@ -171,7 +171,7 @@ Structure sOptions
   SelectionY.w
   SelectionW.w
   SelectionH.w
-    
+  
   ; shapes (box, circle...)
   Shape.a
   ShapeX.w
@@ -201,10 +201,10 @@ Structure sOptions
   Autosave.a
   AutosaveTime.i
   AutosaveAtExit.a
+  AutosaveFileName$
   ImageHasChanged.a
-  
   ConfirmExit.a
-
+  
   
   ; Undo
   Maxundo.w
@@ -243,17 +243,17 @@ Structure sOptions
   PanelToolsH.w
   NbTools.a
   
-   ; animation, frame...
+  ; animation, frame...
   SizeFrameW.w
   AnimBarre.a
-    
+  
   ; color  
   selectColor.a ; what is the selector color used ?
   
   
   ; Tools options
-
-    
+  
+  
   ; PANEL LAYERS 
   ; PanelLayerW.w ; Panel Layer W
   ; PanelLayerH.w ; Panel Layer H
@@ -265,7 +265,7 @@ Structure sOptions
   ; PANEL OPTIOPNS
   AreaBGColor.i
   Paper$ ; the paper of the canvas
-    
+  
   ; Directory  
   DirPattern$
   DirPreset$
@@ -274,7 +274,7 @@ Structure sOptions
   ;}
   
   
-   ; delays  
+  ; delays  
   Delay.w
   DelayMax.w
   
@@ -287,7 +287,7 @@ Structure sOptions
   
   ; Zoom
   Zoom.w
-    
+  
   
   ; layers
   AdjustLayerToImage.a
@@ -307,7 +307,7 @@ Structure sOptions
   ; path et file
   PathSave$
   PathOpen$
- 
+  
   
 EndStructure
 Global OptionsIE.sOptions
@@ -373,7 +373,7 @@ Structure sColor
   L.l ; luminence 
 EndStructure
 
-;{ brush - the brush structures
+;{ tools (the brush structures)
 Structure Brush
   
   Name$
@@ -398,7 +398,7 @@ Structure Brush
   SizeW.w : sizeH.w
   SizeRndFactor.w : SizeMin.w
   SizeOld.w : SizeNew.w ; to see if the size has changed, if yes : I resize the image and set sizeOld = sizeNew.
-  FinalSize.w ; needed for some action with pressure tablet
+  FinalSize.w           ; needed for some action with pressure tablet
   
   
   Transition.a
@@ -417,7 +417,7 @@ Structure Brush
   ; stroke
   Pas.w : Trait.a
   StrokeTyp.a : Stroke.a
-
+  
   
   ; position and size
   X.w : Y.w
@@ -448,7 +448,7 @@ Structure Brush
   
   ;on garde, car je m'en sers pour le mixtype = 1
   ColorOld.i ; pour le fade vers le mix
-  ColorNext.i ; pour le fade vers le mix
+  ColorNext.i; pour le fade vers le mix
   Color.i
   ColorQ.i ; couleur temporaire, avec mixing
   Randcolor.w
@@ -463,7 +463,7 @@ Structure Brush
   
   ; les actions et type d'outil
   Tool.a ; si brush = pinceau =>
-  ; Action.a ; on peint, on déplace un calque, etc...
+         ; Action.a ; on peint, on déplace un calque, etc...
   
   
   ; l'image utilisé pour le brush
@@ -471,7 +471,7 @@ Structure Brush
   BrushNumMax.w ; le nombre max de brush dans le dossier "data\brush..."
   BrushDir$     ; directory des brush
   BrushForm.a   ; circle, square
-
+  
   KeepAlpha.a
   
   
@@ -480,7 +480,7 @@ Structure Brush
   Spray.w
   SprayForm.w
   NbSpray.a
-
+  
   ; Particle
   
   ; pickers
@@ -497,11 +497,26 @@ Structure Brush
   
   ; Gradient
   GradientType.a
-
+  
   
 EndStructure
 Global Dim brush.brush(#Action_Zoom)
 Global Action.a = #Action_Brush  
+
+; define by default
+For i=0 To #Action_Zoom
+  With Brush(i)
+    If i <> #Action_Brush
+      \size = 1
+      \alpha = 255
+      \AlphaFG = 255
+      \Color = RGB(255, 255, 255)
+      \ColorBG\R = 255
+      \ColorBG\G = 255
+      \ColorBG\B = 255
+    EndIf
+  EndWith
+Next 
 
 With Brush(Action) ; define some parameters (no more used ?)
   \Id = 62
@@ -520,6 +535,8 @@ With Brush(Action) ; define some parameters (no more used ?)
   \Wash = 1
   \version = 6 ; 6th version ,  c'est la sixième version : GM/PB/teo/agk/pb2-optimised/pb_screen
 EndWith
+
+
 ;}
 
 
@@ -551,14 +568,14 @@ Global HSV.sHsv
 
 
 ;{ les tiles
-  
-  ; taille des tiles
-  Global Nx,Ny,Tw,NbTile
-  Tw = 128
-  Nx = Round(Doc\W/Tw,#PB_Round_Up)
-  Ny = Round(Doc\H/Tw,#PB_Round_Up)
-  NbTile = Nx * Ny
-    
+
+; taille des tiles
+Global Nx,Ny,Tw,NbTile
+Tw = 128
+Nx = Round(Doc\W/Tw,#PB_Round_Up)
+Ny = Round(Doc\H/Tw,#PB_Round_Up)
+NbTile = Nx * Ny
+
 Structure stile
   x.w
   y.w
@@ -647,7 +664,7 @@ Structure sLayer
   ToDelete.a ; on va supprimer le calque
   
   Haschanged.a ; pour vérifier s'il a changé, c'est pour l'autosave par exemple
-    
+  
   OkForColorPick.a ; on peut l'utiliser pour prendre la couleur (avec le mode mixtyp en custom
   
   ; transform
@@ -668,7 +685,7 @@ Global LayerNb.w,LayerIdMax.w
 ;}
 
 
-;{ paper : the papers are in data\paper // il y a le papier qu'on utilise et les images dans le dossier data/paper/
+;{ background/paper : the papers are in data\papers // il y a le papier qu'on utilise et les images dans le dossier data/paper/
 Structure sPaper
   nom$
   alpha.a
@@ -679,8 +696,14 @@ Structure sPaper
   Color.i
 EndStructure
 Global Paper.sPaper
+; Define by default
+Paper\alpha = 255
+Paper\scale = 10
+Paper\intensity = 1
+Paper\Color = RGB(255, 255, 255)
+
 Global Dim Thepaper.sPaper(0) ; for the paper editor
-;}
+                              ;}
 
 
 
@@ -742,9 +765,8 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 317
-; FirstLine = 11
-; Folding = AQAJAA-
+; CursorPosition = 108
+; Folding = AAAAAA5
 ; Markers = 367
 ; EnableXP
 ; EnableUnicode

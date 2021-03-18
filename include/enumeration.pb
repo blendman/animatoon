@@ -53,7 +53,7 @@ Enumeration ; windows
   #Win_New
   #winNewTileset
   #Win_Pref
-    
+  
   
   #Win_Layer
   #Win_Swatch
@@ -118,7 +118,7 @@ Enumeration ; images
   #image_RB
   
   
-    ;{ icone
+  ;{ icone
   #ico_New
   #ico_Open
   #ico_Save
@@ -175,12 +175,12 @@ Enumeration ; images
   
   
   ; window new
-;   #ImgAboutCredit
-   #Img_About
+  ;   #ImgAboutCredit
+  #Img_About
   
-   
-   #Img_AlphaSel
-   
+  
+  #Img_AlphaSel
+  
   #Img_Max
   
 EndEnumeration
@@ -276,7 +276,7 @@ Enumeration ; menuItem
   #menu_ScreenQuality
   #menu_ShowStatus
   #menu_ShowLayer
-
+  
   
   ; Selection
   #Menu_SelectAll
@@ -330,7 +330,7 @@ Enumeration ; menuItem
   #Menu_IE_Sharpen
   #Menu_IE_SharpenAlpha
   #menu_IE_Offset
-
+  
   ; Help
   #Menu_about
   #Menu_Infos
@@ -355,12 +355,12 @@ Enumeration ; gadgets
   #G_1
   
   ;{-- Window main
-    
+  
   ;{ toolbar
   #G_ToolBar
   ; le type de Tools
   #G_IE_Type
-
+  
   ;{ Buttons tools (sur toolbar)
   
   #G_IE_Pen ; toujours premier des outils
@@ -407,8 +407,8 @@ Enumeration ; gadgets
   #G_SplitLayerRB ; roughboard/layer
   #G_SplitToolCol ; tool/color
   #G_SplitToolScreen ; tool-color/screen
-  #G_SplitScreenLayer ; screen/Layer-swatch
-    
+  #G_SplitScreenLayer; screen/Layer-swatch
+  
   
   
   
@@ -427,8 +427,8 @@ Enumeration ; gadgets
   
   
   #G_FirstParamBrush ; attention, toujours le garde en premier pour les paramètres des brush
-    
-    ;size
+  
+  ;size
   #G_FrameSize
   #G_BrushSize
   #G_BrushSizeMin
@@ -467,13 +467,13 @@ Enumeration ; gadgets
   #G_BrushCurve
   #G_BrushStrokeTyp
   
-    ; image
+  ; image
   #G_FrameBrushImage
   #G_BrushPrevious
   #G_BrushNext
   #G_BrushPreview
   #G_BrushTrim
-    
+  
   ; dyn (rot, scatter)
   #G_FrameRot
   #G_BrushRotate
@@ -482,10 +482,10 @@ Enumeration ; gadgets
   #G_FrameScatter  
   #G_BrushScatter
   
-    ; misc
+  ; misc
   #G_FrameMisc
   #G_BrushSymetry
-
+  
   
   ; color
   #G_FrameWater
@@ -503,7 +503,7 @@ Enumeration ; gadgets
   
   
   #G_LastParamBrush ; toujours en dernier pour les paramètres des Tools
-  ;}
+                    ;}
   
   ;{ Tool Move Layer, Transform, rotate
   #G_ActionX
@@ -539,7 +539,7 @@ Enumeration ; gadgets
   ;}
   
   ;{ panel color (selector)
-    #G_PanelCol
+  #G_PanelCol
   #G_BrushColorBG
   #G_BrushColorFG
   #G_ColorArcEnCielSelect
@@ -548,9 +548,9 @@ Enumeration ; gadgets
   #GADGET_ColorTxtR
   #GADGET_ColorTxtG
   #GADGET_ColorTxtB
-;}
+  ;}
   
-    
+  
   ;{ layer
   #G_PanelLayer
   #G_Layer
@@ -588,7 +588,7 @@ Enumeration ; gadgets
   #G_PresetSavePresetAs
   #G_PresetName
   ;}
-    
+  
   ;{ options
   #G_ListPaper
   #G_PaperAlpha
@@ -633,7 +633,7 @@ Enumeration ; gadgets
   ;}
   
   ;}
-    
+  
   ;{-- Window swatch
   #G_WinSwatchScroll
   #G_WinSwatchCanvas
@@ -655,7 +655,7 @@ Enumeration ; gadgets
   
   
   ;{**** window par menu
-    
+  
   
   ;{-- MENU FILE
   
@@ -665,10 +665,10 @@ Enumeration ; gadgets
   #GADGET_WNewW
   #GADGET_WNewH
   ;}
-    
+  
   ;{ window preference
   #G_PrefPanel
-    
+  
   #G_Frame_Lang
   #G_Cob_Lang
   #G_Pref_AutoSave
@@ -686,27 +686,27 @@ Enumeration ; gadgets
   #G_WAnim_CoBFrameTimeline
   #G_WAnim_CBTimelineBar
   #G_WPref_SizeFrame
-
+  
   ;}
   
   ;}  
   
   ;{-- MENU IMAGES
-    ; color balance    
-    #IE_BalColNormal
-    #IE_BalColNew
-    #IE_BalColRed
-    #IE_BalColGreen
-    #IE_BalColBlue
-    #IE_BalColOk
-    
-    ; Constrats
-    #IE_ContrastOk
-    #IE_ContrastTB
-    #IE_ContrastSG
-    #IE_BrightnessTB
-    #IE_BrightnessSG
-
+  ; color balance    
+  #IE_BalColNormal
+  #IE_BalColNew
+  #IE_BalColRed
+  #IE_BalColGreen
+  #IE_BalColBlue
+  #IE_BalColOk
+  
+  ; Constrats
+  #IE_ContrastOk
+  #IE_ContrastTB
+  #IE_ContrastSG
+  #IE_BrightnessTB
+  #IE_BrightnessSG
+  
   ;}
   
   ;{-- MENU HELP
@@ -717,7 +717,7 @@ Enumeration ; gadgets
   #GADGET_WAboutSA
   #GADGET_WAboutBtnOk
   ;}
-
+  
   
   ;}
   
@@ -809,6 +809,9 @@ Enumeration ; action qu'on effectue sur le calque
   
   ; doivent être identique à l'organisation des gadgets outils (dans IE_GadgetAdd() (gadgets.pbi)
   ; ainsi que Enumeration gadget/bouton toolbar
+  ; be carefull ! THose constant order need to be the same than the organisation of the gadgets tool (in IE_GadgetAdd() gadgets.pbi), 
+  ; and the same as enumeration gadget/bouton toolbar.
+  
   
   #Action_Pen
   #Action_Brush
@@ -824,11 +827,11 @@ Enumeration ; action qu'on effectue sur le calque
   #Action_Fill
   
   #Action_Text
-
+  
   #Action_Eraser
   #Action_Clear
   
-  #Action_Pipette  
+  #Action_Pipette ; #Action_PickColor
   
   
   #Action_Select
@@ -869,7 +872,7 @@ Enumeration ; stroke style
   #Stroke_Rough ; blendman line,  not great
   #Stroke_Knife ; LSI thickline
   #Stroke_Dash  ; HB Dashdraw
-  #Stroke_LineAA ; by lsi
+  #Stroke_LineAA; by lsi
   
   
   
@@ -890,8 +893,7 @@ Enumeration ; layer type
 EndEnumeration
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 66
-; FirstLine = 12
-; Folding = QAAAAAw
+; CursorPosition = 6
+; Folding = AAAAAAw
 ; EnableXP
 ; EnableUnicode
