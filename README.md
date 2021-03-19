@@ -10,11 +10,14 @@ Made by blendman (Since 2011, 2012-2015, 2017, 2021), with the help of a lot of 
 # Screenshots
 ![animatoon 0.5.8.8.7](https://github.com/blendman/animatoon/blob/main/screenshots/animatoon0.588.7.jpg)
 
+# Videos (youtube)
+![Animatoon Video timelapse](https://www.youtube.com/watch?v=jCmOMTAC71c)
+
 # Contributions and help
 Kernadec, Dobro, Attomo, G-rom, Le Soldat Inconnu (LSI), Kwandjeen, Djes, Falsam, Typhoon, Guillot, Netmaestro, Danillo, Rashad, Wilbert, Onilink, Marc256, and probably a lot of others users of purebasic I have forgotten (sorry)...
 
-
-You can use it, modify it, but please provide the new sources and don't forget my name Blendman ;).
+# Informations
+You can use it, modify it, dand so but please provide the new sources (and don't forget my name Blendman ;)).
 
 
 Thanks.
