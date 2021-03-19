@@ -80,18 +80,18 @@ Procedure Layer_ConvertToBm(i)
     DrawingMode(#PB_2DDrawing_AllChannels)
     
     ; d'abord, on doit ajouter une box de la couleur nécessaire, pour certain BM
-    Select Layer(i)\bm
+    ;Select Layer(i)\bm
         
         ;Case #Bm_Darken
         ;Box(0,0,doc\w,doc\h,RGB(255,255,255))
         
         ;       Case 
         
-    EndSelect
+   ; EndSelect
     
     
     
-    ; puis pour le mask alpha
+    ; For the alpha mask // puis pour le mask alpha
     If layer(layerid)\MaskAlpha =1
       DrawingMode(#PB_2DDrawing_AlphaChannel)
       DrawAlphaImage(ImageID(Layer(i)\ImageAlpha),0,0)    
@@ -102,7 +102,7 @@ Procedure Layer_ConvertToBm(i)
       DrawingMode(#PB_2DDrawing_AlphaBlend)
     EndIf
     
-    SetBm(i,0)    
+    SetBm(i,0)    ; in image.pbi
     
     ;  DrawingMode(#PB_2DDrawing_AlphaBlend)
     DrawAlphaImage(ImageID(layer(i)\Image),0,0)    
@@ -812,11 +812,18 @@ Procedure Layer_FreeAll()
   
   For i = 0 To ArraySize(layer())
     
+    ; Image for layer
     FreeImage2(Layer(i)\Image)
     FreeImage2(Layer(i)\ImageBM)
     FreeImage2(Layer(i)\ImageTemp)
     FreeImage2(Layer(i)\ImgLayer)
+    FreeImage2(Layer(i)\ImageAlpha)
+    ; FreeImage2(Layer(i)\ImageStyle) -> isn't used for the moment
+    
+    ; image for UI
     FreeGadget(Layer(i)\IG_LayerMenu)
+    
+    ; Image for Preview on screen
     FreeSprite2(Layer(i)\Sprite)
     
   Next i
@@ -915,71 +922,106 @@ EndProcedure
 ; operation on layers 
 Procedure Layer_Merge(mode=0)
   
+  ; procedure to merge several layers.
+  ; this procedure does'nt have the features : merge linked layers and merge layers visible (I will add that in a next version)
+  
+  ; because we merge, we have to tell the software it's a newaction (newpainting)
   NewPainting = 1
   
-  If mode = 0 ; Only Two layers (from top to bottom) :: seulement 2 layer vers le bas
+  ; check if we have enough layer to merge
+  If ArraySize(layer()) < 1
     
-    ; convert the layer bm if needed
-    Layer_convertToBm(LayerId-1)
-    Layer_convertToBm(LayerId)
-    
-    Tmp = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
-    If StartDrawing(ImageOutput(tmp))
-      ;DrawingMode(#PB_2DDrawing_AlphaBlend)
+     MessageRequester(lang("Error"), Lang("You need at least 2 layers to do this operation."))
+
+   Else
+     
+    ; ok, we have enough layers to merge.
+    If mode = 0 ; Only Two layers (from top to bottom) :: seulement 2 layer vers le bas
       
-      Layer_Bm2(LayerId-1)
-      DrawAlphaImage(ImageID(layer(LayerId-1)\ImageTemp),0,0,layer(layerId-1)\alpha) 
       
-      Layer_Bm2(LayerId)
-      DrawAlphaImage(ImageID(layer(LayerId)\ImageTemp),0,0,layer(layerId)\alpha) 
-      
-      StopDrawing()
-    EndIf
-    
-    FreeImage2(layer(LayerId-1)\Image)
-    Layer(LayerId-1)\Image = CopyImage(tmp,#PB_Any)
-    FreeImage2(tmp)
-    Layer_Delete()
-    
-  ElseIf mode = 1 ; merge all
-    
-    ; CHange the image with blendmode // d'abord, on doit modifier l'image en fonction du blendmode
-    For i = 0 To ArraySize(layer())
-      With layer(i)
-        If \view
-          Layer_convertToBm(i)
+      For i =0 To ArraySize(layer())
+        If i = layerId Or i = layerId-1
+          Debug "Calque N° "+Str(i)
         EndIf
-      EndWith
-    Next i
-    
-    ; ensuite on crée une image temporaire sur laquelle on va dessiner tous les calques
-    Tmp = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
-    If StartDrawing(ImageOutput(tmp))
-      DrawingMode(#PB_2DDrawing_AlphaBlend)  
+      Next
+      
+      ; check if 2 layer are viewed
+      If layer(layerId)\view = 0 Or layer(layerId-1)\view = 0 
+        
+        MessageRequester(lang("Error"), lang("Your layers must be seen before to merge them."))
+        
+      Else
+        
+        ; convert the layer bm if needed
+        Layer_convertToBm(LayerId-1)
+        Layer_convertToBm(LayerId)
+        
+        ; create the temp image (result of merging)
+        Tmp = CreateImage(#PB_Any, doc\w, doc\h, 32, #PB_Image_Transparent)
+        
+        ; drawing the "merge" on this image
+        If StartDrawing(ImageOutput(tmp))
+          ;DrawingMode(#PB_2DDrawing_AlphaBlend)
+          
+          Layer_Bm2(LayerId-1)
+          DrawAlphaImage(ImageID(layer(LayerId-1)\ImageTemp),0,0,layer(layerId-1)\alpha) 
+          
+          Layer_Bm2(LayerId)
+          DrawAlphaImage(ImageID(layer(LayerId)\ImageTemp),0,0,layer(layerId)\alpha) 
+          
+          StopDrawing()
+        EndIf
+        
+        FreeImage2(layer(LayerId-1)\Image)
+        Layer(LayerId-1)\Image = CopyImage(tmp,#PB_Any)
+        FreeImage2(tmp)
+        Layer_Delete()
+        
+      EndIf
+      
+    ElseIf mode = 1 ; merge all
+      
+      ; CHange the image with blendmode // d'abord, on doit modifier l'image en fonction du blendmode
       For i = 0 To ArraySize(layer())
         With layer(i)
           If \view
-            Layer_Bm2(i)
-            DrawAlphaImage(ImageID(\ImageTemp),0,0,\alpha) 
+            Layer_convertToBm(i)
           EndIf
         EndWith
       Next i
-      StopDrawing()
+      
+      ; ensuite on crée une image temporaire sur laquelle on va dessiner tous les calques
+      Tmp = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
+      If StartDrawing(ImageOutput(tmp))
+        DrawingMode(#PB_2DDrawing_AlphaBlend)  
+        For i = 0 To ArraySize(layer())
+          With layer(i)
+            If \view
+              Layer_Bm2(i)
+              DrawAlphaImage(ImageID(\ImageTemp),0,0,\alpha) 
+            EndIf
+          EndWith
+        Next i
+        StopDrawing()
+      EndIf
+      
+      ; puis on libère la mémoire, on supprime ce qui ne sert plus.
+      Layer_FreeAll() 
+      Layer_Add()
+      FreeImage2(Layer(layerId)\Image)
+      Layer(LayerId)\Image = CopyImage(tmp,#PB_Any)
+      FreeImage2(tmp)
+      
+    ElseIf mode = 2 ; merge visible
+      
+      MessageRequester(lang("Infos"), lang("Not implemented"))
+      
+    ElseIf mode = 3 ; merge linked
+      
+      MessageRequester(lang("Infos"), lang("Not implemented"))
+
+      
     EndIf
-    
-    ; puis on libère la mémoire, on supprime ce qui ne sert plus.
-    Layer_FreeAll() 
-    Layer_Add()
-    FreeImage2(Layer(layerId)\Image)
-    Layer(LayerId)\Image = CopyImage(tmp,#PB_Any)
-    FreeImage2(tmp)
-    
-  ElseIf mode = 2 ; merge visible
-    
-    
-  ElseIf mode = 3 ; merge linked
-    
-    
   EndIf
   
 EndProcedure
@@ -1266,8 +1308,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1264
-; FirstLine = 51
-; Folding = AAAAAAAAAAAAAAAAAAAAAA-
+; CursorPosition = 820
+; FirstLine = 42
+; Folding = AAAAAAAAAAAAYAAAAAAAAA5
 ; EnableXP
 ; EnableUnicode

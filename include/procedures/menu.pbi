@@ -303,7 +303,7 @@ EndProcedure
 
 
 
-;{ File + options (pref)
+;{ File + options (pref) & autosave
 
 Procedure.a GetFileExist(filename$)
   
@@ -506,6 +506,12 @@ Procedure OpenOptions()
             
             \Version$ = "6"
             ; GM = 1, Construct = 2, PB-canvas = 3, pb_teo = 4, agk = 5, pb_screen = 6, pb_openGL = 7
+            
+            
+            ; statistics
+            \NbNewFile       = ReadPreferenceInteger("NbNewFile", 1)
+            \NbMinutes       = ReadPreferenceInteger("NbMinutes", 0)
+            
             
           EndWith
           doc\w = OptionsIE\ImageW
@@ -768,6 +774,9 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("ConfirmExit",  \ConfirmExit)
     WritePreferenceInteger("Filtering",     \SpriteQuality)
     
+    WritePreferenceInteger("NbNewFile",     \NbNewFile)
+    WritePreferenceInteger("NbMinutes",     \NbMinutes)
+    
     
     
   EndWith
@@ -938,18 +947,18 @@ Procedure CreateOptionsFile()
   
   
   If CreatePreferences("Pref.ini")
-    
-    
     WriteDefaultOption()
     ClosePreferences()
   EndIf
   
 EndProcedure
 
+
+; NEW document
+; windowDocNew() in window.pbi
+
+
 ; OPEN
-Procedure Doc_openOld()
-  
-EndProcedure
 Procedure Doc_Open()
   
   ; procedure pour ouvrir un document (animatoon old (abi), new, teo=, c'est à dire avec tous les calques, les paramètres, etc..
@@ -1814,27 +1823,28 @@ Procedure AutoSave()
         ;Debug saveDir$
         
         ; create autosave if needed
-        autosaveDir$ = saveDir$;+"autosave\"
-                               ;Debug autosaveDir$
-                               ;         If ExamineDirectory(0, autosaveDir$, "")
-                               ;           If IsDirectory(0) = 0
-                               ;             If CreateDirectory(autosaveDir$) = 0
-                               ;               MessageRequester(LAng("Error"), lang("Unable to create the 'autosave' directory."))
-                               ;               autosaveDir$ =  GetCurrentDirectory()
-                               ;             
-                               ;             EndIf
-                               ;           Else
-                               ;             While NextDirectoryEntry(0)
-                               ;               If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
-                               ;                 If
-                               ;                 EndIf
-                               ;               EndIf
-                               ;             Wend 
-                               ;           EndIf
-                               ;           FinishDirectory(0)
-                               ;         Else
-                               ;           Debug "erreur examinedirectory "+
-                               ;         EndIf
+        autosaveDir$ = saveDir$ 
+        ;+"autosave\"
+        ;Debug autosaveDir$
+        ;         If ExamineDirectory(0, autosaveDir$, "")
+        ;           If IsDirectory(0) = 0
+        ;             If CreateDirectory(autosaveDir$) = 0
+        ;               MessageRequester(LAng("Error"), lang("Unable to create the 'autosave' directory."))
+        ;               autosaveDir$ =  GetCurrentDirectory()
+        ;             
+        ;             EndIf
+        ;           Else
+        ;             While NextDirectoryEntry(0)
+        ;               If DirectoryEntryType(0) = #PB_DirectoryEntry_Directory
+        ;                 If
+        ;                 EndIf
+        ;               EndIf
+        ;             Wend 
+        ;           EndIf
+        ;           FinishDirectory(0)
+        ;         Else
+        ;           Debug "erreur examinedirectory "+
+        ;         EndIf
         
         
         ; Debug autosaveDir$
@@ -1845,19 +1855,25 @@ Procedure AutoSave()
           If layer(i)\Haschanged
             layer(i)\Haschanged = 0 
             ; Debug "autosave !!! "
-            Date$ = FormatDate("%yyyy%mm%dd%hh%ii%ss", Date()) 
+            Date$ = FormatDate("%yyyy%mm%dd", Date()) 
             
             ;Debug "save\AutoSave_"+Date$+"_"+layer(i)\Name$+"_"+Str(i)+".png"
             
             theAutosavedir$ = autosaveDir$ ; GetCurrentDirectory() + "save\autosave\"
-            If SaveImage(layer(i)\Image,  theAutosavedir$+"AutoSave_"+Date$+"_"+layer(i)\Name$+"_"+Str(i)+".png",#PB_ImagePlugin_PNG)
+            
+            ; check if we have still an autosavefilename$
+            If OptionsIE\AutosaveFileName$ = ""
+              OptionsIE\AutosaveFileName$ = theAutosavedir$+"AutoSave_"+Doc\name$+"_"+Str(OptionsIE\NbNewFile)+"_"+Str(Random(100000))+Date$
+            EndIf
+            
+            If SaveImage(layer(i)\Image,  optionsIE\AutosaveFileName$ +"_"+layer(i)\Name$+"_"+Str(i)+".png", #PB_ImagePlugin_PNG)
               ; Debug LAng("ok save image layer "+layer(i)\Name$)
             Else
               ; Debug LAng("Error") +" /"+ lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$)
               ; add a log error !!
               AddLogError(1, lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$))
             EndIf
-            AddLogError(1, lang("Unable To save the 'autosave' image layer : "+layer(i)\Name$))
+            
           EndIf
           
         Next i
@@ -1897,7 +1913,7 @@ Procedure Edit_Copy()
 EndProcedure
 Procedure Edit_Paste()
   
-  tmp = GetClipboardImage(#PB_Any,32)
+  tmp = GetClipboardImage(#PB_Any, 32)
   
   If tmp
     
@@ -2316,8 +2332,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2305
-; Folding = AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA9
+; CursorPosition = 513
+; FirstLine = 123
+; Folding = AACgfAAAEAWAAAAAAAAAAAIAAAGYAAAAAAAA9
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

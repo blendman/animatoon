@@ -354,29 +354,25 @@ Repeat
                 Layer_Add()
                 
               Case #Menu_LayerDel
-                If ArraySize(layer()) > 1
+                If ArraySize(layer()) >= 1
                   Layer_Delete()
+                Else
+                  MessageRequester(lang("Infos"), lang("You can't delete a unique layer. You need at least 2 layers to delete 1 layer."))
                 EndIf
                 
               Case #Menu_LayerMergeDown
-                If ArraySize(layer()) > 1 And LayerId > 0
+                If LayerId >= 0
                   Layer_Merge()
                 EndIf
                 
               Case #Menu_LayerMergeAllVisible
-                If ArraySize(layer()) > 1
-                  Layer_Merge(2)
-                EndIf
+                Layer_Merge(2)
                 
               Case #Menu_LayerMergeAll
-                If ArraySize(layer()) > 1
-                  Layer_Merge(1)
-                EndIf
+                Layer_Merge(1)
                 
               Case #Menu_LayerMergeLinked
-                If ArraySize(layer()) > 1
-                  Layer_Merge(3)
-                EndIf
+                Layer_Merge(3)
                 
               Case #Menu_LayerRotate
                 angle = Val(InputRequester(Lang("Define angle"),Lang("Define angle"),""))
@@ -1402,8 +1398,8 @@ End
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1253
-; FirstLine = 49
-; Folding = hHTQAAAAuTJJAYCCQAMCC9-G38
+; CursorPosition = 359
+; FirstLine = 73
+; Folding = hvTQAgMwdKJBATQACgRQAf3Qe-
 ; EnableXP
 ; EnableUnicode

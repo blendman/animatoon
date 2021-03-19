@@ -205,6 +205,9 @@ Structure sOptions
   ImageHasChanged.a
   ConfirmExit.a
   
+  ; Statistics
+  NbNewFile.i
+  NbMinutes.i
   
   ; Undo
   Maxundo.w
@@ -765,8 +768,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 108
-; Folding = AAAAAA5
-; Markers = 367
+; CursorPosition = 209
+; FirstLine = 48
+; Folding = ACAAAA5
+; Markers = 370
 ; EnableXP
 ; EnableUnicode

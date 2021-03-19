@@ -1,11 +1,11 @@
-﻿;-- infos
-XIncludeFile "include\infos.pb" 
+﻿;-- infos/changelog
+; XIncludeFile "changelog.txt" 
 
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
 #ProgramVersion   = "0.5.8.9"
-#ProgramRevision  = 0
+#ProgramRevision  = 1
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
 #ProgramNbLine    = "21000"
 ;}
@@ -39,7 +39,7 @@ XIncludeFile "include\procedures.pb" ;  screen et sprite
 
 ; contain :
 ; XIncludeFile "include\procedures\declare.pbi" 
-; XIncludeFile "include\procedures\menu.pbi" ; menu, file, edition..
+; XIncludeFile "include\procedures\menu.pbi" ; menu, file (open/save, options preference, autosave..), edition..
 ; XIncludeFile "include\procedures\history.pbi" ; script, history
 ; XIncludeFile "include\procedures\swatch.pbi" 
 ; XIncludeFile "include\procedures\roughboard.pbi"
@@ -273,14 +273,13 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 272
-; FirstLine = 30
-; Folding = CAA8
+; CursorPosition = 41
+; FirstLine = 27
+; Folding = DAA8
 ; EnableXP
 ; EnableUser
 ; UseIcon = teo.ico
 ; Executable = animatoon0.588.exe
-; DisableDebugger
 ; Warnings = Display
 ; EnablePurifier
 ; IncludeVersionInfo

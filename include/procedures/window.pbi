@@ -23,7 +23,7 @@ Macro WinDocNewCont(typ)
       
     Case 0 ; recent document
       
-    Case 1 ; template 
+    Case 1 ; template "classique"
       If cont
         
         nomtxt=TG(xx,yy,"Name",col2)        
@@ -203,37 +203,27 @@ Procedure WindowDocNew()
     
     
     If ok =1
-      Layer_FreeAll()
       
-      ;       w = Val(InputRequester("Infos","New Width of Document",Str(doc\w)))
-      ;       If w >0 And w < 10000
-      ;         Doc\w = w
-      ;       Else
-      ;         MessageRequester("Infos", "The width must be between 1 and 10000. The default width is applied")
-      ;         Doc\w = 1024
-      ;       EndIf
-      ; ;       
-      ; ;       h = Val(InputRequester("Infos","New Height of Document",Str(doc\h)))
-      ;       If h >0 And w < 10000
-      ;         Doc\h = h
-      ;       Else
-      ;         MessageRequester("Infos", "The height must be between 1 and 10000. The default height is applied")
-      ;         Doc\h = 768
-      ;       EndIf
-      ;       
+      ; we have clicked on ok  button, we can create a new document
+      Layer_FreeAll()
       
       Doc\name$ = name$
       Doc\w = Val(GetGadgetText(#GADGET_WNewW))
       Doc\h = Val(GetGadgetText(#GADGET_WNewH))
       
-      
+      ; add a new layer.
       Layer_Add()
+      
+      ; reset the options parameters
+      OptionsIE\AutosaveFileName$ = ""
+      OptionsIE\NbNewFile +1
       
       
       ;ClearGadgetItems(#G_LayerList)
       ;n = ArraySize(layer())
       ;AddGadgetItem(#G_LayerList,-1,Layer(layerId)\Name$)
       
+      ; update the GUI
       IE_StatusBarUpdate()
       ScreenUpdate()
       
@@ -653,7 +643,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 119
-; Folding = AAAAAA5
+; CursorPosition = 218
+; FirstLine = 147
+; Folding = PIAAAA5
 ; EnableXP
 ; EnableUnicode
