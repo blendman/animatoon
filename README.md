@@ -30,7 +30,7 @@ You will able to download Animatoon from the [Github releases][gh-release] (will
 ## Contributing
 
 * [Issue Tracker](https://github.com/blendman/Animatoon/issues) - Report bugs or request features.
-* [Developer Guide](https://github.com/blendman/Animatoon/wiki) - Learn how to compile Pencil2D yourself (not finished).
+* [Developer Guide](https://github.com/blendman/Animatoon/wiki) - Learn how to compile Animatoon yourself (not finished).
 
 
 ## Thanks for the help & contributers
