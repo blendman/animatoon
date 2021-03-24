@@ -20,7 +20,7 @@ Animatoon is developped in [Purebasic][1] and has been created by Blendman (Sinc
 
 ## Download ###
 
-### Animatoon 0.5.8x (WIP, march 2021)
+### Animatoon 0.5.9.x (march 2021)
 
 You will able to download Animatoon from the [Github releases][gh-release] (will be available soon)
 
