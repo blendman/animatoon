@@ -3,6 +3,8 @@ Declare CreateOptionsFile()
 Declare AddLogError(error, info$) ; needed for error with initsprite/initkeyboard...
 
 ; layers
+Declare CreateLayertempo_()
+Declare RecreateLayerUtilities()
 Declare Layer_FreeAll()
 Declare Layer_Add(x=0,y=0,text$="") 
 Declare Layer_Clear(i,onlyAlpha=0) 
@@ -19,10 +21,16 @@ Declare IE_UpdateLayerUi()
 Declare Layer_updateUi(i)
 
 
+; brush
 Declare UpdateBrushPreview()  
 Declare BrushUpdateImage(load=0,color=0) 
 Declare OpenPresetBank() 
 Declare BrushChangeColor(change=0,color=-1)
+
+; Image
+Declare LoadImage2(nb,file$, w=25, h=25)
+Declare FreeImage2(img)
+Declare CreateImage2(img,w,h,img$,d=24,t=0)
 
 ; image processing
 Declare ResizeImage2_(image, w, h, mode=#PB_Image_Smooth)
@@ -33,6 +41,7 @@ Declare.l RotateImageEx2(ImageID, Angle.f, Mode.a=2)
 Declare UnPreMultiplyAlpha(image)
 
 ; paper
+Declare PaperUpdate(load=0)
 Declare PaperInit(load=1) 
 Declare PaperDraw() 
 Declare IE_StatusBarUpdate() ; statusbar 
@@ -45,7 +54,6 @@ Declare BrushResetColor()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 44
-; FirstLine = 18
+; CursorPosition = 7
 ; EnableXP
 ; EnableUnicode

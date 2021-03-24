@@ -382,6 +382,12 @@ Repeat
                   ScreenUpdate(1)
                 EndIf
                 
+              Case #Menu_LayerTransformToLine
+                Layer_TransformToLine()
+                
+              Case #Menu_BackgroundEditor
+                WindowBackgroundEditor()
+                
                 ;}
                 
                 ;{ Filters
@@ -839,7 +845,12 @@ Repeat
                     
                   Case #G_ActionXLock, #G_ActionYLock
                     OptionsIE\lockX = GetGadgetState(#G_ActionXLock)
-                    OptionsIE\lockY = GetGadgetState(#G_ActionYLock)
+                    If IsGadget( OptionsIE\lockY)
+                      OptionsIE\lockY = GetGadgetState(#G_ActionYLock)
+                    Else
+                      OptionsIE\lockY = OptionsIE\lockX
+                    EndIf
+                    
                     
                   Case #G_ShapeParam1  
                     brush(action)\AlphaFG = GetGadgetState(#G_ShapeParam1)
@@ -1156,45 +1167,45 @@ Repeat
             Case  #Win_Pref
               ;{ window pref
               gad=0
-            Select EventGadget
-                
-              Case #G_Cob_Lang
-                OptionsIE\lang$ = GetGadgetText(#G_Cob_Lang)
-                SaveOptions()
-                UpdateLanguageUI() ; in Menu.pbi
-                ; OpenLang()
-                ; AddMenuMain()
-                
-              Case #G_GridW              
-                OptionsIE\gridW = GetGadgetState(#G_GridW)
-                ScreenUpdate()
-                
-              Case #G_GridH
-                OptionsIE\gridH = GetGadgetState(#G_GridH)
-                ScreenUpdate()
-                
-              Case #G_GridColor
-                OptionsIE\GridColor = ColorRequester(OptionsIE\gridColor)
-                ScreenUpdate()
-                
-              Case #G_BrushPreset_Save_color                  
-                ;OptionsIE\brushPresetsavecolor = GetGadgetState(#G_BrushPreset_Save_color)
-                
-                ; animation
-              Case #G_WAnim_CBTimelineBar
-                OptionsIE\AnimBarre = GetGadgetState(#G_WAnim_CBTimelineBar)
-                ;UpdateTimeLine()
-                
-                
-              Case #G_WPref_SizeFrame
-                OptionsIE\SizeFrameW = GetGadgetState(#G_WPref_SizeFrame)
-                ;AddTimeLine(WindowWidth(#WinMain))                
-                ;UpdateTimeLine()
-                
-            EndSelect          
-            
+              Select EventGadget
+                  
+                Case #G_Cob_Lang
+                  OptionsIE\lang$ = GetGadgetText(#G_Cob_Lang)
+                  SaveOptions()
+                  UpdateLanguageUI() ; in Menu.pbi
+                                     ; OpenLang()
+                                     ; AddMenuMain()
+                  
+                Case #G_GridW              
+                  OptionsIE\gridW = GetGadgetState(#G_GridW)
+                  ScreenUpdate()
+                  
+                Case #G_GridH
+                  OptionsIE\gridH = GetGadgetState(#G_GridH)
+                  ScreenUpdate()
+                  
+                Case #G_GridColor
+                  OptionsIE\GridColor = ColorRequester(OptionsIE\gridColor)
+                  ScreenUpdate()
+                  
+                Case #G_BrushPreset_Save_color                  
+                  ;OptionsIE\brushPresetsavecolor = GetGadgetState(#G_BrushPreset_Save_color)
+                  
+                  ; animation
+                Case #G_WAnim_CBTimelineBar
+                  OptionsIE\AnimBarre = GetGadgetState(#G_WAnim_CBTimelineBar)
+                  ;UpdateTimeLine()
+                  
+                  
+                Case #G_WPref_SizeFrame
+                  OptionsIE\SizeFrameW = GetGadgetState(#G_WPref_SizeFrame)
+                  ;AddTimeLine(WindowWidth(#WinMain))                
+                  ;UpdateTimeLine()
+                  
+              EndSelect          
+              
               ;}
-            
+              
             Case #Win_Level
               ;{ Win level
               gad=1              
@@ -1229,7 +1240,9 @@ Repeat
                    
               EndSelect              
               ;}
-            
+              
+              ; For the other window gagdets, see include\procedures\window.pbi
+              
           EndSelect
        
         Case #PB_Event_CloseWindow
@@ -1329,12 +1342,25 @@ Repeat
               ; save for undo // on sauve pour l'undo
               ; ImageForUndo()
               
-              ; wash the beush (set the initial color ) // on lave le pinceau si besoin
+              ; wash the brush (set the initial color ) // on lave le pinceau si besoin
               If Brush(Action)\Wash
                 Brush(Action)\Color = RGB(Brush(Action)\ColorBG\R,Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B)
                 BrushResetColor()
                 BrushUpdateImage(0,1)
               EndIf
+              
+              
+              ; clear the layer_tempo
+              Select action 
+                Case #Action_Box, #Action_Circle, #Action_Line, #Action_Gradient
+                  ; I have to clear the sprite layer tempo (the sprite for temporary operations)
+                  If StartDrawing(SpriteOutput(#Sp_LayerTempo))
+                    DrawingMode(#PB_2DDrawing_AlphaChannel)
+                    Box(0, 0, OutputWidth(), OutputHeight(), RGBA(0,0,0,255))
+                    Box(0, 0, OutputWidth(), OutputHeight(), RGBA(0,0,0,0))
+                    StopDrawing()
+                  EndIf   
+              EndSelect
               
               ; update the preview of the layerImage
               Layer_UpdateUi(layerid)
@@ -1398,8 +1424,8 @@ End
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 359
-; FirstLine = 73
-; Folding = hvTQAgMwdKJBATQACgRQAf3Qe-
+; CursorPosition = 388
+; FirstLine = 98
+; Folding = hvTQAgModKJBEzgAEAjAg+qjz8
 ; EnableXP
 ; EnableUnicode

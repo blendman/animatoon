@@ -56,6 +56,7 @@ Enumeration ; windows
   
   
   #Win_Layer
+  #Win_BGeditor
   #Win_Swatch
   
   ; reglages images
@@ -127,6 +128,7 @@ Enumeration ; images
   #ico_Export
   #ico_Ok
   #ico_Prop
+  #ico_loop
   
   #ico_IE_Pen
   #ico_IE_Brush
@@ -315,6 +317,8 @@ Enumeration ; menuItem
   #Menu_LayerMergeAll
   #Menu_LayerMergeLinked
   #Menu_LayerRotate
+  #Menu_LayerTransformToLine
+  #Menu_BackgroundEditor
   
   
   ; Actions
@@ -709,6 +713,33 @@ Enumeration ; gadgets
   
   ;}
   
+  ;{-- MENU Layer
+  
+  ;{ window background editor
+  #GADGET_WinBGED_BtnSaveBG
+  #GADGET_WinBGED_BtnUpdateBG
+  #GADGET_WinBGED_BtnsaveBGColors
+  #GADGET_WinBGED_listBG
+  #GADGET_WinBGED_SA_Paper
+  #GADGET_WinBGED_Canvas_Paper
+  #GADGET_WinBGED_SA_colors
+  #GADGET_WinBGED_Canvas_colors
+  #GADGET_WinBGED_TB_ALpha
+  #GADGET_WinBGED_TB_ALphaSG
+  #GADGET_WinBGED_TB_ALphaName
+  #GADGET_WinBGED_TB_scale
+  #GADGET_WinBGED_TB_scaleSG
+  #GADGET_WinBGED_TB_scaleName
+  #GADGET_WinBGED_TB_intensity
+  #GADGET_WinBGED_TB_intensitySG
+  #GADGET_WinBGED_TB_intensityName
+  #GADGET_WinBGED_BtnCancel
+  #GADGET_WinBGED_BtnOk
+  
+  ;}
+  
+  ;}
+  
   ;{-- MENU HELP
   
   ;{ window About  
@@ -893,7 +924,8 @@ Enumeration ; layer type
 EndEnumeration
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 6
-; Folding = AAAAAAw
+; CursorPosition = 734
+; FirstLine = 45
+; Folding = AABAcGA-
 ; EnableXP
 ; EnableUnicode

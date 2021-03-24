@@ -59,7 +59,7 @@ Procedure AddMenu(clear=0)
     MenuBar()
     ;OpenSubMenu(Lang("Canvas"))
     ;CloseSubMenu()
-    OpenSubMenu(Lang("Screen"))
+    OpenSubMenu(Lang("Canvas drawing"))
     MenuItem(#Menu_RealTime,      Lang("Update the screen (Real Time)"))
     SetMenuItemState(0,#Menu_RealTime,Clear)
     MenuItem(#menu_ChangeCenter,  Lang("Change the Center"))
@@ -136,6 +136,10 @@ Procedure AddMenu(clear=0)
     MenuItem(#Menu_MirorH,        Lang("Flip layer horizontaly"))
     MenuItem(#Menu_MirorV,        Lang("Flip layer verticaly"))
     MenuItem(#Menu_LayerRotate,   Lang("Rotate the layer"))
+    MenuBar()
+    MenuItem(#Menu_LayerTransformToLine,   Lang("Transform the image of the layer in line"))
+    MenuBar()
+    MenuItem(#Menu_BackgroundEditor,   Lang("Background editor"))
     
     ; FILTERS
     MenuTitle(Lang("Filters"))
@@ -502,6 +506,7 @@ Procedure OpenOptions()
             
             \PathOpen$  = ReadPreferenceString("PathOpen", GetCurrentDirectory() +"save\")
             \PathSave$  = ReadPreferenceString("PathSave", GetCurrentDirectory() + "save\")
+            ; \FileBGcolor$  = ReadPreferenceString("FileBGcolor", GetCurrentDirectory() + "data\Presets\Background\colors.gpl")
             
             
             \Version$ = "6"
@@ -756,6 +761,7 @@ Procedure WriteDefaultOption()
     EndIf
     WritePreferenceString("PathSave", RemoveString(\PathSave$, GetCurrentDirectory()))
     WritePreferenceString("DirPresets", RemoveString(\DirPreset$, GetCurrentDirectory()))
+    ; WritePreferenceString("FileBGcolor", RemoveString(\FileBGcolor$, GetCurrentDirectory()))
     
     ; Grid
     WritePreferenceInteger("Grid",    \Grid)
@@ -961,8 +967,13 @@ EndProcedure
 ; OPEN
 Procedure Doc_Open()
   
+  
+  ; procedure to open a document.
+  
+  
   ; procedure pour ouvrir un document (animatoon old (abi), new, teo=, c'est à dire avec tous les calques, les paramètres, etc..
   
+  ; first, we get the file to open.
   ; d'abord, on va chercher le fichier à ouvrir
   
   ; File$ = OpenFileRequester(Lang("Open Teo"), "", "Teo (*.teo)|*.teo|Abi (*.abi)|*.abi",0)
@@ -974,7 +985,7 @@ Procedure Doc_Open()
             "Ani (Animatoon document)|*.ani|Ani (Animatoon - Old version)|*.ani|Abi (old animatoon file)|*.abi|Teo (Tile editor organisation)|*.teo"
   
   
-  File$ = OpenFileRequester("Open an image or an animatoon document", OptionsIE\PathOpen$,Pattern$,4) 
+  File$ = OpenFileRequester("Open an image or an animatoon document", OptionsIE\PathOpen$,Pattern$,0) 
   Index = SelectedFilePattern()
   
   Debug "index :"+ Str(Index)
@@ -999,7 +1010,7 @@ Procedure Doc_Open()
       Case "ani","abi","teo"
         
         If Ext$ = "abi"
-          MessageRequester("Info", "Not implemented yet")
+          MessageRequester(lang("Info"), lang("Not implemented yet"))
         Else
           
           If Index  = 4 ; new file format : *.ani
@@ -1116,10 +1127,19 @@ Procedure Doc_Open()
                   Case "Background"; info about the background (paper..)
                     OptionsIE\Paper$ = StringField(line$, 2, "|")
                     paper\alpha = Val(StringField(line$, 3, "|"))
-                    paper\scale = Val(StringField(line$, 3, "|"))
-                    paper\intensity = Val(StringField(line$, 3, "|"))
-                    paper\Color = Val(StringField(line$, 3, "|"))
-                    
+                    paper\scale = Val(StringField(line$, 4, "|"))
+                    paper\intensity = Val(StringField(line$, 5, "|"))
+                    paper\Color = Val(StringField(line$, 6, "|"))
+                    ; update the background parameters
+                    SetGadgetState(#G_paperScale, paper\scale)
+                    SetGadgetText(#G_PaperScaleSG, Str(paper\scale))
+                    SetGadgetState(#G_PaperAlpha, paper\alpha)
+                    SetGadgetText(#G_PaperAlphaSG, Str(paper\alpha))
+                    SetGadgetState(#G_PaperIntensity, paper\intensity)
+                    SetGadgetText(#G_PaperIntensitySG, Str(paper\intensity))
+                    ; SetGadgetState(#G_ListPaper, paper\intensity)
+                    ; update the paper
+                    PaperUpdate(2)
                     
                   Case "Image";  informations on the document
                     
@@ -1214,7 +1234,7 @@ Procedure Doc_Open()
                       
                     EndWith
                     NewPainting = 1
-                    ;Layer_Update(LayerId)
+                    ; Layer_Update(LayerId)
                     ScreenUpdate(1)
                     
                 EndSelect
@@ -1223,18 +1243,24 @@ Procedure Doc_Open()
               
               
             EndIf
-            ; on ferme le fichier
+            
+            ; close // on ferme le fichier
             CloseFile(0)
-            ; supprime le dossier temporaire
+            
+            ; delete temporary folder // supprime le dossier temporaire
             If pack >= 1 And pack <> 2
               ;DeleteFile(Filemain$)
               DeleteDirectory(Directory$,"",#PB_FileSystem_Recursive)
             EndIf
             
-            ; on update la liste des calques
+            ; update list for layers
             Layer_UpdateList()
             
-            ; on update le screen
+            ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
+            RecreateLayerUtilities()
+
+            
+            ;  update  screen
             NewPainting =1
             ScreenUpdate(0)
             
@@ -1242,6 +1268,10 @@ Procedure Doc_Open()
             Debug "pas de fichier à lire : " +Filemain$
             MessageRequester(lang("Error"),lang("No file to open. Please with the old .ani format."))
             Layer_Add()
+            
+            ; I have to delete the sprite layer tempo (the sprite for temporary operations) and re create it (because it has new size)
+            RecreateLayerUtilities()
+
           EndIf
           
           
@@ -1249,16 +1279,25 @@ Procedure Doc_Open()
         
       Case "jpg","png","bmp"
         ;{ on ouver une image 
+        
         tmp = LoadImage(#PB_Any, File$)
         Doc\w = ImageWidth(tmp)
         Doc\h = ImageHeight(tmp)
+        
+        
         Layer_Add()
+        
         If StartDrawing(ImageOutput(Layer(layerId)\Image))
           DrawingMode(#PB_2DDrawing_AlphaBlend)
           DrawAlphaImage(ImageID(tmp),0,0)
           StopDrawing()
-        EndIf        
+        EndIf 
+        
         FreeImage2(tmp)
+        
+        ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
+        RecreateLayerUtilities()
+
         
         ; on update la liste des calques
         Layer_UpdateList()
@@ -1298,8 +1337,6 @@ Procedure Doc_Save()
   
   If p$<>"" 
     
-    
-    
     If GetFileExist(p$) = #True
       rep = MessageRequester(Lang("Info"), Lang("The file already exists. Do you want to overwrite it ?"), #PB_MessageRequester_YesNo)
       If rep = #PB_MessageRequester_Yes
@@ -1309,8 +1346,10 @@ Procedure Doc_Save()
       ok = 1
     EndIf 
     
-    If ok
-      
+    If ok = 0
+      Doc_Save()
+    Else
+     
       zip$  = RemoveString(p$, ".ani")
       p$    = RemoveString(p$, ".ani")  + ".ani"    
       Name$ = GetFilePart(p$, #PB_FileSystem_NoExtension)    
@@ -1462,7 +1501,9 @@ Procedure Doc_Save()
 EndProcedure
 Procedure ExportImage(auto=0)
   
+  ; to export the image, the current layer
   ; pour exporter l'image, le calque actif
+  
   If auto = 0
     filename$ = SaveFileRequester("Save Image","","png|*.png",0)
   EndIf
@@ -1952,6 +1993,8 @@ EndProcedure
 Procedure ResizeDoc(canvas=0)
   
   ; If OpenWindow(#Win_ResizeDoc,
+  
+  ; need To be changed by a window to resize the doc (like to create a new doc)
   w = Val(InputRequester("Width","New Width of the Document", ""))
   h = Val(InputRequester("Height","New Height of the Document", ""))
   oldW = doc\w
@@ -1997,13 +2040,15 @@ Procedure ResizeDoc(canvas=0)
       n = ArraySize(layer())
       n1 = (n+1)*10 +20
       ;Debug "nb layer : "+Str(n)
-      StatusBarProgress(#Statusbar,3,5,5,0,n1)
+      StatusBarProgress(#Statusbar,3,5,#PB_StatusBar_BorderLess,0,n1)
       
-      If canvas = 0  ; on agrandit le document, on redimensionne 
+      If canvas = 0  
+        
+        ; resize the document size //  on agrandit le document, on redimensionne 
         
         For i=0 To n
           
-          StatusBarProgress(#Statusbar, 3, (i+1)*10,0,0,n1)
+          StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
           
           ; on redimensionne nos calques (images et bm)
           If IsImage(layer(i)\ImageTemp)
@@ -2024,7 +2069,7 @@ Procedure ResizeDoc(canvas=0)
         Next i 
         
       Else 
-        ;{ on agrandit/diminue la surface de travail 
+        ;{ Resize the canvas // on agrandit/diminue la surface de travail 
         
         ;Debug "canvas resize ! "
         
@@ -2043,7 +2088,7 @@ Procedure ResizeDoc(canvas=0)
             
             ;Debug i
             
-            StatusBarProgress(#Statusbar, 3, (i+1)*10,0,0,n1)
+            StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
             
             ; d'abord, on sauve les images et imageBm
             If StartDrawing(ImageOutput(Tmp))
@@ -2103,12 +2148,16 @@ Procedure ResizeDoc(canvas=0)
       EndIf  
       
       
+      ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
+      RecreateLayerUtilities()
+
+      
     EndIf
     
     NewPainting = 1
-    StatusBarProgress(#Statusbar, 3, n1-10,0,0,n1)
+    StatusBarProgress(#Statusbar, 3, n1-10,#PB_StatusBar_BorderLess,0,n1)
     ScreenUpdate(1)
-    StatusBarProgress(#Statusbar, 3, n1,0,0,n1)
+    StatusBarProgress(#Statusbar, 3, n1,#PB_StatusBar_BorderLess,0,n1)
     IE_StatusBarUpdate()
     
     ;Debug "New size : "+Str(doc\w)+"/"+Str(doc\h)
@@ -2138,7 +2187,7 @@ Procedure CropDoc()
     
     n = ArraySize(layer())
     n1 = (n+1)*10 +20
-    StatusBarProgress(#Statusbar,3,5,5,0,n1)
+    StatusBarProgress(#Statusbar,3,5, #PB_StatusBar_BorderLess,0,n1)
     
     StatusBarProgress(#Statusbar, 3, 5)
     
@@ -2213,11 +2262,15 @@ Procedure CropDoc()
       
     Next i 
     
+    ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
+    RecreateLayerUtilities()
+
+    
     ; puis, on met à jour
     NewPainting = 1
-    StatusBarProgress(#Statusbar, 3, n1-10,0,0,n1)
+    StatusBarProgress(#Statusbar, 3, n1-10,#PB_StatusBar_BorderLess,0,n1)
     ScreenUpdate(1)
-    StatusBarProgress(#Statusbar, 3, n1,0,0,n1)
+    StatusBarProgress(#Statusbar, 3, n1, #PB_StatusBar_BorderLess,0,n1)
     IE_StatusBarUpdate()
     
     
@@ -2245,7 +2298,7 @@ Procedure TrimDoc(img,crop=0)
   
   If StartDrawing(ImageOutput(img))
     DrawingMode(#PB_2DDrawing_AlphaBlend)
-    ; on calcule x et Y et W et H pour recadrer l'image avec en enlevant les bordures alpha.
+    ; calcul dimension to crop image without alpha border // on calcule x et Y et W et H pour recadrer l'image en enlevant les bordures alpha.
     For u=0 To 3    
       For i =0 To w-1
         For j=0 To h-1
@@ -2332,9 +2385,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 513
-; FirstLine = 123
-; Folding = AACgfAAAEAWAAAAAAAAAAAIAAAGYAAAAAAAA9
+; CursorPosition = 763
+; FirstLine = 192
+; Folding = AACgfAAAGAAAAAAAAAAAAAIAAAAAAAAAAAAA9
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

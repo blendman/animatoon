@@ -5,7 +5,9 @@
 
 ; ui & update
 
-;{ Macro et Utils Gadget
+;{ Macro et procedures to create easily Gadgets 
+
+; use text$ as argument and not lang(text$), so I can do : IE_btn2(id, icon, lang(text$)+text2$...) if needed.
 
 ; gadgets
 Procedure IE_InsertBar(xx, u=4)
@@ -34,52 +36,69 @@ Macro IE_Btn(id, icon, tip)
   
   xx + 25      
   If ButtonImageGadget(id, xx, yy, 22, 22, ImageID(icon), #PB_Button_Toggle) 
-    GadgetToolTip(id, lang(tip))
+    GadgetToolTip(id, tip)
   EndIf
   
 EndMacro
 Macro IE_Btn1(gad, icon, tip)
   ButtonImageGadget(gad, i, yy, 22, 22, ImageID(icon), #PB_Button_Toggle) 
-  GadgetToolTip(gad, Lang(tip))
+  GadgetToolTip(gad, tip)
 EndMacro
 Macro AddSpinGadget(gadg,val,tip,x,y,w,h,min,max,flag)
   
   If SpinGadget(gadg,x,y,w,h,min,max,flag)
     SetGadgetState(gadg, val)
-    GadgetToolTip(gadg, lang(tip))
+    GadgetToolTip(gadg, tip)
   EndIf
   
 EndMacro
 Macro AddCheckBox(gadg,x,y,w,h,nom,val,tip)
   
-  If CheckBoxGadget(gadg, x,y,w,h, lang(nom))
+  If CheckBoxGadget(gadg, x,y,w,h, nom)
     SetGadgetState(gadg, val)
-    GadgetToolTip(gadg, lang(tip)) 
+    GadgetToolTip(gadg, tip)
   EndIf
   
 EndMacro
 Macro AddButonImage(gadg,x,y,w,h,img,flag,tip)
   
   If ButtonImageGadget(gadg,x,y,w,h, ImageID(img),flag) 
-    GadgetToolTip(gadg, lang(tip))
+    GadgetToolTip(gadg, tip)
   EndIf
   
 EndMacro
 
-Procedure AddSTringTBGadget(gad0,gad1,gad2,val,name$,tip$,x,y,w1,w2,min,max) ; string gadget, name and trackbar
+Procedure AddSTringTBGadget(gadName,gadTB,gadSG,val,name$,tip$,x,y,wtb,wsg,min,max,wtg=30)
   
-  ; test pour ajouter un gadget "spécial : nom, trackbar et stringgadget
+  ; string gadget, name and trackbar
+  
+  ; wtb = width for trackbar
+  ; wsg = width of stringgagdet
+  ; wtg = width for the text gadget
+  
+  ; to color the gadget
+  color =  GetWindowColor(GetActiveWindow())
+  
+  ; To add a gadget Name+trackbar +stringgadget !! test pour ajouter un gadget "spécial : nom, trackbar et stringgadget
   h = 20
-  If TextGadget(gad0, 5, y, 50, h, name$)
-    If TrackBarGadget(gad1, x+25, y, w1, h, min, max)
-      If StringGadget(gad2,x+25+W1, y, w2, h, Str(val))  
-        SetGadgetState(gad1, val)
-        SetGadgetState(gad2, val)
-        GadgetToolTip(gad1, tip$)
-        GadgetToolTip(gad2, tip$)
+  If TextGadget(gadName, x+5, y, wtg, h, name$)
+    SetGadgetColor(gadName, #PB_Gadget_BackColor, color)       
+    
+    If TrackBarGadget(gadTB, x+2+wtg, y, wtb, h, min, max)
+      SetGadgetColor(gadTB, #PB_Gadget_BackColor, color)       
+      SetGadgetState(gadTB, val)
+      GadgetToolTip(gadTB, tip$)
+      
+      If StringGadget(GadSG,x+4+wtg+wtb, y, wsg, h, Str(val))  
+        SetGadgetColor(GadSG, #PB_Gadget_BackColor, color)       
+        SetGadgetText(GadSG, Str(val))
+        GadgetToolTip(GadSG, tip$)
         ProcedureReturn 1
+        
       EndIf
+      
     EndIf
+    
   EndIf
   
 EndProcedure
@@ -89,23 +108,39 @@ Procedure AddCheckBox2(x,y,w,h,nom$,val,tip$)
   gad = CheckBoxGadget(#PB_Any, x,y,w,h,nom$)
   If gad
     SetGadgetState(gad, val)
-    GadgetToolTip(gad, lang(tip$)) 
+    GadgetToolTip(gad, tip$) 
   EndIf
   ProcedureReturn gad
 EndProcedure
 Procedure AddButonImage2(x,y,w,h,img,flag,tip$)
   gad = ButtonImageGadget(#PB_Any,x,y,w,h, ImageID(img),flag) 
   If gad 
-    GadgetToolTip(gad, lang(tip$))
+    GadgetToolTip(gad, tip$)
   EndIf
   ProcedureReturn gad
 EndProcedure
-Procedure AddButon2(x,y,w,h,txt$,flag,tip$)
-  gad = ButtonGadget(#PB_Any,x,y,w,h, lang(txt$),flag) 
+Procedure AddButonImage3(id, x,y,w,h,img,flag,tip$)
+  
+  ; to create a butonimage
+  ; I should replace AddButonImage2() by this procedure
+  
+  gad = ButtonImageGadget(id,x,y,w,h, ImageID(img),flag) 
+  
   If gad 
-    GadgetToolTip(gad, lang(tip$))
+    GadgetToolTip(id, tip$)
   EndIf
   ProcedureReturn gad
+  
+EndProcedure
+Procedure AddButon2(x,y,w,h,txt$,flag,tip$)
+  
+  gad = ButtonGadget(#PB_Any,x,y,w,h, txt$,flag) 
+  
+  If gad 
+    GadgetToolTip(gad, tip$)
+  EndIf
+  ProcedureReturn gad
+  
 EndProcedure
 
 
@@ -124,10 +159,12 @@ Macro FreeGadget2(gad)
 EndMacro
 
 ; Utile (create gadget)
-Procedure TG(x,y,txt$,col=-1) ; create textgadget
+Procedure TG(x,y,txt$,col=-1) 
+  
+  ; create textgadget
   
   ; a procedure to create a text gadget
-  gad = TextGadget(#PB_Any,x,y,Len(lang(txt$)+":")*7,20,lang(txt$)+":")
+  gad = TextGadget(#PB_Any,x,y,Len(txt$+":")*7,20,txt$+":")
   If col <> -1
     SetGadgetColor(gad,#PB_Gadget_BackColor,col)
   EndIf
@@ -135,9 +172,11 @@ Procedure TG(x,y,txt$,col=-1) ; create textgadget
   ProcedureReturn gad
   
 EndProcedure
-Procedure SG(x,y,w,txt$,col=-1)  ; create Stringgadget
-                                 ; a procedure to create a string gadget
-  gad = StringGadget(#PB_Any,x,y,w,20, lang(txt$))
+Procedure SG(x,y,w,txt$,col=-1) 
+  ; create Stringgadget
+  ; a procedure to create a string gadget
+  
+  gad = StringGadget(#PB_Any,x,y,w,20, txt$)
   If col <> -1
     SetGadgetColor(gad,#PB_Gadget_BackColor,col)
   EndIf
@@ -922,15 +961,17 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       ;{
       If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
         i+20
+        sizmin = 0
         Select  action 
           Case #Action_Box
             txt1$ = lang("Size of the round")
           Case #Action_Line
             txt1$ = lang("Size of the line")
+            sizmin = 1
           Case #Action_Circle
             txt1$ = lang("Size of the line")
         EndSelect
-        AddSpinGadget(#G_ActionX,Brush(action)\size,txt1$,5,h1+i,wb,20,1,500,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionX,Brush(action)\size,txt1$,5,h1+i,wb,20,sizmin,500,#PB_Spin_Numeric)
         ; AddSpinGadget(#G_LayerY,Brush(action)\AlphaFG,"Foreground Alpha",5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
         i+ub+15
         
@@ -1246,7 +1287,7 @@ Procedure IE_GadgetAdd()
   If SplitterGadget(#G_SplitToolCol, 0, ToolbarH, ScreenX, h, #G_PanelTool,#G_PanelCol) : EndIf
   
   
-  ; panel layer, options, presets
+  ; panel layer, presets, options (paper)
   If PanelGadget(#G_PanelLayer, 0, 0, ScreenX-5, PanelLayerH_IE)
     
     SetGadgetColor(#G_PanelLayer,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
@@ -1293,14 +1334,14 @@ Procedure IE_GadgetAdd()
     If TrackBarGadget(#G_LayerAlpha,i-2,yy,100,20,0,255)
       GadgetToolTip(#G_LayerAlpha,Lang("Layer Alpha"))
     EndIf
-    AddSpinGadget(#G_LayerAlphaSpin,255,"Layer Opacity",GadgetX(#G_LayerAlpha)+GadgetWidth(#G_LayerAlpha),yy,43,20,0,255,#PB_Spin_Numeric)
+    AddSpinGadget(#G_LayerAlphaSpin,255, lang("Layer Opacity"),GadgetX(#G_LayerAlpha)+GadgetWidth(#G_LayerAlpha),yy,43,20,0,255,#PB_Spin_Numeric)
     yy=yy+25
     
-    IE_Btn1(#G_LayerView,         #ico_LayerView,       "View layer")  : i+ub
-    IE_Btn1(#G_LayerLockAlpha,    #ico_LayerLockAlpha,  "Lock Alpha")  : i+ub
-    IE_Btn1(#G_LayerLockMove,     #ico_LayerLockMove,   "Lock Move")   : i+ub
-    IE_Btn1(#G_LayerLockPaint,    #ico_LayerLockPaint,  "Lock Paint")  : i+ub
-    IE_Btn1(#G_LayerLocked,       #ico_LayerLocked,     "Lock Layer")  : i+ub
+    IE_Btn1(#G_LayerView,         #ico_LayerView,       lang("View layer"))  : i+ub
+    IE_Btn1(#G_LayerLockAlpha,    #ico_LayerLockAlpha,  lang("Lock Alpha"))  : i+ub
+    IE_Btn1(#G_LayerLockMove,     #ico_LayerLockMove,   lang("Lock Move"))   : i+ub
+    IE_Btn1(#G_LayerLockPaint,    #ico_LayerLockPaint,  lang("Lock Paint"))  : i+ub
+    IE_Btn1(#G_LayerLocked,       #ico_LayerLocked,     lang("Lock Layer"))  : i+ub
     yy + 25
     i = 5
     
@@ -1330,10 +1371,10 @@ Procedure IE_GadgetAdd()
     
     If ButtonGadget(#G_LayerAdd,i,yy,bw,bw,"+") : i+wbtn : EndIf
     If ButtonGadget(#G_LayerDel,i,yy,bw,bw,"-") : i+wbtn : EndIf
-    AddButonImage(#G_LayerMoveup,   i,yy,bw,bw,#ico_LayerUp,    #PB_Button_Default, "Move the layer up")   : i+wbtn
-    AddButonImage(#G_LayerMovedown, i,yy,bw,bw,#ico_LayerDown,  #PB_Button_Default, "Move the layer down") : i+wbtn
-    AddButonImage(#G_LayerMaskAlpha,i,yy,bw,bw,#ico_LayerMask,  #PB_Button_Default, "Add A mask alpha")    : i+wbtn
-    AddButonImage(#G_LayerProp,     i,yy,bw,bw,#ico_Prop,       #PB_Button_Default, "Layer Properties")    : i+wbtn
+    AddButonImage(#G_LayerMoveup,   i,yy,bw,bw,#ico_LayerUp,    #PB_Button_Default, lang("Move the layer up"))   : i+wbtn
+    AddButonImage(#G_LayerMovedown, i,yy,bw,bw,#ico_LayerDown,  #PB_Button_Default, lang("Move the layer down")) : i+wbtn
+    AddButonImage(#G_LayerMaskAlpha,i,yy,bw,bw,#ico_LayerMask,  #PB_Button_Default, lang("Add A mask alpha"))    : i+wbtn
+    AddButonImage(#G_LayerProp,     i,yy,bw,bw,#ico_Prop,       #PB_Button_Default, lang("Layer Properties"))    : i+wbtn
     yy + 25
     If OptionsIE\Debbug = 1
       AddSpinGadget(#G_layerbm1,blend1,"",10,yy,40,20,#PB_Sprite_BlendZero,#PB_Sprite_BlendInvertDestinationAlpha,#PB_Spin_Numeric)
@@ -1342,13 +1383,13 @@ Procedure IE_GadgetAdd()
     ;}
     
     
-    AddGadgetItem(#G_PanelLayer,1,Lang("Presets"))
+    AddGadgetItem(#G_PanelLayer, 1, Lang("Presets"))
     ;{ presets
     xx= 5
-    AddButonImage(#G_PresetReloadBank,xx,10,bw,bw,#ico_Merge,   #PB_Button_Default,"Refresh the bank presets")  : xx+wbtn
-    AddButonImage(#G_PresetChangeBank,xx,10,bw,bw,#ico_Open,    #PB_Button_Default,"Open a bank presets")       : xx+wbtn
-    AddButonImage(#G_PresetSavePreset,xx,10,bw,bw,#ico_Save,    #PB_Button_Default,"Save the current preset")   : xx+wbtn
-    AddButonImage(#G_PresetSavePresetAs,xx,10,bw,bw,#ico_Export,#PB_Button_Default,"Export the current preset") : xx+wbtn
+    AddButonImage(#G_PresetReloadBank,xx,10,bw,bw,#ico_Merge,   #PB_Button_Default, lang("Refresh the bank presets"))  : xx+wbtn
+    AddButonImage(#G_PresetChangeBank,xx,10,bw,bw,#ico_Open,    #PB_Button_Default, lang("Open a bank presets"))       : xx+wbtn
+    AddButonImage(#G_PresetSavePreset,xx,10,bw,bw,#ico_Save,    #PB_Button_Default, lang("Save the current preset") )  : xx+wbtn
+    AddButonImage(#G_PresetSavePresetAs,xx,10,bw,bw,#ico_Export,#PB_Button_Default, lang("Export the current preset")) : xx+wbtn
     
     If TreeGadget(#G_PresetTG,5,40,ScreenX-20,PanelLayerH_IE-105)
       OpenPresetBank()
@@ -1370,28 +1411,22 @@ Procedure IE_GadgetAdd()
     
     ; Paper alpha
     wp = 30
-    If AddSTringTBGadget(#G_PaperAlphaName,#G_PaperAlpha,#G_PaperAlphaSG, paper\alpha, lang("Alpha"), lang("Alpha paper"),0,yy,ScreenX-50-wp,wp,0,255)
-      ;     If TrackBarGadget(#G_PaperAlpha, 20, yy , ScreenX-50-wp, 20, 0, 255)
-      ;       GadgetToolTip(#G_PaperAlpha,Lang("Alpha paper"))
-      ;       SetGadgetState(#G_PaperAlpha, 255)
-      ;       StringGadget(
+    If AddSTringTBGadget(#G_PaperAlphaName,#G_PaperAlpha,#G_PaperAlphaSG, paper\alpha, 
+                         lang("Alpha"), lang("Alpha of the background"),0,yy,ScreenX-50-wp,wp,0,255)
       YY+GadgetHeight(#g_paperAlpha)
     EndIf
     
     ; Paper Scale 
-    If AddSTringTBGadget(#G_PaperScaleName,#G_PaperScale,#G_PaperScaleSG, paper\scale, lang("Scale"), Lang("Alpha scale"),0,yy,ScreenX-50-wp,wp,1,200)
-      
-      ;     If TrackBarGadget(#G_PaperScale, 20, yy, ScreenX-50-wp, 20, 1, 200)
-      ;       GadgetToolTip(#G_PaperScale,Lang("Scale paper"))
-      ;       SetGadgetState(#G_PaperScale, 10)
+    If AddSTringTBGadget(#G_PaperScaleName, #G_PaperScale, #G_PaperScaleSG, paper\scale, 
+                         lang("Scale"), Lang("Scale of the background"),0,yy,ScreenX-50-wp,wp,1,200)
       YY+GadgetHeight(#G_PaperScale)
     EndIf
     
-    
-    If TrackBarGadget(#G_PaperIntensity, 20, yy, ScreenX-50-wp, 20, 1, 1000)
-      GadgetToolTip(#G_PaperIntensity, Lang("Intensity paper"))
-      SetGadgetState(#G_PaperIntensity, paper\intensity)
+    If AddSTringTBGadget(#G_PaperIntensityName,#G_PaperIntensity,#G_PaperIntensitySG, paper\intensity, 
+                         Lang("Intensity"), Lang("Intensity of the background"),0,yy,ScreenX-50-wp,wp,1,1000)
+      YY+GadgetHeight(#G_PaperIntensity)
     EndIf
+    
     
     
     ;}
@@ -1574,16 +1609,23 @@ EndMacro
 
 
 ; paper
+
 Procedure IE_UpdatePaperList()
   
+  ; to update the list of paper
+  size =0
   If ExamineDirectory(0, GetCurrentDirectory() + "data\paper\", "*.*")  
+    
     While NextDirectoryEntry(0)
       
       If DirectoryEntryType(0) = #PB_DirectoryEntry_File
         
-        Nom$ = DirectoryEntryName(0)
-        AddGadgetItem(#G_ListPaper, -1, Nom$)
+        Name$ = DirectoryEntryName(0)
+        AddGadgetItem(#G_ListPaper, -1, Name$)
         
+        ReDim Thepaper(size)
+        Thepaper(size)\name$ = Name$
+        size = ArraySize(Thepaper())+1
       EndIf
       
     Wend
@@ -1602,35 +1644,68 @@ Procedure PaperDraw()
   DisplayTransparentSprite(#Sp_PaperColor,canvasX,canvasY, 255)
   
   ;   draw the paper
+  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha) ; multiply
   ZoomSprite(#Sp_Paper,doc\w*z,doc\h*z)
-  DisplayTransparentSprite(#Sp_Paper,canvasX,canvasY, GetGadgetState(#G_PaperAlpha))
+  DisplayTransparentSprite(#Sp_Paper,canvasX,canvasY, paper\alpha)
   
 EndProcedure
 Procedure PaperUpdate(load=0)
   
-  If load = 1    
+  
+  ; if we load a new image for the background
+  If load >= 1    
+    
     If LoadImage(#Img_Paper, GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)
-      SetGadgetState(#G_paperScale, 10)
-    EndIf
+      
+      If load = 1
+        
+        If IsGadget(#G_paperScale)
+          SetGadgetState(#G_paperScale, 10)
+        EndIf
+        
+        If IsSprite(#Sp_Paper)
+          FreeSprite(#Sp_Paper)
+        EndIf
+        If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending) = 0
+          MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
+        EndIf
+         
+       EndIf
+       
+     EndIf
+     
   EndIf
   
-  
-  z.d = 1; OptionsIE\zoom*0.01
-  
+  ; define some variable
+  z.d = 1 ; OptionsIE\zoom*0.01
   scale.d = 1
+  
+  ; than change the image on the sprite.
   If IsGadget(#G_paperScale)
-    scale = GetGadgetState(#G_paperScale)
+    
+    If paper\scale <1
+      paper\scale = GetGadgetState(#G_paperScale)
+    EndIf
+    
+    scale = paper\scale
     scale = scale /10
     ;   Else
     ;     Debug "paperscale gadget pas ok"
   EndIf
   ;    Debug "paperscale "+StrD(scale)
+  
+  
+  ; <------- attention : need to check if scale isn't too large or not enough large
+  
+  
+  
+  ; create a tempImage for paper.
   tempImgPaper = CopyImage(#Img_Paper, #PB_Any)
   
   w = ImageWidth(#Img_Paper)
   h = ImageHeight(#Img_Paper)
-  w1= ImageWidth(#Img_Paper)*scale
-  h1 = ImageHeight(#Img_Paper)*scale
+  w1.d= ImageWidth(#Img_Paper) * scale
+  h1.d = ImageHeight(#Img_Paper) * scale
   If w1 > 5000
     w1= 5000
   EndIf
@@ -1638,40 +1713,81 @@ Procedure PaperUpdate(load=0)
     h1= 5000
   EndIf
   
-  ResizeImage(tempImgPaper, w1, h1)
-  w = ImageWidth(tempImgPaper)
-  h = ImageHeight(tempImgPaper)
-  
-  ; MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
-  
-  If StartDrawing(SpriteOutput(#Sp_Paper))
+  If IsImage(tempImgPaper)
     
-    ; DrawingMode(#PB_2DDrawing_Default)
+    ; resize the image 
+    ResizeImage(tempImgPaper, w1, h1)
+    ; tempImgPaper = UnPreMultiplyAlpha(tempImgPaper) ; not need because image has no alpha chanel ^^, it's a bacground.
+    w = ImageWidth(tempImgPaper)
+    h = ImageHeight(tempImgPaper)
     
-    ; Box(0, 0, SpriteWidth(#Sp_Paper), SpriteHeight(#Sp_Paper), RGBA(255, 255, 255, 255))
+;      MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
     
-    DrawingMode(#PB_2DDrawing_AlphaBlend )
+    ; update the color of the BG
+    If StartDrawing(SpriteOutput(#Sp_PaperColor))
+      Box(0, 0, OutputWidth(), OutputHeight(), paper\color) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
+      StopDrawing()
+    EndIf
     
-    For i=0 To (doc\w/w)*z
+    
+    ; draw on the sprite the new background
+    If StartDrawing(SpriteOutput(#Sp_Paper))
       
+      ; DrawingMode(#PB_2DDrawing_Default)
       
-      For j = 0 To (doc\h/h)*z
-        ; ZoomSprite(#Sp_Paper,w*z,h*z)
-        ; DisplaySprite(#Sp_Paper,i*w*z+canvasX,j*h*z+canvasY)
+      ; Box(0, 0, SpriteWidth(#Sp_Paper), SpriteHeight(#Sp_Paper), RGBA(255, 255, 255, 255))
+      
+      DrawingMode(#PB_2DDrawing_AlphaBlend )
+      
+      For i=0 To (doc\w/w)*z +1
         
-        ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
-        DrawImage(ImageID(tempImgPaper),i*w,j*h)
         
-      Next j 
+        For j = 0 To (doc\h/h)*z +1
+          ; ZoomSprite(#Sp_Paper,w*z,h*z)
+          ; DisplaySprite(#Sp_Paper,i*w*z+canvasX,j*h*z+canvasY)
+          
+          ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
+          DrawImage(ImageID(tempImgPaper),i*w,j*h)
+          
+        Next j 
+        
+        
+      Next i       
       
+      StopDrawing()
       
-    Next i       
+    EndIf
     
-    StopDrawing()
+    ; delete tempImage
+    FreeImage(tempImgPaper)
     
   EndIf
+
+
+EndProcedure
+Procedure PaperCreate(delete=0)
   
-  FreeImage(tempImgPaper)
+  ; to create the papaer sprite
+  If IsImage(#img_paper)
+    
+    ; need to recreate the sprite (if we change
+    If delete =1
+      If IsSprite(#Sp_Paper)
+        FreeSprite(#Sp_Paper)
+      EndIf
+    EndIf
+    
+    If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending)
+      ;       If StartDrawing(SpriteOutput(#Sp_Paper))
+      ;         DrawImage(ImageID(#Img_Paper),0,0)
+      ;         StopDrawing()
+      ;       EndIf      
+      PaperUpdate() 
+    Else
+      MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
+    EndIf
+    
+  EndIf
   
 EndProcedure
 Procedure PaperInit(load=1)
@@ -1703,39 +1819,22 @@ Procedure PaperInit(load=1)
     EndIf
   EndIf
   
-  ; create the paper
-  If IsImage(#img_paper)
-    If CreateSprite(#Sp_Paper, doc\w,doc\h, #PB_Sprite_AlphaBlending)
-      ;       If StartDrawing(SpriteOutput(#Sp_Paper))
-      ;         DrawImage(ImageID(#Img_Paper),0,0)
-      ;         StopDrawing()
-      ;       EndIf      
-      PaperUpdate() 
-    Else
-      MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
-    EndIf
-  EndIf
+;   ; create the paper
+;   PaperCreate()
+;   
+;   ; Create a temporary layer/sprite, for temporary operation (selection, box, circle...)
+;   ; puis, je crée le layertempo, un sprite pour les opérations comme sélection, box, cercle, gradient, etc...
+;   CreateLayertempo()
   
-  ; Create a temporary sprite, for temporary operation (selection, box, circle...)
-  ; puis, je crée le layertempo, un sprite pour les opérations comme sélection, box, cercle, gradient, etc...
-  If CreateSprite(#Sp_LayerTempo,doc\w,doc\h,#PB_Sprite_AlphaBlending) 
-    If StartDrawing(SpriteOutput(#Sp_LayerTempo))
-      DrawingMode(#PB_2DDrawing_AlphaChannel)
-      Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
-      Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-      StopDrawing()
-    EndIf    
-  EndIf
+  ; create the paper and layertemporary
+  RecreateLayerUtilities()
   
+  
+  ; then create the grid
   CreateGrid()
   
 EndProcedure
-Procedure WindowEditorPaper()
-  
-  ; the window background editor
-  
-  
-EndProcedure
+; WindowBackgroundEditor() : see include\procedures\window.pbi
 
 
 ; update general UI
@@ -2003,8 +2102,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2002
-; FirstLine = 46
-; Folding = AAAAOAADAAAAAAAAAAAAAAAACYAAAAAAAAAAAA-
+; CursorPosition = 1646
+; FirstLine = 131
+; Folding = B95A5AAMAAAAAAAAAAAAAAAAYgxHAA+h6DCOAAA5
 ; DisableDebugger
 ; EnableUnicode

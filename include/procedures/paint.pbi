@@ -1167,9 +1167,17 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
         EndIf
         
       EndIf
+     
       
       v+1
       u + b
+      
+      
+;        FinalSize - FinalSize*ratio
+;       If FinalSize <0
+;         FinalSize = 0
+;         Break
+;       EndIf
       
     Next u
     
@@ -2057,8 +2065,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 115
-; FirstLine = 76
-; Folding = AAAAAAAAAAAAgGcAAAAAAA5BAAeAAAAg
+; CursorPosition = 1179
+; FirstLine = 192
+; Folding = AAAAAAAAAAAAgGcAAIAAAA5BAAeAAAAg
 ; EnableXP
 ; EnableUnicode

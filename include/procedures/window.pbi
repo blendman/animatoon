@@ -83,12 +83,12 @@ Macro WinDocNewCont(typ)
         Format$(6) = "Points (pt)"
         Format$(7) = "Pixels (px)"
         
-        TGWidth=TG(xx+5,yy,"Width",col2)
+        TGWidth=TG(xx+5,yy, lang("Width"),col2)
         SpinGadget(#GADGET_WNewW,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewW,Str(doc\w_def))
         CBPixelW = ComboBoxGadget(#PB_Any,xx+115,yy,80,20) 
         
         YY +25
-        TGHeight=TG(xx+5,yy,"Height",col2)
+        TGHeight=TG(xx+5,yy, lang("Height"),col2)
         SpinGadget(#GADGET_WNewH,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewH,Str(doc\h_def)) 
         CBPixelH = ComboBoxGadget(#PB_Any,xx+115,yy,80,20) 
         
@@ -119,7 +119,7 @@ Macro WinDocNewCont(typ)
 EndMacro
 Procedure WindowDocNew()
   
-  If OpenWindow(#winNewTileset,0,0,650,500,Lang("NewDoc"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
+  If OpenWindow(#winNewTileset,0,0, 650,500,Lang("NewDoc"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
     
     w1 = WindowWidth(#winNewTileset)
     h1 = WindowHeight(#winNewTileset)
@@ -207,9 +207,16 @@ Procedure WindowDocNew()
       ; we have clicked on ok  button, we can create a new document
       Layer_FreeAll()
       
+      
+      
+      ; then, set the new document parameters
       Doc\name$ = name$
       Doc\w = Val(GetGadgetText(#GADGET_WNewW))
       Doc\h = Val(GetGadgetText(#GADGET_WNewH))
+      
+      ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
+      RecreateLayerUtilities()
+
       
       ; add a new layer.
       Layer_Add()
@@ -535,18 +542,489 @@ Procedure WindowLayerProp()
 EndProcedure
 
 
+; Paper
+Procedure UpdateCanvasBGColor(x,y,wcol,image)
+  
+  ; Then update the canvasBGcolor
+  If StartDrawing(CanvasOutput(#GADGET_WinBGED_Canvas_colors))
+    ; draw a color on the canvas
+    Box(0, 0, OutputWidth(), OutputHeight(), col2)
+    
+    ; then draw the colors from the colorfile
+    If IsImage(image)
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
+      DrawAlphaImage(ImageID(image), 0, 0, 255)
+    Else
+      Debug "error image BGcolor in window.pbi"
+    EndIf
+    
+    ; then draw the selected color
+    DrawingMode(#PB_2DDrawing_Outlined )
+    Box(x,y,wcol,wcol, RGB(255,0,0))
+    Box(x+1,y+1,wcol-2,wcol-2, RGB(0,0,0))
+    
+    StopDrawing()
+  EndIf
+  
+EndProcedure
+Procedure UpdateIMageBGColor(image, filecolor$, wcol)
+  
+  ; to update the color on the canvas BGcolor(background editor)
+  If StartDrawing(ImageOutput(image))
+    
+    
+    
+    ; then draw the colors from the colorfile
+    ;{ open the bgcolors and draw it
+    
+    ; width for the colors case
+    wcanvas = ImageWidth(image)
+    
+    ; Debug filecolor$
+    DrawingMode(#PB_2DDrawing_AllChannels)
+   
+    ; check if file exists
+    If GetFileExist(filecolor$)
+      
+      ; and read the file
+      If ReadFile(0, filecolor$)
+        j = 0
+        While Eof(0) = 0    
+          
+          line$ = ReadString(0)
+          char$ = Mid(line$,1,1)
+          
+          If char$ <> "#" And line$ <> ""            
+            
+            line$ = ReplaceString(line$,Chr(9),Chr(32)) 
+            
+            While char$ = Chr(32)
+              char$ = Mid(line$,1,1)
+              line$ = Right(line$,Len(line$)-1)
+            Wend            
+            While FindString(line$,Chr(32)+Chr(32)) >= 1
+              line$ = ReplaceString(line$,Chr(32)+Chr(32),Chr(32))
+            Wend
+            
+            RGB$ = line$
+            count = CountString(line$,Chr(32))
+            R = Val(StringField(RGB$, 1, " "))
+            G = Val(StringField(RGB$, 2, " "))
+            B = Val(StringField(RGB$, 3, " "))
+            Name$ =""          
+            For i = 0 To count 
+              Name$ + StringField(RGB$, 4+i, " ")            
+            Next i
+            Name$ = ReplaceString(Name$,Chr(9),"")
+            
+            ; we draw the color
+            x = Mod(j, Round(wcanvas/wcol, #PB_Round_Down)) * (wcol+2)
+            y = (j/(wcanvas/wcol)) * (wcol+2)
+            
+            Box(x, y, wcol, wcol, RGBA(r,g,b, 255))
+            j+1
+            
+            ;  Debug Str(j)+"|"+Str(x)+"/"+Str(y)+"/"+Str(r)+"/"+Str(G)+"/"+Str(B)+"/"
+            
+          EndIf           
+          
+        Wend
+        
+        CloseFile(0)
+      EndIf 
+      
+      
+    Else
+      ; create some colors, and save it in the file.
+    EndIf
+    
+    ;}
+    
+    StopDrawing()
+  EndIf
+  
+EndProcedure
+Procedure WindowBackgroundEditor()
+  
+  ; the window background editor
+  winW = 800
+  WinH = 500
+  
+  If OpenWindow(#Win_BGeditor, 0, 0, winw, WinH, Lang("Background editor"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu|#PB_Window_Invisible)
+    
+   ;  HideWindow(#Win_BGeditor,1)
+
+    w1 = WindowWidth(#Win_BGeditor)
+    h1 = WindowHeight(#Win_BGeditor)
+    Col = RGB(80,80,80)
+    col2 = RGB(120,120,120)
+    SetWindowColor(#Win_BGeditor,col)
+    
+    
+    ;{ add the gadgets    
+    
+    ; examine the folder for paper
+    paperpath$ = "data\paper\"
+    ; Dim tempImg(ArraySize(Thepaper())
+    
+    
+    ; keep the properties of current paper 
+    ; (If click on cancel button, I will reassigne those parameters To the current background)
+    Define old.sPaper
+    old\name$ = OptionsIE\Paper$
+    old\scale = paper\scale ; GetGadgetState(#G_paperScale)
+    old\alpha = paper\alpha ;GetGadgetState(#G_PaperAlpha)
+    old\intensity = paper\intensity; GetGadgetState(#G_PaperIntensity)
+    old\color = paper\Color
+    
+    ;** define some variables for gadgets
+    
+    ; position of the scrollarea
+    y0 = 30
+    ; height for the scrollarea and canvas paper & colors
+    hh = WinH - 100 - y0
+    
+    ; width of the canvas for paper image
+    wcanvas = winW - 270-40 
+    
+    ; size of a paper image preview on the canvas
+    w2 = wcanvas/4  
+    
+    ; height for the canvas (paper and colors)
+    h2 = (Round((1+ArraySize(Thepaper())) / (wcanvas/w2), #PB_Round_Up))*w2
+    
+    
+    ; the gadgets : 
+    
+    ;{ buttons and list of background presets
+    
+    ; the buton to save a background in data\presets\backgrounds
+    wb = 22
+   ; AddButonImage3(#GADGET_WinBGED_BtnSaveBG, 5, 5, wb, wb, #ico_Save, #PB_Button_Default, 
+                   ;lang("Save the background preset (with paper parameters and colors"))
+    
+    ; the buton to update the list of presets bg, colors, and papers
+    ;AddButonImage3(#GADGET_WinBGED_BtnUpdateBG, 5+wb+5, 5, wb, wb, #ico_loop, #PB_Button_Default, lang("Update presets, papers and colors lists"))
+    
+    
+    ; the list of background presets
+    wlg = 100
+    If ListViewGadget(#GADGET_WinBGED_listBG, 5, y0, wlg, hh)
+      
+    EndIf
+    
+    ;}
+    
+    ;{ paper background
+    ; a scrollarea +canvas to see the paper image
+    If ScrollAreaGadget(#GADGET_WinBGED_SA_Paper, 10+wlg, y0, winW - 220-wlg, hh, winW - 250,  h2+20)
+      SetGadgetColor(#GADGET_WinBGED_SA_Paper, #PB_Gadget_BackColor, col2)      
+      ; Debug Round(wcanvas/100, #PB_Round_Down)
+      
+      If CanvasGadget(#GADGET_WinBGED_Canvas_Paper, 0, 0, wcanvas, h2) 
+        If StartDrawing(CanvasOutput(#GADGET_WinBGED_Canvas_Paper))
+          Box(0, 0, OutputWidth(), OutputHeight(), col2)
+          
+          ; then draw the paper image.
+          nb = ArraySize(Thepaper())
+          For i = 0 To ArraySize(Thepaper())
+            tempImg = LoadImage(#PB_Any, paperpath$ + Thepaper(i)\name$)
+            ResizeImage(tempImg, w2-5, w2-5)
+            x = Mod(i, Round(wcanvas/w2, #PB_Round_Down))*w2
+            y = (i/(wcanvas/w2))*w2
+            DrawImage(ImageID(tempImg), x, y)
+            
+            ; draw a box for the name
+            DrawingMode(#PB_2DDrawing_AlphaBlend)
+            y1 = y+w2-20
+            Box(x, y1, w2-5, 20, RGBA(0,0,0, 100))
+            
+            ; draw the name of the image
+            DrawingMode(#PB_2DDrawing_Transparent)
+            DrawText(x+10, y1, Thepaper(i)\name$, RGB(255,255,255))
+          Next
+          
+          StopDrawing()
+        EndIf
+        FreeImage(tempImg)
+        
+      EndIf
+      CloseGadgetList()
+    EndIf
+    ;}
+    
+    ;{ color background
+    
+    ; the buton to save a color for background (use the *.gpl format (palette like gimp/krita/mypaint), the same used for swatchs
+    xb = 15+winW - 220
+    AddButonImage3(#GADGET_WinBGED_BtnsaveBGColors, xb, 5, wb, wb, #ico_New, #PB_Button_Default, 
+                   lang("Create a new color (and save it in the color presets"))
+
+    ; a scrollarea +canvas to see the colors
+    If ScrollAreaGadget(#GADGET_WinBGED_SA_colors, xb, y0, 200, hh, 150,  WinH*2)
+      
+      SetGadgetColor(#GADGET_WinBGED_SA_colors, #PB_Gadget_BackColor, col2)  
+      
+      
+      ; get the number of colors
+      wcol = 150/3 - 4
+      filecolor$ = GetCurrentDirectory()+ "data\Presets\Background\bgcolors.txt"
+      If ReadFile(0, filecolor$)
+        j = 0
+        While Eof(0) = 0    
+          
+          line$ = ReadString(0)
+          char$ = Mid(line$,1,1)
+          
+          If char$ <> "#" And line$ <> ""  
+            j+1
+          EndIf
+          
+        Wend
+        CloseFile(0)
+        nbcolors = j-1
+        
+        hcanvas = j * wcol
+        SetGadgetAttribute(#GADGET_WinBGED_SA_colors, #PB_ScrollArea_InnerHeight , (j+1) * wcol)
+      Else
+        hcanvas = hh
+      EndIf
+            
+      
+      ; then create the canvas for color
+      If CanvasGadget(#GADGET_WinBGED_Canvas_colors, 0, 0, 150, hcanvas) 
+        
+        ; create an image to draw the colors, and draw this image on the canvasBGcolor
+        Himg = hcanvas
+        If hcanvas > 8192
+          himg = 8192
+        EndIf
+        
+        tempImgBGcolor = CreateImage(#PB_Any, 150, Himg, 32, #PB_Image_Transparent)
+        If tempImgBGcolor 
+          UpdateIMageBGColor(tempImgBGcolor, filecolor$, wcol)
+        Else
+          MessageRequester(lang("Error"), Lang("Unable To create the image For canvas color"), #PB_MessageRequester_Error  )
+        EndIf
+        
+        ;the update the canvas
+        UpdateCanvasBGColor(-100,-100,wcol,tempImgBGcolor)
+      EndIf
+      
+      CloseGadgetList()
+    EndIf
+    
+    ;}
+    
+    ;{ other gagdets (trackbar, button...)
+    ; the alpha gadgets (trackbar, name, spin)
+    y = y0 + hh+10
+    wTB = 150 ; trackbar width
+    wSG = 40 ; stringgadget width
+    wtg = 55 ; textgadget width
+    AddSTringTBGadget(#GADGET_WinBGED_TB_ALphaName,#GADGET_WinBGED_TB_ALpha,#GADGET_WinBGED_TB_ALphaSG, paper\alpha, 
+                      lang("Alpha"), lang("Alpha of the background"), 5, y, wTB, wSG, 0, 255, wtg)
+    
+    ; the scale gadgets (trackbar, name, spin)
+    x4 = 5 + wTB + wSG + wtg
+    AddSTringTBGadget(#GADGET_WinBGED_TB_scaleName, #GADGET_WinBGED_TB_scale, #GADGET_WinBGED_TB_scaleSG, paper\scale, 
+                      lang("Scale"), lang("Scale of the background"), 15+x4, y, wTB, wSG, 1, 50, wtg)
+    
+    ; the intensity gadgets (trackbar, name, spin)
+    AddSTringTBGadget(#GADGET_WinBGED_TB_intensityName, #GADGET_WinBGED_TB_intensity, #GADGET_WinBGED_TB_intensitySG, paper\intensity, 
+                      lang("Intensity"), lang("Intensity of the background"), 5, y+30, wTB, wSG, 1, 10, wtg)  
+    
+    
+    ; add two buttons in the bottom
+    ButtonGadget(#GADGET_WinBGED_BtnOk,w1-70,h1 -25,60,20,Lang("Ok"))
+    ButtonGadget(#GADGET_WinBGED_BtnCancel,w1-140,h1-25,60,20,Lang("Cancel"))
+    SetGadgetColor(#GADGET_WinBGED_BtnCancel,#PB_Gadget_BackColor,col2)
+    SetGadgetColor(#GADGET_WinBGED_BtnOk, #PB_Gadget_BackColor,col2)
+    
+    ;}
+    
+    ;}
+    
+    HideWindow(#Win_BGeditor,0)
+    
+     Repeat
+      
+      Event       = WaitWindowEvent(10)
+      EventGadget = EventGadget()
+      EventType   = EventType()
+      
+      Select event
+          
+        Case #PB_Event_CloseWindow
+          quit = 1
+          
+        Case #PB_Event_Gadget
+          
+          Select EventGadget
+              
+            Case #GADGET_WinBGED_Canvas_Paper
+              If eventtype = #PB_EventType_LeftButtonDown  
+                pos_x = GetGadgetAttribute(#GADGET_WinBGED_Canvas_Paper, #PB_Canvas_MouseX) 
+                pos_y = GetGadgetAttribute(#GADGET_WinBGED_Canvas_Paper, #PB_Canvas_MouseY) 
+                
+                ; to know on which paper image we are
+                paperx = pos_x/w2
+                papery = pos_y/w2
+                
+                ; then we change the paper (its only a preview, it will be changed if we confirm by clicking on buton ok
+                Idpaper = paperx + papery*4
+                ; Debug Str(idpaper)
+                ; Debug thepaper(idpaper)\name$
+                OptionsIE\Paper$ = thepaper(idpaper)\name$
+                PaperUpdate(1)
+                ScreenUpdate(0)
+              EndIf
+              
+            Case #GADGET_WinBGED_Canvas_colors
+              If eventtype = #PB_EventType_LeftButtonDown  
+                pos_x = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseX) 
+                pos_y = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseY) 
+                
+                ; to know on which color image we are
+                paperx = pos_x/(wcol+2)
+                papery = pos_y/(wcol+2)
+                
+                ; get the "ID of color
+                IdColor = paperx + papery*3
+                
+                If idcolor <= nbcolors
+                  
+                  ; get the color
+                  If StartDrawing(CanvasOutput(EventGadget))
+                    paper\Color = Point(paperx*(wcol+2), paperY*(wcol+2))
+                    StopDrawing()
+                  EndIf
+                  
+                  UpdateCanvasBGColor(paperx*(wcol+2), papery*(wcol+2), wcol, tempImgBGcolor)
+                  ; Debug Str(idpaper)+"/"+Str(paperx)+"/"+Str(papery) ; +"/"+Str(paper\color)
+                  
+                  PaperUpdate(1)
+                  ScreenUpdate(0)
+                
+                EndIf
+              EndIf
+              
+            Case #GADGET_WinBGED_TB_ALpha, #GADGET_WinBGED_TB_ALphaSG
+              ;{
+              paper\alpha = setmin(GetGadgetState(EventGadget), 0)
+              SetGadgetState(#GADGET_WinBGED_TB_ALpha, paper\alpha)
+              SetGadgetText(#GADGET_WinBGED_TB_ALphaSG, Str(paper\alpha))
+              PaperUpdate(1)
+              ScreenUpdate(0)
+              ;}
+              
+            Case #GADGET_WinBGED_TB_scale, #GADGET_WinBGED_TB_scaleSG
+              ;{
+              paper\scale = setmin(GetGadgetState(EventGadget), 1)
+              SetGadgetState(#GADGET_WinBGED_TB_ALpha, paper\scale)
+              SetGadgetText(#GADGET_WinBGED_TB_ALphaSG, Str(paper\scale))
+              PaperUpdate(1)
+              ScreenUpdate(0)
+              ;}
+              
+            Case #GADGET_WinBGED_TB_intensity, #GADGET_WinBGED_TB_intensitySG
+              ;{
+              paper\intensity = setmin(GetGadgetState(EventGadget), 1)
+              SetGadgetState(#GADGET_WinBGED_TB_intensity, paper\intensity)
+              SetGadgetText(#GADGET_WinBGED_TB_intensitySG, Str(paper\intensity))
+              PaperUpdate(1)
+              ScreenUpdate(0)
+              ;}
+              
+            Case #GADGET_WinBGED_BtnsaveBGColors
+              color = ColorRequester(paper\color)
+              If color <> -1
+                paper\color = color
+                
+                ; need to add the new color to the file and to the canvas.
+                namecolor$ = InputRequester(lang("Name"), lang("Name for the new color"),"")
+                If OpenFile(0, filecolor$, #PB_File_Append)
+                  WriteStringN(0, Str(Red(color))+Chr(32)+Str(Green(color))+Chr(32)+Str(Blue(color))+Chr(32)+namecolor$)
+                  CloseFile(0)
+                EndIf
+                
+                ; update the canvas-color
+                If tempImgBGcolor 
+                  UpdateIMageBGColor(tempImgBGcolor, filecolor$, wcol)
+                EndIf
+                
+                UpdateCanvasBGColor(paperx, papery, wcol, tempImgBGcolor)
+                
+                ; update the paper-background
+                PaperUpdate(1)
+                ScreenUpdate(0)
+              EndIf
+              
+            Case #GADGET_WinBGED_BtnCancel
+              quit =2
+              
+            Case #GADGET_WinBGED_BtnOk
+              quit =1
+              
+              
+          EndSelect
+          
+          
+      EndSelect
+      
+    Until quit >=1
+    
+    ; free images
+    FreeImage(tempImgBGcolor)
+    
+    ; close window
+    CloseWindow(#Win_BGeditor)
+    
+    
+    ; if click on cancel button, we have to re-update the paper with its previous parameters
+    If quit = 2
+      OptionsIE\Paper$ = old\name$
+      paper\scale = old\scale  
+      paper\alpha = old\alpha
+      paper\intensity = old\intensity
+      paper\Color= old\color
+      PaperUpdate(1)
+      ScreenUpdate(0)
+      
+    EndIf
+    
+    ; and update the gadget for panel options
+    SetGadgetState(#G_paperScale, paper\scale)
+    SetGadgetState(#G_PaperScaleSG, paper\scale)
+    SetGadgetState(#G_PaperAlpha, paper\alpha)
+    SetGadgetState(#G_PaperAlphaSG, paper\alpha)
+    SetGadgetState(#G_PaperIntensity, paper\intensity)
+    SetGadgetState(#G_PaperIntensitySG, paper\intensity)
+    
+  EndIf
+  
+  
+EndProcedure
+
+
+
 ;--- HELP
 Procedure WindowAbout()
   
-  txt$ = "Animatoon (version "+#ProgramVersion+")"+Chr(13)+"Développé par Blendman"+Chr(13)
+  txt$ = lang("Animatoon (version")+Chr(32)+#ProgramVersion+")"+Chr(13)+lang("Developped by Blendman (and many contributers)")+Chr(13)
   
-  txtcredit$ ="Fred (Purebasic)"+Chr(13)+"B.Vignoli pour la base"+Chr(13)
-  txtcredit$ + "LSI (Image Processing), Venom, G-rom,"+Chr(13)+"Kwangee, Dobro, Fangbeast,"+Chr(13)+"Blbltheworm"+Chr(13)+Chr(13)
+  txtcredit$ ="Fred (Purebasic) & purebasic team (Freak...)"+Chr(13)+lang("B.Vignoli for the base")+Chr(13)+Chr(13)  
+  txtcredit$ + "LSI (Image Processing), Venom, G-rom,"+Chr(13)+
+               "Kwanjeen, Dobro, Fangbeast, Danilo, "+Chr(13)+
+               "Purelust, Netmaestro, Blbltheworm,"+Chr(13)+
+               "Rashad, Eddy, Chi, Omy, Idle, Icesoft,"+Chr(13)+
+               "Onilink, Kernadec, Falsam, Manalabel,"+Chr(13)+
+               "Infratec, ApplePy, Willburt, StarGate..."+Chr(13)+Chr(13)  
   
-  txtcredit$ +"Icone by : "+Chr(13)+"Sergio Sanchez Lopez, Marco Martin"+Chr(13)+"Oxygen Team, Gnome Project"+Chr(13)+"Creative FreeDom Ltd"+Chr(13)+"David Vignoni"
+  txtcredit$ +lang("Icone by :")+Chr(13)+"Sergio Sanchez Lopez, Marco Martin"+Chr(13)+"Oxygen Team, Gnome Project"+Chr(13)+"Creative FreeDom Ltd"+Chr(13)+"David Vignoni"
   txtcredit$ +Chr(13)+"FatCow Web Hosting, Jaanos"
   
-  t1$ = "Developped By : "  
+  t1$ = lang("Developped By :")+Chr(32)  
   
   
   ;txt_1$ + Chr(13)+ Chr(13)+"Distributed under the LGPL Licence"
@@ -556,7 +1034,7 @@ Procedure WindowAbout()
     ImgAbout = CreateImage(#PB_Any, 380,imgH);,32, #PB_Image_Transparent)
     ImgAboutCredit = CreateImage(#PB_Any, 380,WindowHeight(#win_About)-80);,32, #PB_Image_Transparent)
     
-    ImageLoad2(#Img_About,optionsIE\Theme$+"\paint.png" )
+    LoadImage2(#Img_About,optionsIE\Theme$+"\paint.png" )
     
     ImageGadget(#GADGET_WAboutImage,10,10,380,imgH,ImageID(ImgAbout))
     
@@ -578,13 +1056,13 @@ Procedure WindowAbout()
       yy2 = 30
       DrawingFont(FontID(#fnt_Arial12))
       DrawText(xx1,yy2,t1$,0)
-      DrawText(xx1,yy2+40,"Version : ",0) 
+      DrawText(xx1,yy2+40,lang("Version :")+" ",0) 
       
       DrawingFont(FontID(#fnt_Arial12Italic))
       DrawText(xx1+TextWidth(t1$),yy2,"Blendman",0)
       
       DrawingFont(FontID(#fnt_Arial10BoldItalic))
-      DrawText(xx1+5+TextWidth("Version : "),yy2+42,#ProgramVersion+" ("+FormatDate("%dd/%mm/%yyyy", #ProgramDate)+")",#Black) 
+      DrawText(xx1+5+TextWidth(lang("Version :")+" "),yy2+42,#ProgramVersion+" ("+FormatDate("%dd/%mm/%yyyy", #ProgramDate)+")",#Black) 
       StopDrawing()
     EndIf
     
@@ -593,7 +1071,7 @@ Procedure WindowAbout()
       Box(0,0,400,WindowHeight(#win_About),RGB(170,170,170))
       DrawingMode(#PB_2DDrawing_Transparent)
       yy1 = 10
-      DrawText(10,yy1,Lang("Thanks to "),0)      
+      DrawText(10,yy1, Lang("Thanks to")+" ",0)      
       DrawingFont(FontID(#fnt_Arial12))
       DrawTextEx(10,yy1+20,txtcredit$) 
       StopDrawing()
@@ -604,7 +1082,7 @@ Procedure WindowAbout()
     SetGadgetState(#GADGET_WAboutImage,ImageID(ImgAbout))
     SetGadgetState(#GADGET_WAboutImageCredit,ImageID(ImgAboutCredit))
     
-    ButtonGadget(#GADGET_WAboutBtnOk,170,WindowHeight(#win_About)-50,60,20,"Ok")
+    ButtonGadget(#GADGET_WAboutBtnOk,170,WindowHeight(#win_About)-50,60,20, lang("Ok"))
   EndIf
   
   
@@ -643,8 +1121,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 218
-; FirstLine = 147
-; Folding = PIAAAA5
+; CursorPosition = 706
+; FirstLine = 180
+; Folding = 1JAQM--4z3ZY+-
 ; EnableXP
 ; EnableUnicode

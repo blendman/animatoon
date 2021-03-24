@@ -134,8 +134,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 133
-; FirstLine = 107
-; Folding = ---
+; CursorPosition = 6
+; FirstLine = 1
+; Folding = AA5
 ; EnableXP
 ; EnableUnicode

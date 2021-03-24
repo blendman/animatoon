@@ -1,11 +1,12 @@
 ﻿;-- infos/changelog
 ; XIncludeFile "changelog.txt" 
+; XIncludeFile "include\infos.pbi" 
 
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
-#ProgramVersion   = "0.5.8.9"
-#ProgramRevision  = 1
+#ProgramVersion   = "0.5.9.0"
+#ProgramRevision  = 0
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
 #ProgramNbLine    = "21000"
 ;}
@@ -29,13 +30,15 @@ XIncludeFile "include\prototypes.pb" ; for tablet (wacom)
 ;-- Variables
 XIncludeFile "include\variables.pb"
 
-;-- macro & utiles
+;-- macro & utiles (maths)
 XIncludeFile "include\macros.pb"
 
 
 ;{ *** procedure 
 ;-- procedures
 XIncludeFile "include\procedures.pb" ;  screen et sprite
+
+; maths and usefull procedures are in XIncludeFile "include\macros.pb"
 
 ; contain :
 ; XIncludeFile "include\procedures\declare.pbi" 
@@ -57,10 +60,10 @@ XIncludeFile "include\procedures.pb" ;  screen et sprite
 ;{ *** Open window 
 ;-- Open window
 
-; fenêtre d'introduction (pour faire patienter pendant le chargement des images par exemple
+; Introduction Image windows // fenêtre d'introduction (pour faire patienter pendant le chargement des images par exemple
 w= 500
 h= 250
-If ImageLoad2(#Img_Intro,"data\animatoon.jpg",500,250)
+If LoadImage2(#Img_Intro,"data\animatoon.jpg",500,250)
   w = ImageWidth(#img_intro)
   h = ImageHeight(#img_intro)
 EndIf
@@ -81,10 +84,10 @@ If OpenWindow(#Win_Intro,0,0,w,h,#ProgramName, #PB_Window_BorderLess|#PB_Window_
   CreateImage2(#Img_PreviewBrush,100,100,"Image Preview Brush")
   
   ; Icone layers
-  ImageLoad2(#Img_LayerCenter,  OptionsIE\Theme$ +"\layer.jpg",254,25)  
-  ImageLoad2(#ico_LayerEye,   OptionsIE\Theme$ +"\layereye.jpg",11,9)  
-  ;ImageLoad2(#Img_Pan_LayerLock,  OptionsIE\Theme$ +"\layerlocked.jpg",12,12)  
-  ImageLoad2(#Img_LayerCenterSel,OptionsIE\Theme$ +"\layersel.jpg",254,25)  
+  LoadImage2(#Img_LayerCenter,  OptionsIE\Theme$ +"\layer.jpg",254,25)  
+  LoadImage2(#ico_LayerEye,   OptionsIE\Theme$ +"\layereye.jpg",11,9)  
+  ;LoadImage2(#Img_Pan_LayerLock,  OptionsIE\Theme$ +"\layerlocked.jpg",12,12)  
+  LoadImage2(#Img_LayerCenterSel,OptionsIE\Theme$ +"\layersel.jpg",254,25)  
   
 EndIf
 
@@ -125,7 +128,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_MacOS
   
 CompilerEndIf
 
-; fenêtre principale
+; Main window // fenêtre principale
 If ExamineDesktops()
   WinW = DesktopWidth(0)
   WinH = DesktopHeight(0)
@@ -213,8 +216,9 @@ CompilerEndIf
 
 ; à remplacer par un sprite du brush ?
 ; CompilerIf  #PB_Compiler_OS <> #PB_OS_Windows 
-ShowCursor_(1) ; montre le curseur sur le screen
-               ; CompilerEndIf
+; Show the cursor on the screen // montre le curseur sur le screen
+ShowCursor_(1)
+; CompilerEndIf
 
 ; PaperChange()
 PaperInit() ; in 
@@ -232,7 +236,7 @@ BrushUpdateColor()
 
 ;}
 
-;{ autres
+;{ Others
 
 ; we add a layer (because we need at least 1 layer :)
 Layer_Add()
@@ -273,22 +277,10 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 41
-; FirstLine = 27
-; Folding = DAA8
+; CursorPosition = 8
+; Folding = DQA7
 ; EnableXP
-; EnableUser
+; EnableOnError
 ; UseIcon = teo.ico
-; Executable = animatoon0.588.exe
 ; Warnings = Display
 ; EnablePurifier
-; IncludeVersionInfo
-; VersionField0 = 0,3,8
-; VersionField1 = 0,3,8
-; VersionField2 = Dracaena studio - blendman
-; VersionField3 = Animatoon
-; VersionField6 = 2D painting and animation software
-; VersionField7 = animatoon
-; VersionField8 = animatoon
-; VersionField9 = blendman
-; EnableUnicode

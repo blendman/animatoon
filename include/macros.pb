@@ -56,20 +56,45 @@ Procedure Snap(x,grid=10)
 EndProcedure
 
 ;{ util, math
-Procedure SetMaximum(a,b)
-  If a > b
-    a = b
+
+Procedure SetMaximum(a,max)
+  ; to set the maxi for a variable
+  If a > max
+    a = max
   EndIf
   ProcedureReturn a
 EndProcedure
+Procedure Max(a, b)
+  
+  ; get the max of 2 numbers
+  
+  If a > b
+    ProcedureReturn a
+  Else
+    ProcedureReturn b
+  EndIf
+  
+EndProcedure
+
 Procedure Min(a,b)
   
+  ; get the min of 2 variable
   If a>b
     ProcedureReturn b
   EndIf
   ProcedureReturn a
   
 EndProcedure
+Procedure SetMin(a, min)
+  
+  ; to set the min value to a variable
+  If a < min
+    a = min
+  EndIf
+  
+  ProcedureReturn a
+EndProcedure
+
 
 
 Procedure.f Max3(Value1.f=0, Value2.f=0, Value3.f=0)
@@ -158,8 +183,8 @@ EndMacro
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 157
-; FirstLine = 131
-; Folding = -------
+; CursorPosition = 98
+; FirstLine = 15
+; Folding = 5BR1dAA-
 ; EnableXP
 ; EnableUnicode

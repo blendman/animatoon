@@ -1,10 +1,7 @@
 ﻿
-; Animatoon
-; july 2015
-; by blendman
-; pb 5.31
+; Animatoon, Image filters
 
-; 
+
 ; Structure MenuPlugin ; Action on the top icon // Action sur les icones du haut
 ;   MenuId.i
 ;   Name$
@@ -317,8 +314,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 11
-; FirstLine = 10
+; CursorPosition = 1
 ; Folding = AAPeAv
 ; EnableXP
 ; EnableUnicode

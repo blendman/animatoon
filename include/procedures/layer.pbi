@@ -1,6 +1,43 @@
 ﻿
 ; Paper: see gadgets.pbi
 
+; others sprite/image thant the layer, but drawn on the screen/canvas (sprite temporary, paper...)
+Procedure CreateLayertempo_()
+  
+  ; free the sprite
+  If IsSprite(#sp_LayerTempo)
+    FreeSprite(#sp_LayerTempo)
+  EndIf
+  
+  ; recreate the sprite for layer temporary operation - like box, circle, gradient...
+  If CreateSprite(#Sp_LayerTempo,doc\w,doc\h,#PB_Sprite_AlphaBlending) 
+    If StartDrawing(SpriteOutput(#Sp_LayerTempo))
+      DrawingMode(#PB_2DDrawing_AlphaChannel)
+      Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
+      Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+      StopDrawing()
+    EndIf    
+  EndIf
+  
+EndProcedure
+Procedure RecreateLayerUtilities()
+  
+  ; needed when : crop, resize, newdoc, opendoc...
+  CreateLayertempo_()
+  
+  ; recreate the paper
+  PaperUpdate(1) ; in gadgets.pbi
+  
+  ; recreate the grid ?
+  
+  ; and other sprite ??
+  
+EndProcedure
+; paper : see gadget.pbi
+
+
+
+
 Macro Layer_DrawImg(u,alpha)
   If layer(u)\Typ = #Layer_TypBG
     For i=0 To layer(u)\w / layer(u)\W_Repeat 
@@ -17,13 +54,13 @@ EndMacro
 ; Layer UI & gadget
 Procedure Layer_importImage(update=1)
   
-  filename$ = OpenFileRequester("Import Image as a new layer","","Allformat|*png;*.jpg;*.bmp|png|*.png|jpg|*.jpg|bmp|*.bmp|",0)
+  filename$ = OpenFileRequester(lang("Import Image as a new layer"),"","Allformat|*png;*.jpg;*.bmp|png|*.png|jpg|*.jpg|bmp|*.bmp|",0)
   
   If filename$ <>""
     
     temp = LoadImage(#PB_Any,Filename$)
     If temp  = 0
-      MessageRequester("Error", "Unable to image the image as new layer.")
+      MessageRequester(Lang("Error"), lang("Unable to image the image as new layer."))
     Else
       
       ; on ajoute un layer
@@ -334,20 +371,18 @@ Procedure Layer_Add(x=0,y=0,txt$="")
     \view = 1
     \alpha = 255
     \ordre = n
+    \h = Doc\h
+    \w = Doc\w
     
     Select \typ 
         
       Case #Layer_TypBG
-        \h = Doc\h
-        \w = Doc\w
         \name$ = "Background"+Str(LayerIdMax)
         \W_Repeat = 100
         \H_Repeat = 100
         Debug "bg !!!"
         
       Case #Layer_TypBitmap
-        \h = Doc\h
-        \w = Doc\w
         \name$ = "Layer"+Str(LayerIdMax)
         
       Case   #Layer_TypText
@@ -365,8 +400,6 @@ Procedure Layer_Add(x=0,y=0,txt$="")
         \y = y
         
       Default 
-        \h = Doc\h
-        \w = Doc\w
         \name$ = "Layer"+Str(LayerIdMax)
         
     EndSelect
@@ -383,8 +416,11 @@ Procedure Layer_Add(x=0,y=0,txt$="")
     Else
       \Image = CreateImage(#PB_Any,\w,\h,32,#PB_Image_Transparent)
     EndIf
+    
+    ; create the aimges
     \ImageBM = CreateImage(#PB_Any,\w,\h,32,#PB_Image_Transparent)
     \ImageAlpha = CreateImage(#PB_Any,\w,\h,32,#PB_Image_Transparent)
+    
     If StartDrawing(ImageOutput(\ImageAlpha))
       ;Box(0,0,\w,\h,RGBA(255,255,255,0))    
       DrawingMode(#PB_2DDrawing_AlphaChannel)
@@ -468,9 +504,10 @@ EndProcedure
 
 
 
-;update
+; update & blendmode (bm)
 Procedure Layer_UpdateUi(i)
   
+  ; to update the layer UI (image for view, preview layer, lock...)
   n =ArraySize(layer())
   
   With layer(i)
@@ -753,11 +790,10 @@ EndProcedure
 ; draw
 Procedure Layer_Draw(i)
   
+  ; to draw a layer on the screen-canvas
   z.d = OptionsIE\zoom * 0.01
   w.d = Layer(i)\w * z
-  ;w= w/100
   h.d = Layer(i)\h * z
-  ;h = h/100 
   Layer_Bm(i)
   ZoomSprite(Layer(i)\Sprite,w,h)
   DisplayTransparentSprite(Layer(i)\Sprite,canvasX+layer(i)\x * z,canvasY+layer(i)\y * z,layer(i)\alpha)
@@ -790,12 +826,14 @@ Procedure Layer_DrawBorder(i)
 EndProcedure
 Procedure Layer_DrawAll()
   
+  ; to draw all layers 
+  
   For i=0 To ArraySize(layer())
     If Layer(i)\view 
       Layer_Draw(i)
       If i = layerId
         If OptionsIE\Shape=1 
-          DisplayTransparentSprite(#Sp_LayerTempo, canvasX, canvasY, layer(layerid)\alpha)  
+          ;DisplayTransparentSprite(#Sp_LayerTempo, canvasX, canvasY, layer(layerid)\alpha)  
         EndIf
       EndIf  
     EndIf
@@ -807,6 +845,8 @@ EndProcedure
 
 ; free, clear
 Procedure Layer_FreeAll()
+  
+  ; procedure to free all the layers, for example when create a new document
   ; procedure qu'on utilise pour supprimer tous les layers.
   ; Par exemple, lorsqu'on crée un nouveau document
   
@@ -828,9 +868,12 @@ Procedure Layer_FreeAll()
     
   Next i
   
+  ; Then redim the layer() array and reset variable for layers
   ReDim Layer(0)
   LayerNb = 0
   LayerIdMax = 0
+  
+  
   
 EndProcedure
 Procedure Layer_Clear(i, onlyAlpha=0)
@@ -1251,7 +1294,60 @@ Procedure Layer_Rotate(i,angle)
   
   
 EndProcedure
-
+Procedure Layer_TransformToLine()
+  
+  ; transform an image to another with a alpha chanel based in the inverse of the grey level of the image
+  ; for exemple, to transform automatically a scanned drawing into black line.
+  
+  ; get the color of the layer
+  w = layer(layerid)\W
+  h = layer(layerid)\H
+  tempImg = CreateImage(#PB_Any, w, h, 32, #PB_Image_Transparent)
+  
+  ; create a copy of the image of the current layer
+  tempimg_grey = CopyImage(Layer(LayerId)\Image,#PB_Any)
+  
+  
+  ; **** OPTIMISATION : copie the procedures of IE_desaturation & IE_invertcolor, to not do 3 times IE_GetImagePixelColor
+  
+  
+  ; desaturate the image of the current layer
+  ; IE_Desaturation(tempimg_grey)
+  
+  ; invert the colors (because we will use the color (grey level) as alpha in our new image
+  IE_InvertColor(tempimg_grey)
+  
+  ; get the pixels new color
+  IE_GetImagePixelColor(tempimg_grey)
+  
+  ; Than we add a new layer
+  Layer_Add()
+  
+  ; and draw on this layer the new image 
+  If StartDrawing(ImageOutput(layer(LayerId)\image))
+    ;DrawingMode(#PB_2DDrawing_AlphaBlend)
+    ;DrawAlphaImage(ImageID(TempImg),0,0)
+    
+    DrawingMode(#PB_2DDrawing_AllChannels)
+    ; draw the pixel on the alpha chanel
+    For y = 0 To h - 1
+      For x = 0 To w - 1
+        color =  pixel(x, y)
+        Plot(x, y, RGBA(0,0,0,color))
+      Next
+    Next
+    StopDrawing()
+  EndIf
+  
+  ; free the images
+  FreeImage(tempimg)
+  FreeImage(tempimg_grey)
+  
+  ; then update 
+  NewPainting = 1
+  ScreenUpdate()
+  
+EndProcedure
 
 
 ; temporary layer
@@ -1304,12 +1400,12 @@ Procedure Layer_SelectAlpha()
 EndProcedure
 
 ; windows
-; windowprop : see window.pbi
+; window properties for layer (windowprop) : see window.pbi
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 820
-; FirstLine = 42
-; Folding = AAAAAAAAAAAAYAAAAAAAAA5
+; CursorPosition = 28
+; FirstLine = 3
+; Folding = RAAAAAAAAAAAAAAAAAAAAAAA-
 ; EnableXP
 ; EnableUnicode

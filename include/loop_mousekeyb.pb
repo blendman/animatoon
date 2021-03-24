@@ -87,7 +87,7 @@ If GetActiveWindow() = #WinMain
     
     ;}
     
-    If MouseClic ; on clique sur le canvas
+    If MouseClic ; click on the canvas // on clique sur le canvas
       
       ; OPtionsIE\cursorX = 10000
       UpdateSc.a = 0
@@ -153,7 +153,7 @@ If GetActiveWindow() = #WinMain
               UsePickColorTogetColor(mx, my)
               ;}
               
-            Else ; on dessine (brush, eraser, floodfill, box, etc...
+            Else ; we draw // on dessine (brush, eraser, floodfill, box, etc...
               
               Select Action
                   
@@ -335,7 +335,7 @@ If GetActiveWindow() = #WinMain
                     
                     ; save the dot() for the futur stroke // on enregistre les dot()             
                     ;{ pour créer les dot() en tps réel // désactivé pour l'instant
-                    ; AddDot(mx,my,size,color)
+;                      AddDot(mx, my,size,color)
                     ;}
                     
                     
@@ -370,11 +370,10 @@ If GetActiveWindow() = #WinMain
                       brushsiz_old = brushsiz
                     EndIf
                     
-                    ; ratio.d = \dot(i-1)\size - \dot(i)\size
-                    ;                       ratio.d = Abs(Brushsiz_old - Brushsiz)
-                    ;                       ratio/dist
-                    
-                    
+;                     ratio.d = stroke(StrokeId)\dot(i-1)\size - stroke(StrokeId)\dot(i)\size
+;                     ratio.d = Abs(Brushsiz_old - Brushsiz)
+;                     ratio/dist
+;                    
                     
                     ;}
                     
@@ -406,8 +405,8 @@ If GetActiveWindow() = #WinMain
                         ;xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
                         ;yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
                         
-                        xx = Mx - canvasX*zoum  - Brush(Action)\CenterX 
-                        yy = MY - canvasY*zoum  - Brush(Action)\CenterY 
+                        xx = Mx - canvasX * zoum  - Brush(Action)\CenterX 
+                        yy = MY - canvasY * zoum  - Brush(Action)\CenterY 
                         
                         If StartDrawingOnImageNotClear = 0
                           StartDrawingOnImageNotClear = 1
@@ -444,6 +443,8 @@ If GetActiveWindow() = #WinMain
                           EndIf
                           
                           DisplayTransparentSprite(#Sp_BrushCopy,x_result,y_result,alpha,Col) 
+                          
+;                           FinalSize - FinalSize*ratio*u
                           
                           v+1
                           u + b
@@ -771,7 +772,9 @@ If GetActiveWindow() = #WinMain
                   ;}
                   
               EndSelect
+              
             EndIf
+            
           EndIf
           
           ;}
@@ -1271,7 +1274,8 @@ EndIf
 FPS()
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 43
-; Folding = bAAAAAAAAAAAAAAAAAAAAA1CAAAAAAAAAg
+; CursorPosition = 337
+; FirstLine = 150
+; Folding = bYcw+-Ag0fvzsIOFAAAAAA1CAAAAAAAAAg-
 ; EnableXP
 ; EnableUnicode

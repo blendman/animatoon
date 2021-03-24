@@ -1,9 +1,6 @@
 ﻿
 ; procedure animation v6 - 06/2015 - pb 5.30LTS
 
-; declare
-; XIncludeFile "procedures\declare.pbi"
-
 
 ;{ util
 
@@ -16,40 +13,6 @@ Procedure FreeSprite2(sprite)
   
 EndProcedure
 
-; images
-Procedure ImageLoad2(nb,file$,w=25,h=25)
-  
-  Result = LoadImage(nb,file$)
-  
-  If Result = 0
-    MessageRequester("Error", "Impossible d'ouvrir l'image "+file$)
-    If CreateImage(nb,w,h,32)   = 0
-      MessageRequester("Error", "Unable to create an image !")
-      End
-    EndIf
-  Else
-    ProcedureReturn Result
-  EndIf
-  
-EndProcedure
-Procedure CreateImage2(img,w,h,img$,d=24,t=0)
-  
-  Result = CreateImage(img,w,h,d,t)
-  
-  If Result = 0
-    MessageRequester("Error","Unable to create image : "+img$)
-    End  
-  EndIf
-  
-  ProcedureReturn Result
-EndProcedure
-Procedure FreeImage2(img)
-  
-  If IsImage(img)
-    FreeImage(img)
-  EndIf
-  
-EndProcedure
 
 ; text
 Procedure DrawTextEx(x.f,y.f,text$, couleur.l=0, lineHeight.w=19)  
@@ -209,7 +172,7 @@ Procedure ScreenDraw()
   ClearScreen(RGB(120,120,120))
   
   ; the paper
-  PaperDraw() ; in 
+  PaperDraw() ; in gagdets.pbi
   
   ; les calques
   Layer_DrawAll() ; in layer.pb
@@ -472,9 +435,8 @@ XIncludeFile "procedures\window.pbi"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 392
-; FirstLine = 59
-; Folding = AABAAAQCw
+; CursorPosition = 29
+; Folding = AAAAAAA5
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

@@ -1,6 +1,49 @@
 ﻿
 ; image
 
+
+; images
+Procedure LoadImage2(nb, file$, w=25, h=25)
+  
+  Result = LoadImage(nb, file$)
+  
+  If Result = 0
+    AddLogError(1, Lang("Unable to open the image ")+file$)
+    If CreateImage(nb,w,h,32,#PB_Image_Transparent)   = 0
+      MessageRequester(lang("Error"), lang("Unable to create an image !"))
+      AddLogError(1, lang("Unable to create an image !"))
+      End
+    Else
+      
+    EndIf
+  Else
+    ProcedureReturn Result
+  EndIf
+  
+EndProcedure
+Procedure CreateImage2(img,w,h,img$,d=24,t=0)
+  
+  Result = CreateImage(img,w,h,d,t)
+  
+  If Result = 0
+    MessageRequester("Error","Unable to create image : "+img$)
+    End  
+  EndIf
+  
+  ProcedureReturn Result
+EndProcedure
+Procedure FreeImage2(img)
+  
+  If IsImage(img)
+    FreeImage(img)
+  EndIf
+  
+EndProcedure
+
+
+
+
+
 ; MOdule by Wilbert
 DeclareModule Premultiply
   
@@ -233,7 +276,7 @@ Macro IE_GetImagePixelColor(img)
   Dim pixel.i(w, h)
   Dim alph.a(w, h)
   
-  ; on chope la couleur
+  ; we get the color // on chope la couleur
   If StartDrawing(ImageOutput(img))
     DrawingMode(#PB_2DDrawing_AllChannels)
     
@@ -505,6 +548,7 @@ Procedure IE_Desaturation(img)
         
       Next
     Next
+    
     StopDrawing()
   EndIf
   
@@ -820,6 +864,48 @@ Procedure IE_Level(img,Minimum,maximum)
   IE_SetImageOutput1(1)
   
   ProcedureReturn img 
+EndProcedure
+
+
+; other image process
+Procedure.i Color_Darken(Color.i, Fact.d)
+  
+  ; By Omi, atm. for ChartPie & ChartBarVert
+  
+  Protected.i ColorRet, Element
+   
+   ;ColorRet= Color & $ff000000
+   ;ColorRet+ (Color & $ff0000) * Fact
+   ;ColorRet+ (Color & $ff00) * Fact
+   ;ColorRet+ (Color & $ff) * Fact
+   
+   ;... Changed due to Color dependent bug, 2016-04-19 ...
+   
+   If Fact > 1.0 : Fact = 1.0 : EndIf
+   ColorRet= (Color & $ff000000)
+   
+   Element= ((Color & $ff0000) >> 16) * Fact
+   ColorRet+ Element << 16
+   
+   Element= ((Color & $ff00) >> 8) * Fact
+   ColorRet+ Element << 8
+   
+   Element= (Color & $ff) * Fact
+   ColorRet+ Element
+   
+   ProcedureReturn ColorRet
+EndProcedure
+Procedure.i Color_Darken2(Color.i, Fact.d)
+  ; By Omi
+   Protected.i Red, Blue, Green, Alpha
+   
+   If Fact > 1.0 : Fact = 1.0 : EndIf
+   Alpha   = Alpha(Color)
+   Red     = Red(Color)   * Fact
+   Green   = Green(Color) * Fact
+   Blue    = Blue(Color)  * Fact
+   
+   ProcedureReturn RGBA(Red, Green, Blue, Alpha)
 EndProcedure
 
 
@@ -2245,8 +2331,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2194
-; FirstLine = 75
-; Folding = 5DIAAAAAAAAHAAAAAAAAAAAACAAAAAAAAAAQAAAAs-
+; CursorPosition = 911
+; FirstLine = 80
+; Folding = WxHQILABAAA9gDAAAAAAAAAAAAAAAAAAAAAAAAAAAAg
 ; EnableXP
 ; EnableUnicode

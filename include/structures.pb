@@ -141,7 +141,7 @@ Structure sOptions
   CurSorW.w
   CursorH.w
   
-  ; theme
+  ; theme program
   Lang$
   Theme$
   ThemeColor.i
@@ -310,7 +310,7 @@ Structure sOptions
   ; path et file
   PathSave$
   PathOpen$
-  
+  ; FileBGcolor$
   
 EndStructure
 Global OptionsIE.sOptions
@@ -690,7 +690,7 @@ Global LayerNb.w,LayerIdMax.w
 
 ;{ background/paper : the papers are in data\papers // il y a le papier qu'on utilise et les images dans le dossier data/paper/
 Structure sPaper
-  nom$
+  name$
   alpha.a
   scale.w
   intensity.w ; intensity
@@ -705,8 +705,10 @@ Paper\scale = 10
 Paper\intensity = 1
 Paper\Color = RGB(255, 255, 255)
 
-Global Dim Thepaper.sPaper(0) ; for the paper editor
-                              ;}
+; for the paper editor and paper list
+Global Dim Thepaper.sPaper(0) 
+
+;}
 
 
 
@@ -768,9 +770,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 209
-; FirstLine = 48
-; Folding = ACAAAA5
+; CursorPosition = 312
+; FirstLine = 87
+; Folding = ACAAAQ5
 ; Markers = 370
 ; EnableXP
 ; EnableUnicode
