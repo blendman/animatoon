@@ -94,9 +94,10 @@ EndIf
 ; for the moment, tablet only works on windows, I don't know how to use tablet on other system.
 CompilerIf #PB_Compiler_OS = #PB_OS_Windows
   
-  errortablet$ = "Unable to load Wintab32.dll. Is your Tablet ready ?"+Chr(10)+
-                 "You can try To copy the wintab32.Dll from your windows system To the directory of animatoon."
-  If OpenLibrary(0, "Wintab32.dll")
+  errortablet$ = lang("Unable to load Wintab32.dll. Is your Tablet ready ?")+Chr(10)+
+                 lang("You can try To copy the wintab32.Dll from your windows system To the directory of animatoon.")
+  
+  If OpenLibrary(0, "Wintab32.dll") Or OpenLibrary(0, "C:\Windows\System32\Wintab32.dll") Or OpenLibrary(0,"C:\Windows\SysWOW64\Wintab32.dll")
     
     WTInfo.WTInfo_     = GetFunction(0, "WTInfoA")
     WTOpen.WTOpen_     = GetFunction(0, "WTOpenA")
@@ -115,6 +116,7 @@ CompilerIf #PB_Compiler_OS = #PB_OS_Windows
       
     EndIf
     
+    Debug "ok wintab32.dll, tablet ready ! "
     
   Else
     MessageRequester("ERROR", Errortablet$)
@@ -277,10 +279,12 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 8
-; Folding = DQA7
+; CursorPosition = 119
+; FirstLine = 65
+; Folding = HTA7
 ; EnableXP
 ; EnableOnError
 ; UseIcon = teo.ico
+; Executable = _release\0.5.9.0\animatoon.exe
 ; Warnings = Display
 ; EnablePurifier
