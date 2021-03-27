@@ -32,27 +32,25 @@ CompilerIf #PB_Compiler_OS = #PB_OS_Linux
   
   
   ;}
-    
-; CompilerElseIf #PB_Compiler_OS = #PB_OS_MacOS
+  
+  ; CompilerElseIf #PB_Compiler_OS = #PB_OS_MacOS
   
 CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacOS
-
-Repeat
   
-  Z.d = OptionsIE\Zoom*0.01
-  mx = WindowMouseX(0) - ScreenX 
-  my = WindowMouseY(0) - ScreenY
-
+  
   Repeat 
+    Z.d = OptionsIE\Zoom*0.01
+    mx = WindowMouseX(0) - ScreenX 
+    my = WindowMouseY(0) - ScreenY
     
-      Event       = WaitWindowEvent(1)
-      EventMenu   = EventMenu()
-      EventGadget = EventGadget()
-      EventType   = EventType()
-      EventWindow = EventWindow()
-          
-      RunScript(ScriptNumber)
-      AutoSave()
+    Event       = WaitWindowEvent(1)
+    EventMenu   = EventMenu()
+    EventGadget = EventGadget()
+    EventType   = EventType()
+    EventWindow = EventWindow()
+    
+    RunScript(ScriptNumber)
+    AutoSave()
     
     If event <> 0
       
@@ -79,7 +77,7 @@ Repeat
                 
               Case #menu_New
                 WindowDocNew()
-                                
+                
               Case #Menu_Open
                 Doc_Open()
                 
@@ -143,12 +141,12 @@ Repeat
                       filename$ + ".png"
                     EndIf
                     If OptionsIE\SaveImageRT
-                    SaveImage(Layer(LayerId)\image, filename$,#PB_ImagePlugin_PNG)
-                  Else
-                    CopySprite(Layer(LayerId)\Sprite,#Sp_CopyForsave, #PB_Sprite_AlphaBlending)
-                    SaveSprite(#Sp_CopyForsave, filename$,#PB_ImagePlugin_PNG)
-                    FreeSprite2(#Sp_CopyForsave)
-                  EndIf                  
+                      SaveImage(Layer(LayerId)\image, filename$,#PB_ImagePlugin_PNG)
+                    Else
+                      CopySprite(Layer(LayerId)\Sprite,#Sp_CopyForsave, #PB_Sprite_AlphaBlending)
+                      SaveSprite(#Sp_CopyForsave, filename$,#PB_ImagePlugin_PNG)
+                      FreeSprite2(#Sp_CopyForsave)
+                    EndIf                  
                   EndIf
                 EndIf
                 
@@ -178,7 +176,7 @@ Repeat
               Case #Menu_SelectAll,#Menu_DeSelect
                 sel = (EventMenu-#Menu_DeSelect)
                 Edit_Select(1+sel)
-                 
+                
               Case #Menu_FillAll
                 Layer_Fill(1)
                 
@@ -276,9 +274,9 @@ Repeat
                   EndIf              
                 EndIf
                 
-;               Case #menu_IE_Zoom10   
-;                 OptionsIE\Zoom = 10
-;                 ScreenZoom()   
+                ;               Case #menu_IE_Zoom10   
+                ;                 OptionsIE\Zoom = 10
+                ;                 ScreenZoom()   
                 
               Case #menu_IE_Zoom50   
                 OptionsIE\Zoom = 50
@@ -398,7 +396,7 @@ Repeat
                 ImgFilterSharpenAlpha()
                 
                 
-              ;Case #menu_IE_Offset
+                ;Case #menu_IE_Offset
                 
               Case #menu_IE_Noise
                 ImgFilterNoise()
@@ -457,26 +455,26 @@ Repeat
             
           Else
             
-;             ForEach Ani_Plugins()
-;               
-;               If EventMenu = #Menu_Last + Ani_Plugins()\menuId
-;                 If Ani_Plugins()\lib <> 0; OpenLibrary(0, "PureBasic.dll")                  
-;                   layimg = Layer(layerid)\Image
-;                   *img = imageToArray(layimg, ImageWidth(layimg)-1,ImageHeight(layimg)-1)
-;                   CallFunction(Ani_Plugins()\lib, "DoFilter",@img)
-;                   ArrayToImage(layimg, *img,ImageWidth(layimg),ImageHeight(layimg))
-;                   FreeMemory(*img)
-;                   
-;                   ;CloseLibrary(0)
-;                 EndIf
-;                 Break
-;               EndIf 
-;               
-;             Next
-;             
+            ;             ForEach Ani_Plugins()
+            ;               
+            ;               If EventMenu = #Menu_Last + Ani_Plugins()\menuId
+            ;                 If Ani_Plugins()\lib <> 0; OpenLibrary(0, "PureBasic.dll")                  
+            ;                   layimg = Layer(layerid)\Image
+            ;                   *img = imageToArray(layimg, ImageWidth(layimg)-1,ImageHeight(layimg)-1)
+            ;                   CallFunction(Ani_Plugins()\lib, "DoFilter",@img)
+            ;                   ArrayToImage(layimg, *img,ImageWidth(layimg),ImageHeight(layimg))
+            ;                   FreeMemory(*img)
+            ;                   
+            ;                   ;CloseLibrary(0)
+            ;                 EndIf
+            ;                 Break
+            ;               EndIf 
+            ;               
+            ;             Next
+            ;             
             
           EndIf
-        
+          
           ;}
           
         Case #PB_Event_Gadget
@@ -593,23 +591,23 @@ Repeat
                     newpainting = 1
                     ScreenUpdate(1) 
                     
-                  ;Case #G_LayerList
+                    ;Case #G_LayerList
                     ;{
-;                     If OldAction <> Action
-;                       Layer_ValidChange(Action)  
-;                       OldAction = Action
-;                     EndIf                
-;                     Id = GetGadgetState(#G_LayerList) 
-;                     UpdateGadgetLayer(id)
-;                     ScreenUpdate()            
-;                     LayerId= id
-;                     If EventType = #PB_EventType_LeftDoubleClick
-;                     nom$ = InputRequester("Name","New Name","")
-;                     If nom$ <> ""
-;                       layer(layerid)\name$ = nom$
-;                       SetGadgetItemText(#G_LayerList,id,nom$)
-;                     EndIf
-;                   EndIf
+                    ;                     If OldAction <> Action
+                    ;                       Layer_ValidChange(Action)  
+                    ;                       OldAction = Action
+                    ;                     EndIf                
+                    ;                     Id = GetGadgetState(#G_LayerList) 
+                    ;                     UpdateGadgetLayer(id)
+                    ;                     ScreenUpdate()            
+                    ;                     LayerId= id
+                    ;                     If EventType = #PB_EventType_LeftDoubleClick
+                    ;                     nom$ = InputRequester("Name","New Name","")
+                    ;                     If nom$ <> ""
+                    ;                       layer(layerid)\name$ = nom$
+                    ;                       SetGadgetItemText(#G_LayerList,id,nom$)
+                    ;                     EndIf
+                    ;                   EndIf
                     ;}
                     
                   Case #G_LayerBM ; blendmode of the layer
@@ -901,7 +899,7 @@ Repeat
                     Else
                       OptionsIE\ShapeTyp = GetGadgetState(#G_ActionTyp)
                     EndIf
-                  
+                    
                   Case #G_ActionFullLayer
                     OptionsIE\ShapeFullLayer = GetGadgetState(#G_ActionFullLayer)
                     
@@ -1060,7 +1058,7 @@ Repeat
                       ScreenUpdate(0)
                     EndIf
                     
-                      
+                    
                   Case #G_PaperScale
                     SetGadgetText(#G_PaperScaleSG, Str(GetGadgetState(#G_PaperScale)))
                     paper\scale = GetGadgetState(#G_PaperScale)
@@ -1069,10 +1067,10 @@ Repeat
                     
                   Case #G_PaperIntensity
                     paper\intensity = GetGadgetState(#G_PaperIntensity)
-                      
+                    
                   Case #G_PaperAlpha
                     SetGadgetText(#G_PaperAlphaSG, Str(GetGadgetState(#G_PaperAlpha)))
-                     paper\alpha = GetGadgetState(#G_PaperAlpha)
+                    paper\alpha = GetGadgetState(#G_PaperAlpha)
                     PaperUpdate()
                     ScreenUpdate(0)
                     
@@ -1080,7 +1078,7 @@ Repeat
                     Val = Val(GetGadgetText(#G_PaperAlphaSG))
                     If val >=0 And val <=255
                       SetGadgetState(#G_PaperAlpha, val)
-                       paper\alpha = val
+                      paper\alpha = val
                       PaperUpdate()
                       ScreenUpdate(0)
                     EndIf
@@ -1237,14 +1235,14 @@ Repeat
                   NewPainting = 1                   
                   ScreenUpdate()
                   MouseClic = 0
-                   
+                  
               EndSelect              
               ;}
               
               ; For the other window gagdets, see include\procedures\window.pbi
               
           EndSelect
-       
+          
         Case #PB_Event_CloseWindow
           
           If EventWindow = #WinMain
@@ -1258,7 +1256,7 @@ Repeat
               OptionsIE\Shape=0
             EndIf
           EndIf
-                
+          
         Case #WM_MOUSEMOVE
           
           
@@ -1295,8 +1293,8 @@ Repeat
           EndIf
           
         Case  #PB_Event_LeftClick ; mouseleft up
-          ;{
-          ; clic = 0
+                                  ;{
+                                  ; clic = 0
           If Gad =0
             MouseClic = 0
             startzoom = 0
@@ -1320,7 +1318,7 @@ Repeat
               paint = 0 
               
               ; Layer_updateUi(layerId) ; update the gadget-layer current
-                       
+              
               If (layer(layerid)\MaskAlpha >= 1 And layer(layerid)\MaskAlpha < 3) Or layer(layerid)\typ =#Layer_TypBG Or OptionsIE\SelectAlpha = 1
                 Newpainting = 1
                 ScreenUpdate()
@@ -1375,33 +1373,29 @@ Repeat
           ScreenResized = 1
           IE_UpdateGadget()
           ;}
-           
+          
           
           
       EndSelect
       
     EndIf
-        
-  Until event = 0 Or event = #WM_LBUTTONDOWN Or event = #WM_LBUTTONUP
-  
-  IncludeFile "loop_mousekeyb.pb" ; event paint, erase...
-  
-  ; confirm exit
-  If quit = 1
-    If OptionsIE\ConfirmExit = 1
-      If OptionsIE\ImageHasChanged
-        If MessageRequester(Lang("Exit"), Lang("Do you confirm you want to exit this beautiful program ? You have some work which aren't saved."), 
-                            #PB_MessageRequester_YesNo) = #PB_MessageRequester_No    
-          quit =0
+    
+    IncludeFile "loop_mousekeyb.pb" ; event paint, erase...
+    
+    ; confirm exit
+    If quit = 1
+      If OptionsIE\ConfirmExit = 1
+        If OptionsIE\ImageHasChanged
+          Result  = MessageRequester(Lang("Exit"), Lang("Do you confirm you want to exit this beautiful program ? You have some work which aren't saved."), #PB_MessageRequester_YesNo)
+          If Result = #PB_MessageRequester_Yes       ; pressed Yes button
+            quit = 1
+          ElseIf Result = #PB_MessageRequester_No    ; pressed No button
+            quit = 0 
+          EndIf    
         EndIf
       EndIf
     EndIf
-  EndIf
-  
-  
-  
-Until quit = 1
-
+  Until  quit = 1
 CompilerEndIf
 
 
@@ -1412,9 +1406,9 @@ If tablet
 EndIf
 
 If OptionsIE\AutosaveAtExit
-   If OptionsIE\ImageHasChanged
-     ExportImage(1)
-   EndIf
+  If OptionsIE\ImageHasChanged
+    ExportImage(1)
+  EndIf
 EndIf
 
 SaveOptions()
@@ -1423,9 +1417,9 @@ End
 ;}
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 388
-; FirstLine = 98
-; Folding = hvTQAgModKJBEzgAEAjAg+qjz8
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 1397
+; FirstLine = 1363
+; Folding = -------
 ; EnableXP
 ; EnableUnicode
