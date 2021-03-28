@@ -5,18 +5,10 @@
 
 ; The loop for the program // La boucle pour l'application
 CompilerIf #PB_Compiler_OS = #PB_OS_Linux
-  
   ;{ not finished at all !
-  
-  
   Screen = SDL_SetVideoMode_(width, height, depth, #SDL_OPENGL | #SDL_FULLSCREEN)
-  
   Repeat
-    
-    
-    
-    While SDL_PollEvent_(@Event.SDL_Event)
-      
+    While SDL_PollEvent_(@Event.SDL_Event)    
       Select Event\Type
         Case #SDL_MOUSEBUTTONDOWN
           If Event\button\button = 4
@@ -24,26 +16,18 @@ CompilerIf #PB_Compiler_OS = #PB_OS_Linux
           ElseIf event\button\button = 5
             MouseWheels - 1 ;will subtract from the scrolling
           EndIf
-      EndSelect
-      
+      EndSelect   
     Wend
-    
   Until quit = 1
-  
-  
   ;}
-  
   ; CompilerElseIf #PB_Compiler_OS = #PB_OS_MacOS
   
+  
+  
 CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacOS
-  
-  
   Repeat 
     Event       = WaitWindowEvent(1)
     EventWindow = EventWindow()
-    
-    
-    
     
     Z.d = OptionsIE\Zoom*0.01
     
@@ -52,13 +36,13 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
     
     
     
-    RunScript(ScriptNumber)
-    AutoSave()
+    ;    RunScript(ScriptNumber)
+    ;    AutoSave()
     
-    If Event 
-      SaveScript(Event)      
-      SaveHistory(Event) ; for history : undo/redo
-    EndIf
+    ;     If Event 
+    ;       SaveScript(Event)      
+    ;       SaveHistory(Event) ; for history : undo/redo
+    ;     EndIf
     
     
     
@@ -73,10 +57,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
           MenuOpen = 1
         EndIf
         
-        If EventMenu < #Menu_Last
-          
-          Select EventMenu
-              
+        If EventMenu < #Menu_Last          
+          Select EventMenu           
               ;{-- menu main
               
               ;{ file
@@ -1278,28 +1260,45 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
           EndIf
           
           wheelDelta.w = ((ePar>>16)&$FFFF) 
-       
+          
           OptionsIE\zoom + (wheelDelta / 20)     
           If OptionsIE\zoom > 5000
             OptionsIE\zoom = 5000
           EndIf    
           If OptionsIE\zoom < 10
             OptionsIE\zoom = 10
-          EndIf
-          
+          EndIf    
           ScreenZoom() ; update screen   
         EndIf
         
       Case #WM_LBUTTONDOWN 
+        Debug "#WM_LBUTTONDOWN"
         ; we are on the drawing surface, to do action (painting, select...)
         If Mx>0 And My>0 And Mx<GadgetWidth(#G_ContScreen)-1 And My<GadgetHeight(#G_ContScreen)-1 ; ScreenWidth()-1 And My<ScreenHeight()-1 
           MouseClic = 1
           Paint = 1
         EndIf
         
+      Case #WM_RBUTTONDOWN 
+        Debug "#WM_RBUTTONDOWN"
+        ; we are on the drawing surface, to do action (painting, select...)
+        If Mx>0 And My>0 And Mx<GadgetWidth(#G_ContScreen)-1 And My<GadgetHeight(#G_ContScreen)-1 ; ScreenWidth()-1 And My<ScreenHeight()-1 
+          If MouseClic = 1
+            MouseClic = 0
+            Paint = 0
+          Else
+            MouseClic = 1
+            Paint = 1 
+          EndIf
+          
+          
+        EndIf
+        
+        
       Case  #PB_Event_LeftClick ; mouseleft up
-                                ;{
-                                ; clic = 0
+        Debug "#PB_Event_LeftClick"                 
+        ;{
+        ; clic = 0
         If Gad =0
           MouseClic = 0
           startzoom = 0
@@ -1422,9 +1421,9 @@ End
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x64)
-; CursorPosition = 1281
-; FirstLine = 1338
+; CursorPosition = 1286
+; FirstLine = 1251
 ; Folding = ------------------------
-; Markers = 1270,1272
+; Markers = 1252,1254
 ; EnableXP
 ; EnableUnicode
