@@ -21,10 +21,10 @@
 - other minor changes and improvements (check if some images exists...)
 
 #  Bugfixes
-- Bug paper is we open an image with height > width. 
-- New doc, open doc, resize, crop, trim... : didn't update the temporary layer
+- Bug paper if we open an image with height > width. 
+- New doc, open doc, resize, crop, trim...Â : didn't update the temporary layer
 - Bug with shaped if we have changed the size of the document.
-- Newdoc : didn't free the image od the lapha mask of layer 0
+- NewdocÂ : didn't free the image of the alpha mask of layer 0
 - several bugfixes with "merge layer"
 - Bug layer merge-bottom and Blendmode (not used when merge). 
 - when we paint, preview image for layer isn't updated.
@@ -34,5 +34,5 @@
 - CTRL+x (cut) and copy (CTRL+c) didn't copy the selected area or layer
 - paste didn't work 
 - the clipboard image isn't used.
-- Bug spingadgets (panel brush, tra, dyn, color..) we cant' write a number > 99
+- Bug spingadgets (panel brush, tra, dyn, color..) we can't write a number > 99
 - various minor bugfixes and improvements
