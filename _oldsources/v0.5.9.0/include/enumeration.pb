@@ -1,6 +1,7 @@
 ﻿
-; CompilerIf #PB_Compiler_IsMainFile 
-  
+; Application
+#ProgramName      = "Animatoon"
+#ProgramAuteur    = "Blendman"
 
 #Statusbar = 0
 
@@ -58,14 +59,12 @@ Enumeration ; windows
   #Win_BGeditor
   #Win_Swatch
   
-  ; Images settings / reglages images
+  ; reglages images
   #Win_Contrast
   #Win_BalCol
   #Win_Level
-  #Win_HueSaturation
-  #Win_ImgAdjustementLast
   
-  ; other windows
+  
   #Win_Exit
   #Win_About
   
@@ -118,8 +117,7 @@ Enumeration ; images
   
   ; panel
   #image_RB
-  #image_patternscanvas ; image for canvas pattern (in panel pattern)
-  #image_patternForstamp ; image of pattern that we use with stamp tool
+  
   
   ;{ icone
   #ico_New
@@ -195,7 +193,6 @@ Enumeration ; sprite
   
   ; les sprites pour les brushs
   #Sp_BrushOriginal = 100
-  #Sp_BrushCopyResized
   #Sp_BrushCopy
   
   ; les sprites pour l'affichage : paper, texture, grid, selection, repère, marker, perspective, cadre, etc..
@@ -279,23 +276,8 @@ Enumeration ; menuItem
   #menu_ChangeCenter
   #menu_ScreenRedraw
   #menu_ScreenQuality
-  
   #menu_ShowStatus
-  #Menu_SHowHideAllUI
-  
-  #menu_ShowToolParameters
-  #menu_ShowColor
-  #menu_Showgradient
-  #menu_ShowLayers
-  #menu_ShowPresets
-  #menu_Showoptions
-  #menu_ShowSwatchs
-  #menu_ShowRoughBoard
-  #menu_ShowPatterns
-  
-  #menu_UIEditor
-  #menu_UISimple
-  #menu_UIAdvanced
+  #menu_ShowLayer
   
   
   ; Selection
@@ -317,7 +299,6 @@ Enumeration ; menuItem
   #menu_Rotate270
   #menu_RotateFree
   #menu_ColorBalance
-  #menu_HueSat  
   #menu_InverseColor
   #menu_Desaturation
   #menu_Constrast
@@ -338,7 +319,6 @@ Enumeration ; menuItem
   #Menu_LayerRotate
   #Menu_LayerTransformToLine
   #Menu_BackgroundEditor
-  #Menu_LayerAddBackgroundOnAlpha
   
   
   ; Actions
@@ -651,13 +631,6 @@ Enumeration ; gadgets
   #G_SwatchExport
   #G_SwatchEdit
   
-  ; Pattern
-  #G_SA_Pattern ; scrollarea
-  #G_PatternCanvas ; canvas To draw the patterns
-  #G_PatternAdd    ; button to add a pattern 
-  #G_PatternLoad    ; button to add a pattern 
-  
-  
   ; gradient
   #G_SA_Gradient
   #G_Gradient
@@ -702,7 +675,6 @@ Enumeration ; gadgets
   
   #G_Frame_Lang
   #G_Cob_Lang
-  #G_pref_UseRightbutonTopaint
   #G_Pref_AutoSave
   #G_Pref_AskWhenExit
   
@@ -898,7 +870,7 @@ Enumeration ; action qu'on effectue sur le calque
   #Action_Transform
   #Action_Rotate
   
-  #Action_Hand ; 19
+  #Action_Hand
   #Action_Zoom
   
 EndEnumeration
@@ -951,12 +923,9 @@ Enumeration ; layer type
   
 EndEnumeration
 
-
-; CompilerEndIf
-
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 704
-; FirstLine = 26
-; Folding = AABAsAA-
+; CursorPosition = 734
+; FirstLine = 45
+; Folding = AABAcGA-
 ; EnableXP
 ; EnableUnicode

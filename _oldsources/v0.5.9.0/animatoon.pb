@@ -5,14 +5,10 @@
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
-#ProgramVersion   = "0.5.9.3"
+#ProgramVersion   = "0.5.9.0"
 #ProgramRevision  = 0
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
 #ProgramNbLine    = "21000"
-; Application
-#ProgramName      = "Animatoon"
-#ProgramAuteur    = "Blendman"
-
 ;}
 
 ;-- structure
@@ -26,7 +22,7 @@ XIncludeFile "include\lang.pbi"
 
 ;-- init (Screen & image)
 XIncludeFile "include\initscreen.pb" ; just initkeyboard and initscreen, we use the screen for the view (and save screen as image)
-XIncludeFile "include\init.pb"       ; init image encoder/decoder, load images for GUI
+XIncludeFile "include\init.pb" ; init image encoder/decoder, load images for GUI
 
 ;-- prototypes
 XIncludeFile "include\prototypes.pb" ; for tablet (wacom)
@@ -46,11 +42,10 @@ XIncludeFile "include\procedures.pb" ;  screen et sprite
 
 ; contain :
 ; XIncludeFile "include\procedures\declare.pbi" 
-; XIncludeFile "include\procedures\menu.pbi" ; menu and action from menus (file (open/save, options preference, autosave..), edition..)
+; XIncludeFile "include\procedures\menu.pbi" ; menu, file (open/save, options preference, autosave..), edition..
 ; XIncludeFile "include\procedures\history.pbi" ; script, history
 ; XIncludeFile "include\procedures\swatch.pbi" 
 ; XIncludeFile "include\procedures\roughboard.pbi"
-; XIncludeFile "include\procedures\patterns.pbi"
 ; XIncludeFile "include\procedures\gadgets.pbi"
 ; XIncludeFile "include\procedures\brush.pbi"
 ; XIncludeFile "include\procedures\image.pbi" ; image réglages, blendmode
@@ -121,7 +116,7 @@ CompilerIf #PB_Compiler_OS = #PB_OS_Windows
       
     EndIf
     
-    ; Debug "ok wintab32.dll, tablet ready ! "
+    Debug "ok wintab32.dll, tablet ready ! "
     
   Else
     MessageRequester("ERROR", Errortablet$)
@@ -155,7 +150,7 @@ Clear = 1
 
 AddMenu(clear)
 
-If tablet ; FOr tablet
+If tablet ; pour tablet
   
   ;{ info for tablet
   info.LOGCONTEXTA
@@ -195,8 +190,8 @@ IE_StatusBarAdd()
 ScreenY = OptionsIE\ToolbarH -6
 CanvasW = WinW-ScreenX*2
 CanvasH = WinH-StatusBarHeight(#Statusbar) - OptionsIE\ToolbarH
-If ContainerGadget(#G_ContScreen,ScreenX, ScreenY, CanvasW, CanvasH)
-  If OpenWindowedScreen(GadgetID(#G_ContScreen),0,0,CanvasW+175*2,CanvasH) = 0
+If ContainerGadget(#G_ContScreen,ScreenX,ScreenY,CanvasW,CanvasH,#PB_Container_Single )
+  If OpenWindowedScreen(GadgetID(#G_ContScreen),0,0,CanvasW,CanvasH) = 0
     MessageRequester(lang("Error"),lang("Unable to open the screen (openwindowedscreen))"))
     End
   EndIf
@@ -213,6 +208,7 @@ CompilerIf  #PB_Compiler_OS <> #PB_OS_Windows
     
   CompilerEndIf
   
+  
   If InitMouse() =0
     MessageRequester("Error", "cant init the mouse for the screen")
     End
@@ -226,17 +222,23 @@ CompilerEndIf
 ShowCursor_(1)
 ; CompilerEndIf
 
+; PaperChange()
 PaperInit() ; in 
 BrushUpdateImage(2)
 ; ChangeCursor()
-Action = #Action_Brush
 
+
+
+
+Action = #Action_Brush
 ;{ gadgets
 IE_GadgetAdd()
 BrushUpdateColor()
+
+
 ;}
 
-;{ Others (layers...)
+;{ Others
 
 ; we add a layer (because we need at least 1 layer :)
 Layer_Add()
@@ -256,18 +258,11 @@ FreeGadget(tmp)
 FreeImage(#Img_Intro)
 CloseWindow(#Win_Intro)
 
-; then update if we show or hide the UI
-UpdateUIShowHide()
 
-If OptionsIE\ShowPanelColors Or OptionsIE\ShowPanelToolparameters
-  CanvasX = 0
-Else
-  CanvasX = (ScreenWidth() - doc\w)/2
-EndIf
-
+CanvasX = (ScreenWidth() - doc\w)/2
 CanvasY = (ScreenHeight() - doc\h)/2
-ScreenUpdate()
 
+ScreenUpdate()
 size.d = 0
 
 ; on créé le thread autosave
@@ -284,12 +279,12 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 7
-; Folding = DAAw
+; CursorPosition = 119
+; FirstLine = 65
+; Folding = HTA7
 ; EnableXP
 ; EnableOnError
 ; UseIcon = teo.ico
 ; Executable = _release\0.5.9.0\animatoon.exe
-; DisableDebugger
 ; Warnings = Display
 ; EnablePurifier

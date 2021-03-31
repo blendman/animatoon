@@ -93,7 +93,7 @@ Procedure AddMenu(clear=0)
     MenuItem(#menu_Constrast,     Lang("Brightness/constrast"))
     MenuItem(#menu_Level,         Lang("Level"))
     MenuBar()
-    ; MenuItem(#menu_HueSat,         Lang("Hue/Saturation"))
+    ;MenuItem(#menu_HueSat,         Lang("Hue/Saturation"))
     MenuItem(#menu_ColorBalance,  Lang("Color balance"))
     MenuBar()    
     MenuItem(#menu_InverseColor,  Lang("Inverse Color"))
@@ -138,7 +138,8 @@ Procedure AddMenu(clear=0)
     MenuItem(#Menu_LayerRotate,   Lang("Rotate the layer"))
     MenuBar()
     MenuItem(#Menu_LayerTransformToLine,   Lang("Transform the image of the layer in line"))
-    MenuItem(#Menu_LayerAddBackgroundOnAlpha,   Lang("Add a background on the alpha of the layer"))
+    MenuBar()
+    MenuItem(#Menu_BackgroundEditor,   Lang("Background editor"))
     
     ; FILTERS
     MenuTitle(Lang("Filters"))
@@ -200,28 +201,6 @@ Procedure AddMenu(clear=0)
     MenuItem(#Menu_ActionStop,    Lang("Stop action"))
     MenuItem(#Menu_ActionRun,     Lang("Run action"))
     
-    
-    ; window
-    MenuTitle(Lang("Window"))
-    MenuItem(#Menu_SHowHideAllUI,    Lang("Show all UI") +" (Tab)")
-    MenuBar()
-    OpenSubMenu(lang("Show/hide"))
-    MenuItem(#menu_ShowToolParameters,    Lang("Show tools parameters"))    
-    MenuItem(#menu_ShowColor,    Lang("Show colors"))    
-    ; MenuItem(#menu_Showgradient,    Lang("Show Gradients"))   
-    MenuItem(#menu_ShowLayers,    Lang("Show layers"))    
-    ; MenuItem(#menu_ShowPresets,    Lang("Show presets"))    
-    ; MenuItem(#menu_Showoptions,    Lang("Show options"))    
-    MenuItem(#menu_ShowSwatchs,    Lang("Show swatchs"))    
-    ; MenuItem(#menu_ShowRoughBoard,    Lang("Show Roughboards"))    
-    ; MenuItem(#menu_ShowPatterns,    Lang("Show patterns"))
-    CloseSubMenu()
-    ; MenuBar()
-    ; MenuItem(#menu_ShowStatus,    Lang("Show status bar")) 
-    MenuBar()
-    MenuItem(#Menu_BackgroundEditor,   Lang("Background editor"))
-    
-    
     ; HELP
     MenuTitle(Lang("Help"))
     MenuItem(#Menu_about,         Lang("About"))
@@ -256,10 +235,6 @@ Procedure AddMenu(clear=0)
     AddKeyboardShortcut(#WinMain, #PB_Shortcut_Pad1|#PB_Shortcut_Control, #Menu_ResetCenter)
     AddKeyboardShortcut(#WinMain, #PB_Shortcut_Pad4|#PB_Shortcut_Control, #menu_IE_Zoom400)
     AddKeyboardShortcut(#WinMain, #PB_Shortcut_Pad3|#PB_Shortcut_Control, #menu_IE_Zoom300)
-    
-    ; window
-    AddKeyboardShortcut(#WinMain, #PB_Shortcut_Tab, #Menu_SHowHideAllUI)
-
     ;}
     
   EndIf 
@@ -436,11 +411,6 @@ Procedure OpenOptions()
             ; Options
             \zoom           = ReadPreferenceInteger("Zoom",       100)
             \ConfirmExit    = ReadPreferenceInteger("ConfirmExit",   1)
-            \ModeAdvanced    = ReadPreferenceInteger("ModeAdvanced",   1)
-            \UseRighmouseToPaint    = ReadPreferenceInteger("UseRighmouseToPaint",   0)
-            
-            
-            ; autosave
             \autosaveAtExit = ReadPreferenceInteger("autosaveAtExit",   0)
             \autosave       = ReadPreferenceInteger("autosave",   1)
             \AutosaveTime   = ReadPreferenceInteger("autosaveTime",   10)
@@ -472,13 +442,6 @@ Procedure OpenOptions()
             PanelToolsW_IE  = ReadPreferenceInteger("PanelToolsW", 165)
             ScreenX = PanelToolsW_IE +10
             PanelToolsH_IE  = ReadPreferenceInteger("PanelToolsH", 300)
-            
-            \ShowPanelToolparameters = ReadPreferenceInteger("ShowPanelToolparameters", 1)
-            \ShowPanelColors = ReadPreferenceInteger("ShowPanelColors", 1)
-            \ShowPanelLayers = ReadPreferenceInteger("ShowPanelLayers", 1)
-            \ShowPanelswatchs = ReadPreferenceInteger("ShowPanelswatchs", 1)
-            \ShowFullUI = ReadPreferenceInteger("ShowFullUI", 1)
-            
             
             
             ; optimisation, realtime, fps
@@ -556,10 +519,8 @@ Procedure OpenOptions()
             
             
           EndWith
-          
           doc\w = OptionsIE\ImageW
           doc\h = OptionsIE\ImageH
-          
           ;}
           
         Else
@@ -638,7 +599,7 @@ Procedure OpenOptions()
                 \Scatter   = ReadPreferenceInteger("Scatter",  0)
                 \rotate    = ReadPreferenceInteger("rotate",   0)
                 \randRot   = ReadPreferenceInteger("randrotate", 360)
-                \RotateByAngle   = ReadPreferenceInteger("rotateangle", 1)
+                \RotateParAngle   = ReadPreferenceInteger("rotateangle", 1)
                 
                 ; alpha
                 \Alpha     = ReadPreferenceInteger("alpha",    255)
@@ -803,7 +764,7 @@ Procedure WriteDefaultOption()
     ; WritePreferenceString("FileBGcolor", RemoveString(\FileBGcolor$, GetCurrentDirectory()))
     
     ; Grid
-    WritePreferenceInteger("Grid",          \Grid)
+    WritePreferenceInteger("Grid",    \Grid)
     WritePreferenceInteger("ToolbarFileY",  \ToolbarFileY)
     WritePreferenceInteger("ToolbarFileX",  \ToolbarFileX)
     WritePreferenceInteger("ToolbarToolY",  \ToolbarToolY)
@@ -813,26 +774,16 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("DelayMax",      \DelayMax)
     
     WritePreferenceInteger("Maxundo",       \Maxundo)
-    WritePreferenceInteger("ConfirmExit",   \ConfirmExit)
-    WritePreferenceInteger("ModeAdvanced",   \ModeAdvanced)
-    WritePreferenceInteger("UseRighmouseToPaint",   \UseRighmouseToPaint)
-    
-    ; autosave
     WritePreferenceInteger("autosave",      \Autosave)
     WritePreferenceInteger("autosaveTime",  \AutosaveTime)
     WritePreferenceInteger("autosaveAtExit",  \autosaveAtExit)
+    WritePreferenceInteger("ConfirmExit",  \ConfirmExit)
     WritePreferenceInteger("Filtering",     \SpriteQuality)
     
     WritePreferenceInteger("NbNewFile",     \NbNewFile)
     WritePreferenceInteger("NbMinutes",     \NbMinutes)
     
-    ; UI show/hide
-    WritePreferenceInteger("ShowPanelToolparameters", \ShowPanelToolparameters)
-    WritePreferenceInteger("ShowPanelColors",         \ShowPanelColors)
-    WritePreferenceInteger("ShowPanelLayers",         \ShowPanelLayers)
-    WritePreferenceInteger("ShowPanelswatchs",        \ShowPanelswatchs)
-    WritePreferenceInteger("ShowFullUI",              \ShowFullUI)
-
+    
     
   EndWith
   
@@ -912,7 +863,7 @@ Procedure WriteDefaultOption()
       WritePreferenceInteger("scatter",   \Scatter)
       WritePreferenceInteger("randrotate",\randRot)
       WritePreferenceInteger("rotate",    \Rotate)
-      WritePreferenceInteger("rotateangle",\RotateByAngle)
+      WritePreferenceInteger("rotateangle",\RotateParAngle)
       
       ; parameters
       WritePreferenceInteger("pas",       \pas)
@@ -2007,27 +1958,10 @@ Procedure Edit_Paste()
   
   If tmp
     
-    ; variable needed
-    x = 0
-    y = 0
-    Z.d = OptionsIE\Zoom * 0.01
-    
-    
-    ; check if we have selected first something or not
-    If OptionsIE\Selection = 2
-      OptionsIE\Selection = 0
-      x = OptionsIE\SelectionX ;* z
-      y = OptionsIE\SelectionY ;* z
-    EndIf
-    
-    ; add a new layer to paste the clipboardimage
-    Layer_Add()
-    
-    ; then draw on this layer
     If StartDrawing(ImageOutput(layer(LayerId)\Image))
       DrawingMode(#PB_2DDrawing_AlphaBlend)
       
-      DrawAlphaImage(ImageID(tmp),x,y)
+      DrawAlphaImage(ImageID(tmp),0,0)
       
       StopDrawing()
     EndIf
@@ -2451,9 +2385,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 223
-; FirstLine = 168
-; Folding = HACAfAAAEAAAAAAAAAAAAAIAAAAAAAAAAAAA5
+; CursorPosition = 763
+; FirstLine = 192
+; Folding = AACgfAAAGAAAAAAAAAAAAAIAAAAAAAAAAAAA9
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

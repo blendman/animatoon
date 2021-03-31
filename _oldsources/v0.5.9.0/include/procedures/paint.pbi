@@ -1035,10 +1035,10 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       
       
       
-      If Brush(Action)\randRot > 0 Or Brush(Action)\RotateByAngle = 1
+      If Brush(Action)\randRot > 0 Or Brush(Action)\RotateParAngle = 1
         
         ; rotation by the angle
-        If Brush(Action)\RotatebyAngle = 1 
+        If Brush(Action)\RotateParAngle = 1 
           RotImg = RotateImageEx2(ImageID(#BrushCopy),angle+Rnd(Brush(Action)\randRot)) ; test pour voir si je peux rotationné en fonction de l'angle
                                                                                         ;RotImg2 = RotateImageEx2(ImageID(RotImg),) 
                                                                                         ;FreeImage(RotImg)
@@ -1124,7 +1124,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       Else
         
         If Brush(Action)\Sizepressure And FinalSize > 0
-          If Brush(Action)\RotateByAngle = 1
+          If Brush(Action)\RotateParAngle = 1
             RotImg = RotateImageEx2(ImageID(#BrushCopy),angle) ; test pour voir si je peux rotationné en fonction de l'angle
                                                                ; RotImg = UnPreMultiplyAlpha(RotImg)
             
@@ -2065,8 +2065,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1037
-; FirstLine = 89
+; CursorPosition = 1179
+; FirstLine = 192
 ; Folding = AAAAAAAAAAAAgGcAAIAAAA5BAAeAAAAg
 ; EnableXP
 ; EnableUnicode

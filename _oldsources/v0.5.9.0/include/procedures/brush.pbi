@@ -656,8 +656,7 @@ Procedure OpenPreset(file$,brush$="")
       ; ROTATION
       \rotate         = ReadPreferenceInteger("rotate",0)
       \randRot        = ReadPreferenceInteger("randRot",0) 
-      \RotateByAngle = ReadPreferenceInteger("rotateangle", 0)
-      \RotateMin = ReadPreferenceInteger("RotateMin", 0)
+      \RotateParAngle = ReadPreferenceInteger("rotateangle", 0)
       
       ; ALPHA
       \alpha    = ReadPreferenceInteger("alpha",255) 
@@ -734,7 +733,7 @@ Procedure OpenPreset(file$,brush$="")
     
     SetGadgetState(#G_BrushRandRotate,\randRot)
     SetGadgetState(#G_BrushRotate,\Rotate)
-    SetGadgetState(#G_BrushRotateAngle,\RotateByAngle)
+    SetGadgetState(#G_BrushRotateAngle,\RotateParAngle)
     
     SetGadgetState(#G_BrushScatter,\scatter)
     
@@ -810,9 +809,9 @@ Procedure SaveBrush()
   
   With brush(Action)
     
-    PreferenceComment("// Animatoon brush Preset - Blendman 2011-21") 
+    PreferenceComment("//Animatoon brush Preset - Blendman 2015") 
     WritePreferenceString("name",\name$)
-    WritePreferenceInteger("version", 6)
+    WritePreferenceInteger("version",6)
     
     ; size
     WritePreferenceInteger("size",\size)
@@ -828,12 +827,10 @@ Procedure SaveBrush()
     WritePreferenceInteger("rotate",\rotate)
     ;WritePreferenceInteger("rotation",\rotation)
     WritePreferenceInteger("randRot",\randRot)
-    WritePreferenceInteger("rotateangle",\RotateByAngle)
-    WritePreferenceInteger("RotateMin",\RotateMin)
+    WritePreferenceInteger("rotateangle",\RotateParAngle)
     
     
     WritePreferenceInteger("scatter",\scatter)
-    WritePreferenceInteger("ScatterMin",\ScatterMin)
     ;If option\brushPresetsavecolor
     ;WritePreferenceInteger("color",\color) 
     ;EndIf  
@@ -895,8 +892,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 812
-; FirstLine = 802
+; CursorPosition = 891
+; FirstLine = 865
 ; Folding = --------------
 ; EnableXP
 ; EnableUnicode

@@ -2,9 +2,6 @@
 Declare CreateOptionsFile()
 Declare AddLogError(error, info$) ; needed for error with initsprite/initkeyboard...
 
-; gadets, ui
-Declare IE_UpdateGadget(gadget=1)
-
 ; layers
 Declare CreateLayertempo_()
 Declare RecreateLayerUtilities()
@@ -50,7 +47,6 @@ Declare PaperDraw()
 Declare IE_StatusBarUpdate() ; statusbar 
 Declare IE_UpdatePaperList()
 
-
 ; brush color
 Declare GetColor(x,y) 
 Declare BrushUpdateColor()
@@ -58,6 +54,6 @@ Declare BrushResetColor()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 5
+; CursorPosition = 7
 ; EnableXP
 ; EnableUnicode

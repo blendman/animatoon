@@ -707,7 +707,6 @@ Procedure IE_Contrast1(img, contrast, brightness, mode=0)
   
   
   IE_SetImageOutput1(1)
-  
   If mode = 0
     
     ScreenUpdate()
@@ -868,6 +867,48 @@ Procedure IE_Level(img,Minimum,maximum)
 EndProcedure
 
 
+; other image process
+Procedure.i Color_Darken(Color.i, Fact.d)
+  
+  ; By Omi, atm. for ChartPie & ChartBarVert
+  
+  Protected.i ColorRet, Element
+   
+   ;ColorRet= Color & $ff000000
+   ;ColorRet+ (Color & $ff0000) * Fact
+   ;ColorRet+ (Color & $ff00) * Fact
+   ;ColorRet+ (Color & $ff) * Fact
+   
+   ;... Changed due to Color dependent bug, 2016-04-19 ...
+   
+   If Fact > 1.0 : Fact = 1.0 : EndIf
+   ColorRet= (Color & $ff000000)
+   
+   Element= ((Color & $ff0000) >> 16) * Fact
+   ColorRet+ Element << 16
+   
+   Element= ((Color & $ff00) >> 8) * Fact
+   ColorRet+ Element << 8
+   
+   Element= (Color & $ff) * Fact
+   ColorRet+ Element
+   
+   ProcedureReturn ColorRet
+EndProcedure
+Procedure.i Color_Darken2(Color.i, Fact.d)
+  ; By Omi
+   Protected.i Red, Blue, Green, Alpha
+   
+   If Fact > 1.0 : Fact = 1.0 : EndIf
+   Alpha   = Alpha(Color)
+   Red     = Red(Color)   * Fact
+   Green   = Green(Color) * Fact
+   Blue    = Blue(Color)  * Fact
+   
+   ProcedureReturn RGBA(Red, Green, Blue, Alpha)
+EndProcedure
+
+
 
 ; Procedure par LSI
 ProcedureDLL.i Contraste(Couleur.i, Echelle.f) ; Constrater la couleur, échelle négative pour diminuer et positive pour augmenter.
@@ -892,8 +933,6 @@ ProcedureDLL.i Contraste(Couleur.i, Echelle.f) ; Constrater la couleur, échelle
 EndProcedure
 
 ProcedureDLL.i Lumiere(Couleur.i, Echelle.f) ; Eclaicir ou foncer une couleur
-  
-  ; by LSI ?
   Protected Rouge.i, Vert.i, Bleu.i, Alpha.i
   
   Rouge = Couleur & $FF
@@ -912,8 +951,6 @@ ProcedureDLL.i Lumiere(Couleur.i, Echelle.f) ; Eclaicir ou foncer une couleur
 EndProcedure
 
 ProcedureDLL.i Niveau(Couleur.i, Minimum.i, Maximum.i) ; Changer les niveaux de blanc et de noir de la couleur
-  
-  ; by LSI, modified by blendman
   Protected Rouge.i, Vert.i, Bleu.i, Alpha.i, a.f, b.f
   
   If Maximum - Minimum < 0
@@ -943,13 +980,8 @@ ProcedureDLL.i Niveau(Couleur.i, Minimum.i, Maximum.i) ; Changer les niveaux de 
 EndProcedure
 
 ProcedureDLL TSL(Teinte.i, Saturation.i, Luminosite.i) ; TSL (Teinte, Saturation, Luminosité) ; renvoye la couleur au format RGB
-  
-  ; By LSI
-  
   Protected fTeinte.f, Minimum.i, Maximum.i, Difference.i, i.i, Rouge.i, Vert.i, Bleu.i
-  
   fTeinte = 6*Teinte/240
-  
   If Luminosite =< 120
     Maximum = Round((255*Luminosite*(1+Saturation/240)/240), #PB_Round_Nearest)
     Minimum = Round((255*Luminosite*(1-Saturation/240)/240), #PB_Round_Nearest)
@@ -957,7 +989,6 @@ ProcedureDLL TSL(Teinte.i, Saturation.i, Luminosite.i) ; TSL (Teinte, Saturation
     Maximum = Round((255*(Luminosite*(1-Saturation/240)/240+Saturation/240)), #PB_Round_Nearest)
     Minimum = Round((255*(Luminosite*(1+Saturation/240)/240-Saturation/240)), #PB_Round_Nearest)
   EndIf
-  
   Difference = Maximum-Minimum
   i = Round(fTeinte, #PB_Round_Nearest)
   If i = 0
@@ -973,7 +1004,6 @@ ProcedureDLL TSL(Teinte.i, Saturation.i, Luminosite.i) ; TSL (Teinte, Saturation
   Else
     Rouge = Maximum : Vert = Minimum : Bleu = Minimum+(6-fTeinte)*Difference
   EndIf
-  
   ProcedureReturn RGB(Rouge,Vert,Bleu)
 EndProcedure
 
@@ -991,11 +1021,12 @@ EndProcedure
 ; IMAGE
 Macro IE_CloseWin()
   
-  For _uu_ = #Win_Contrast To #Win_ImgAdjustementLast
-    If IsWindow(_uu_)
-      CloseWindow(_uu_)
-    EndIf
-  Next
+  If IsWindow(#Win_BalCol)
+    CloseWindow(#Win_BalCol)
+  EndIf
+  If IsWindow(#Win_Contrast)
+    CloseWindow(#Win_Contrast)
+  EndIf
   
 EndMacro
 Procedure IE_WinBalCol()
@@ -1072,7 +1103,7 @@ Procedure IE_WinBalCol()
       
     Until quit = 1
     
-    CloseWindow(#Win_BalCol)
+    CloseWindow(#Win_Contrast)
     
   EndIf
   
@@ -1093,8 +1124,6 @@ Procedure IE_WinPosterize()
     
     ResizeImage(ImageTransf, W1, H1)
     
-    
-    ; create the image gadgets
     ImageGadget(#IE_BalColNormal, 10,       yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
     ImageGadget(#IE_BalColNew,    w1 + 20,  yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
     
@@ -1104,14 +1133,11 @@ Procedure IE_WinPosterize()
     TG_Post = TextGadget(#PB_Any, x, yy, 50,20,lang("Level"))
     StringGadget(#IE_BrightnessSG, x+200, yy, 40, 20, "0", #PB_String_Numeric)
     yy+20
-    
-    TrackBarGadget(#IE_BrightnessTB, x, yy, 255, 20, 1, 255)
+    TrackBarGadget(#IE_BrightnessTB, x, yy, 255, 20,1,255)
     SetGadgetState(#IE_BrightnessTB, 100)
     yy+20
-    
     ButtonGadget(#IE_ContrastOk, WindowWidth(#Win_Contrast)/2 - 30, yy,  60, 20, lang("Ok"))
-    YY + 20 
-    
+    YY + 30    
     ResizeWindow(#Win_Contrast, #PB_Ignore, #PB_Ignore, #PB_Ignore, YY)
     
     Repeat
@@ -1360,127 +1386,6 @@ Procedure IE_WinLevel()
   
   
 EndProcedure
-
-
-Procedure IE_WinHueSaturation()
-  
-  
-  
-  ; not finished at all !!!!
-  
-  
-  W1 = 300
-  IE_CloseWin()
-  
-  If OpenWindow(#Win_HueSaturation,0, 0, W1*2 + 30, 220, Lang("Color Darken"), #PB_Window_SystemMenu|#PB_Window_ScreenCentered, WindowID(#WinMain))
-    
-    yy = 10
-    
-    H1 = (W1 * Layer(layerid)\H)/Layer(layerid)\W
-    
-    
-    ImgResult = CopyImage(Layer(LayerID)\Image, #PB_Any)
-    ResizeImage(ImgResult, W1, H1)
-    
-    ; create the array for colors
-    ; Dim  Newcolor(w1, h1).i
-    Dim  Oldcolor(w1, h1)
-    If StartDrawing(ImageOutput(ImgResult))
-      
-      For i = 0 To OutputWidth()-1
-        For j = 0 To OutputHeight()-1
-          Oldcolor(i, j) =  Point(i, j)
-          
-        Next
-      Next
-      StopDrawing()
-    EndIf
-    ; CopyArray(Newcolor(), Oldcolor())
-    
-    
-    ; set the image gadgets
-    ImageGadget(#IE_BalColNormal, 10,       yy, W1, H1, ImageID(ImgResult), #PB_Image_Border)
-    ImageGadget(#IE_BalColNew,    w1 + 20,  yy, W1, H1, ImageID(ImgResult), #PB_Image_Border)
-    
-    
-    ; create the trackbar gadget
-    yy + H1 + 10
-    
-    x = 10 + WindowWidth(#Win_HueSaturation)/2 - 255/2
-    TrackBarGadget(#IE_BalColRed,   x, yy, 255, 20, 0, 100)
-    SetGadgetState(#IE_BalColRed, 100)
-    
-    
-    ; create the buton ok
-    ButtonGadget(#IE_BalColOk,      WindowWidth(#Win_HueSaturation)/2 - 30, yy+90,  60, 20, lang("Ok"))
-    
-    YY + 90 +30
-    
-    ResizeWindow(#Win_HueSaturation, #PB_Ignore, #PB_Ignore, #PB_Ignore, YY)
-    
-    
-    Repeat
-      
-      event = WaitWindowEvent(10)
-      
-      
-      Select event
-          
-        Case #PB_Event_Gadget
-          
-          Select EventGadget()
-              
-            Case #IE_BalColRed
-              fact.d = GetGadgetState(#IE_BalColRed)/100
-              
-              temp = CopyImage(ImgResult, #PB_Any) 
-              If StartDrawing(ImageOutput(temp))
-                For i = 0 To OutputWidth()-1
-                  For j = 0 To OutputHeight()-1
-                    color = Oldcolor(i, j)
-                    ;newcolor = Color_Darken(color, fact)   
-                    Plot(i, j, newcolor)
-                  Next
-                Next
-                StopDrawing()
-              EndIf
-              
-
-              
-              SetGadgetState(#IE_BalColNew, ImageID(temp))
-              If temp > #Img_Max
-                FreeImage2(temp)
-              EndIf
-              
-            Case #IE_BalColOk                
-              ; IE_ColorBalance(Layer(LayerID)\Image, r1, g1, b1)
-              If ImgResult > #Img_Max
-                FreeImage2(ImgResult)
-              EndIf
-              NewPainting = 1
-              ScreenUpdate()
-              quit = 1
-              
-          EndSelect
-          
-        Case #PB_Event_CloseWindow
-          quit = 1
-          
-      EndSelect
-      
-      
-    Until quit = 1
-    
-    FreeArray(oldcolor())
-    FreeImage2(ImgResult)
-    FreeImage2(temp)
-      
-    CloseWindow(#Win_HueSaturation)
-    
-  EndIf
-  
-EndProcedure
-
 
 ;}
 
@@ -2426,8 +2331,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 993
-; FirstLine = 89
-; Folding = DwHQoPAQgAAAOwKQACA5-PAAAAAAAAAAAAAAAAAAAAAA9
+; CursorPosition = 911
+; FirstLine = 80
+; Folding = WxHQILABAAA9gDAAAAAAAAAAAAAAAAAAAAAAAAAAAAg
 ; EnableXP
 ; EnableUnicode

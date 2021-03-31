@@ -4,7 +4,7 @@ If GetActiveWindow() = #WinMain
   
   ;{ Mouse, paint
   
-  ;{ For mac/linux // on garde pour mac, linux 
+  ;{ FOr mac/linux // on garde pour mac, linux 
   ; MouseClic = 0
   ; ExamineMouse()     
   ;If MouseButton(1)
@@ -35,12 +35,17 @@ If GetActiveWindow() = #WinMain
   
   If Mx>0 And My>0 And Mx<ScreenWidth()-1 And My<ScreenHeight()-1 
     
-    ; StatusBarText(#Statusbar,2,Str(mx)+"/"+Str(my))
+    ; mx = WindowMouseX(0) - ScreenX 
+    ; my = WindowMouseY(0) - ScreenY
+    
+    
     ; StatusBarText(#Statusbar,2,Str(mx)+"/"+Str(my)+" - "+Str(rx)+"/"+Str(ry)+" - canvas : "+Str(canvasX)+"/"+Str(canvasY)+"-"+Str(ScreenWidth()))
+    ; StatusBarText(#Statusbar,2,Str(mx)+"/"+Str(my)+" | "+Str(mx/z)+"/"+Str(my/z)+" | canvas : "+Str(canvasX)+"/"+Str(canvasY))
+    ; StatusBarText(#Statusbar,2,Str(mx)+"/"+Str(my)+" | "+Str(canvasx)+"/"+Str(canvasY)+" | canvas : "+Str(OldCanvasX)+"/"+Str(OldCanvasY))
     
     ;{ we are on the canvas-screen, to paint // on est sur le screen-canvas, on peut effectuer des actions de dessin
     
-    ;{ Change some parameters (close menu...) // d'abord, on modifie quelques parametres
+    ;{ Change some parameters // d'abord, on modifie quelques parametres
     
     ; On vérifie si un menu est ouvert, on le ferme
     If MenuOpen = 1
@@ -58,34 +63,31 @@ If GetActiveWindow() = #WinMain
       
     EndIf
     
-    ; if a gadget is previously active, e change the active gadget -> toolbar // SI un gadget est actif, on met la toolbar active
+    ; SI un gadget est actif, on met la toolbar active
     If gad = 1 And MouseClic = 1
       gad = 0
       SetActiveGadget(#G_ToolBar)    
     EndIf             
     
     ; We are on the screen  // on doit dire qu'on est sur le screen.
-    If inscreen = 0 ; And size =0
+    If inscreen = 0 ;And size =0
       inscreen = 1
-      ; For window
-      ; CompilerIf #PB_Compiler_OS = #PB_OS_Windows
-      ;   If Mwheel = 0
-      ;     ReleaseMouse(1)
-      ;   EndIf        
-      ; CompilerElse 
+      ; pour window
+      ;CompilerIf #PB_Compiler_OS = #PB_OS_Windows
+      ;If Mwheel = 0
+      ;ReleaseMouse(1)
+      ;EndIf        
+      ;CompilerElse 
       ; pour linux et mac (j'utilise examinemouse() avec llinux et mac)
-      ;   ReleaseMouse(0)
-      ;   MouseLocate(mx,my)
-      ; CompilerEndIf
+      ; ReleaseMouse(0)
+      ; MouseLocate(mx,my)
+      ;CompilerEndIf
       
     EndIf
     
     ;}
     
     If MouseClic ; click on the canvas // on clique sur le canvas
-      
-      
-      ;{  action if clic on the screen (paint, eraser..)
       
       ; OPtionsIE\cursorX = 10000
       UpdateSc.a = 0
@@ -121,31 +123,25 @@ If GetActiveWindow() = #WinMain
         If Action <= #Action_Eraser ; (pen, brush, particule, spray, effacer, )
           
           ;{ action = PAINTING (brush, eraser, pen, spray, particles, box, ellipse, line, gradient..)
-          
-          
           ;{ Clear the screen (option real time) // on efface l'écran (options tps réel)
-          
           If clear = 1
-            If action <> #Action_Eraser
-              ClearScreen(RGB(120,120,120))
-              
-              ; Puis on affiche le fond (paper)          
-              PaperDraw()
-              
-              ; on affiche les calques du dessous
-              For i = 0 To ArraySize(layer())
-                If layer(i)\ordre <= layer(layerId)\ordre
-                  If layer(i)\view 
-                    Layer_Draw(i)
-                  EndIf
+            
+            ClearScreen(RGB(120,120,120))
+            
+            ; Puis on affiche le fond (paper)          
+            PaperDraw()
+            
+            ; on affiche les calques du dessous
+            For i = 0 To ArraySize(layer())
+              If layer(i)\ordre <= layer(layerId)\ordre
+                If layer(i)\view 
+                  Layer_Draw(i)
                 EndIf
-              Next i 
-              
-            EndIf
+              EndIf
+            Next i 
+            
           EndIf
-         
           ;}
-          
           
           If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
             
@@ -157,15 +153,13 @@ If GetActiveWindow() = #WinMain
               UsePickColorTogetColor(mx, my)
               ;}
               
-            Else ; we draw (brush, eraser, floodfill, box, etc...)
+            Else ; we draw // on dessine (brush, eraser, floodfill, box, etc...
               
               Select Action
                   
                   ;{ -------------- Brush, eraser // dessin, gomme             
                   
                 Case #Action_Brush, #Action_Eraser, #Action_Pen
-                  
-                  ;{ brush, eraser, pen
                   
                   Paint = 1 ; we paint // on peint (c'est pour voir si c'est la souris ou non)
                   
@@ -235,7 +229,7 @@ If GetActiveWindow() = #WinMain
                   
                   If size > 0 ; only if brush is visible, of course // on ne dessine que si on a notre brush visible, pardi :)
                     
-                    ;******** then we paint // puis on dessine
+                    ;******** than we paint // puis on dessine
                     ; NewPainting = 1
                     
                     ;{ draw on the screenout, if needed, but not good and slow //pour dessiner sur le screenoutput(), si besoin, (attention lent ?)
@@ -323,7 +317,7 @@ If GetActiveWindow() = #WinMain
                     EndIf
                     
                     ; we have to display again the layer under the current // Puis, on réaffiche les calques du dessous, ben oui
-                    If clear =1
+                    If clear
                       ClearScreen(RGB(120,120,120)) 
                       
                       ; Puis on affiche le fond (paper)          
@@ -354,7 +348,7 @@ If GetActiveWindow() = #WinMain
                       yy = my
                     EndIf
                     
-                    If clic= 0 ; on garde la position de la souris du départ
+                    If clic= 0 ; on garde la position de la souris
                       clic=1
                       StartX = xx
                       StartY = yy                       
@@ -562,17 +556,15 @@ If GetActiveWindow() = #WinMain
                     If FinalSize >0 And OptionsIE\SaveImageRT
                       
                       
+                      
                       If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
                         
-                        ; set the image
                         img = Layer(LayerId)\Image
                         
                         If layer(layerid)\MaskAlpha =2
                           img = Layer(LayerId)\ImageAlpha
                         EndIf
                         
-                        
-                        ; draw on image
                         If StartDrawing(ImageOutput(img))
                           
                           ;{ calcul position et capture du premier point
@@ -592,7 +584,6 @@ If GetActiveWindow() = #WinMain
                           EndIf
                           ;}
                           
-                          
                           Select Brush(Action)\Stroke 
                               
                             Case #Stroke_Rough
@@ -600,7 +591,7 @@ If GetActiveWindow() = #WinMain
                               ; DoPaintForImageLayer(xx,yy,StartX1,StartY1,size)
                               
                             Case  #Stroke_Knife                         
-                              InkLine(xx,yy,StartX1,StartY1,FinalSize*Brush(Action)\size,Color) ; ligne droite, bug un peu
+                              InkLine(xx,yy,StartX1,StartY1,FinalSize*Brush(Action)\size,Color) ; ligne droite, bru un peu
                               
                             Case #Stroke_Dash
                               DashDraw(xx, yy, StartX1, StartY1, brush(action)\pas, FinalSize*Brush(Action)\size, color)
@@ -608,10 +599,11 @@ If GetActiveWindow() = #WinMain
                             Case #Stroke_LineAA
                               LineLSI(xx,yy,StartX1,StartY1,RGBA(0,0,0,255),FinalSize*Brush(Action)\size,alpha);Color,) ; ligne droite, bug un peu                              
                               
-                            
+                              
                           EndSelect
-                        
+                          
                           ;ThickLine(StartX1,StartY1,xx,yy,FinalSize*Brush(Action)\size,Color)  
+                          
                           
                           StartX1 = xx
                           StartY1 = yy
@@ -627,6 +619,8 @@ If GetActiveWindow() = #WinMain
                         
                       EndIf 
                       
+                      
+                      
                     Else
                       
                       StartX1 = xx
@@ -636,8 +630,6 @@ If GetActiveWindow() = #WinMain
                     
                     
                   EndIf
-                  
-                  
                   
                   ; on affiche l'écran (nécessaire ?)
                   If clear = 1 
@@ -650,8 +642,6 @@ If GetActiveWindow() = #WinMain
                   EndIf
                   
                   ;}
-                  ;}
-                  
                   
                   ;{ --------------  other tools for drawing (particles, fill, text, gradient, box, circle...
                   ; // autres outils de dessin: particules, fill, text, gradient, box, circle...
@@ -875,31 +865,36 @@ If GetActiveWindow() = #WinMain
               
             Case #Action_Select 
               ;{  
-              
-              newpainting = 0
-              
-              ; start rectangle selection 
               If Clic = 0
-                Clic = 1
-                OptionsIE\SelectionX = (mx - canvasX)/z
-                OptionsIE\SelectionY = (my - canvasY)/z
+                OptionsIE\SelectionX = mx/z - canvasX
+                OptionsIE\SelectionY = my/z - canvasY
                 If OptionsIE\SelectionX < 0
                   OptionsIE\SelectionX = 0
                 EndIf 
                 If OptionsIE\SelectionY < 0
                   OptionsIE\SelectionY = 0
                 EndIf
+                Clic = 1
               EndIf
-             
-              OptionsIE\SelectionW = (mx - canvasX)/z - OptionsIE\SelectionX
+              ;                 If  OptionsIE\Selection = 1
+              ;                   x = OptionsIE\SelectionX 
+              ;                   y = OptionsIE\SelectionY
+              ;                   w = OptionsIE\SelectionW
+              ;                   h = OptionsIE\SelectionH
+              ;                   If MouseInArea(mx/z,my/z,x,y,w,h) 
+              ;                   EndIf                  
+              ;                 Else
+              OptionsIE\SelectionW = mx/z - OptionsIE\SelectionX - canvasX
               OptionsIE\Selection = 1
-              
-              ; shift -> square selection
               If shift = 1                
                 OptionsIE\SelectionH = OptionsIE\SelectionW
               Else
-                OptionsIE\SelectionH = (my- canvasY)/z - OptionsIE\SelectionY 
+                OptionsIE\SelectionH = my/z - OptionsIE\SelectionY - canvasY
+              EndIf                
+              If  OptionsIE\SelectionW = 0 Or  OptionsIE\SelectionH = 0
+                DisableMenuItem(0, #menu_Crop, 0)
               EndIf
+              ;EndIf
               
               ScreenUpdate()
               ;}
@@ -929,21 +924,15 @@ If GetActiveWindow() = #WinMain
           DisplayTransparentSprite(#Sp_LayerTempo,canvasX,canvasY,layer(layerid)\alpha)  
         EndIf
         
-        ; need to see the layer over our painting (if paint, box, line circle(),...)
-        If clear = 1 
-          If OptionsIE\Selection <> 1 ; And action <> #Action_Eraser
-            For i = 0 To ArraySize(layer())
-              If layer(i)\ordre > layer(layerId)\ordre
-                If layer(i)\view 
-                  Layer_Draw(i)
-                EndIf
+        If clear = 1 ; 0
+          For i = 0 To ArraySize(layer())
+            If layer(i)\ordre > layer(layerId)\ordre
+              If layer(i)\view 
+                Layer_Draw(i)
               EndIf
-            Next i 
-          EndIf
+            EndIf
+          Next i 
         EndIf
-       
-        
-        
         ;{ old
         ;           If my <> OldMx Or My <> OldMy
         ;             ;RotateSprite(OptionsIE\CursorSpriteId,Random(Brush(Action)\RandRot),0)
@@ -967,16 +956,11 @@ If GetActiveWindow() = #WinMain
         
       EndIf
       
-      If action = #Action_Eraser And layer(layerid)\bm <> #Bm_Normal; not flipbuffers(), eraser has its flipbuffers (for layer blendmode <> normal)
-      Else
-        FlipBuffers() 
-      EndIf
-        
-      ;}
+      
+      FlipBuffers() ; on affiche l'ecran
       
       
-      
-    Else ; dont clic on the screen // on ne clique pas sur le screen
+    Else ; on ne clique pas sur le screen
       
       
       ;{ on a levé notre souris, on ne dessine plus
@@ -1033,260 +1017,254 @@ If GetActiveWindow() = #WinMain
     
   EndIf
   
-  ;}
-  
   
   ;{ Keyboard
+  ExamineKeyboard()
+  If KeyboardPushed(#PB_Key_LeftControl)
+    Control = 1
+  EndIf
+  If KeyboardReleased(#PB_Key_LeftControl)
+    Control = 0
+  EndIf
+  If KeyboardPushed(#PB_Key_LeftAlt)
+    Alt = 1
+  EndIf
+  If KeyboardReleased(#PB_Key_LeftAlt)
+    Alt = 0
+  EndIf
+  If KeyboardPushed(#PB_Key_LeftShift)
+    Shift = 1
+  EndIf
+  If KeyboardReleased(#PB_Key_LeftShift)
+    Shift = 0
+  EndIf
   
-  If ExamineKeyboard()
+  If Control = 1
+    If ElapsedMilliseconds()-chrono_keyboard>200
+      If KeyboardPushed(#PB_Key_Subtract) ; zoom -
+                                          ;If KeyZoom = 0
+                                          ;KeyZoom = 1
+        chrono_keyboard = ElapsedMilliseconds()
+        If OptionsIE\zoom> 10
+          OptionsIE\zoom=OptionsIE\zoom -10
+          ScreenZoom()
+        EndIf
+        ;EndIf
+      ElseIf KeyboardPushed(#PB_Key_Add) ; zoom+
+                                         ;If KeyZoom = 0
+                                         ;KeyZoom = 1
+        chrono_keyboard = ElapsedMilliseconds()
+        If OptionsIE\zoom< 5000
+          OptionsIE\zoom=OptionsIE\zoom +10
+          ScreenZoom()
+        EndIf
+        ;EndIf
+      EndIf
+    EndIf
+    ;     If KeyboardReleased(#PB_Key_Subtract) Or KeyboardReleased(#PB_Key_Add)
+    ;       KeyZoom = 0
+    ;     EndIf
     
-    If KeyboardPushed(#PB_Key_LeftControl)
-      Control = 1
-    EndIf
-    If KeyboardReleased(#PB_Key_LeftControl)
-      Control = 0
-    EndIf
-    If KeyboardPushed(#PB_Key_LeftAlt)
-      Alt = 1
-    EndIf
-    If KeyboardReleased(#PB_Key_LeftAlt)
-      Alt = 0
-    EndIf
-    If KeyboardPushed(#PB_Key_LeftShift)
-      Shift = 1
-    EndIf
-    If KeyboardReleased(#PB_Key_LeftShift)
-      Shift = 0
+    If KeyboardPushed(#PB_Key_T) ; transform
+      If key = 0
+        key = 1
+        UpdateTool(#G_IE_Transform) 
+      EndIf
     EndIf
     
-    If Control = 1
-      If ElapsedMilliseconds()-chrono_keyboard>200
-        If KeyboardPushed(#PB_Key_Subtract) ; zoom -
-                                            ;If KeyZoom = 0
-                                            ;KeyZoom = 1
-          chrono_keyboard = ElapsedMilliseconds()
-          If OptionsIE\zoom> 10
-            OptionsIE\zoom=OptionsIE\zoom -10
-            ScreenZoom()
-          EndIf
-          ;EndIf
-        ElseIf KeyboardPushed(#PB_Key_Add) ; zoom+
-                                           ;If KeyZoom = 0
-                                           ;KeyZoom = 1
-          chrono_keyboard = ElapsedMilliseconds()
-          If OptionsIE\zoom< 5000
-            OptionsIE\zoom=OptionsIE\zoom +10
-            ScreenZoom()
-          EndIf
-          ;EndIf
+  Else
+    
+    If alt = 0 And shift = 0
+      
+      ; move the canvas
+      If KeyboardPushed(#PB_Key_Space)
+        If MoveCanvas = 0
+          MoveCanvas = 1
+        EndIf      
+      EndIf
+      If KeyboardReleased(#PB_Key_Space)
+        MoveCanvas = 0 
+        MouseClic = 0
+      EndIf
+      
+      
+      If KeyboardPushed(#PB_Key_Left)
+        If key > 0
+          key -1
+        Else
+          If Action = #Action_Move         
+            If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
+              MoveLayerX -1
+              If ActionKeyb = 0
+                oldposx = layer(layerid)\x
+                oldposy = layer(layerid)\y
+                ActionKeyb = 1
+              EndIf              
+              Layer(layerId)\x = oldposx + MoveLayerX
+              Layer(layerId)\y = oldposy + MoveLayerY
+              ScreenUpdate()
+            EndIf
+            key = 5
+          EndIf 
         EndIf
       EndIf
-      ;     If KeyboardReleased(#PB_Key_Subtract) Or KeyboardReleased(#PB_Key_Add)
-      ;       KeyZoom = 0
-      ;     EndIf
+      If KeyboardPushed(#PB_Key_Right)
+        If key > 0
+          key -1
+        Else
+          If Action = #Action_Move  
+            If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
+              MoveLayerX +1
+              If ActionKeyb = 0
+                oldposx = layer(layerid)\x
+                oldposy = layer(layerid)\y
+                ActionKeyb = 1
+              EndIf             
+              Layer(layerId)\x = oldposx + MoveLayerX
+              Layer(layerId)\y = oldposy + MoveLayerY
+              ScreenUpdate()
+            EndIf            
+            key = 5
+          EndIf 
+        EndIf        
+      EndIf
+      If KeyboardPushed(#PB_Key_Up)
+        If key > 0
+          key -1
+        Else
+          If Action = #Action_Move          
+            If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
+              MoveLayerY-1
+              If ActionKeyb = 0
+                oldposx = layer(layerid)\x
+                oldposy = layer(layerid)\y
+                ActionKeyb = 1
+              EndIf              
+              Layer(layerId)\x = oldposx + MoveLayerX
+              Layer(layerId)\y = oldposy + MoveLayerY
+              ScreenUpdate()
+            EndIf  
+            key = 5
+          EndIf 
+        EndIf        
+      EndIf
+      If KeyboardPushed(#PB_Key_Down)
+        If key > 0
+          key -1
+        Else
+          If Action = #Action_Move          
+            If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
+              MoveLayerY+1
+              If ActionKeyb = 0
+                oldposx = layer(layerid)\x
+                oldposy = layer(layerid)\y
+                ActionKeyb = 1
+              EndIf              
+              Layer(layerId)\x = oldposx + MoveLayerX
+              Layer(layerId)\y = oldposy + MoveLayerY
+              ScreenUpdate()
+            EndIf  
+            key = 5
+          EndIf 
+        EndIf        
+      EndIf
       
-      If KeyboardPushed(#PB_Key_T) ; transform
+      ; raccourci outil
+      If KeyboardPushed(#PB_Key_B)
         If key = 0
           key = 1
-          UpdateTool(#G_IE_Transform) 
+          UpdateTool(#G_IE_Brush) 
         EndIf
       EndIf
-      
-    Else
-      
-      If alt = 0 And shift = 0
-        
-        ; move the canvas
-        If KeyboardPushed(#PB_Key_Space)
-          If MoveCanvas = 0
-            MoveCanvas = 1
-          EndIf      
+      If KeyboardPushed(#PB_Key_E)
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Eraser) 
         EndIf
-        If KeyboardReleased(#PB_Key_Space)
-          MoveCanvas = 0 
-          MouseClic = 0
+      EndIf
+      If KeyboardPushed(#PB_Key_K)
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Fill) 
         EndIf
-        
-        
-        If KeyboardPushed(#PB_Key_Left)
-          If key > 0
-            key -1
-          Else
-            If Action = #Action_Move         
-              If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
-                MoveLayerX -1
-                If ActionKeyb = 0
-                  oldposx = layer(layerid)\x
-                  oldposy = layer(layerid)\y
-                  ActionKeyb = 1
-                EndIf              
-                Layer(layerId)\x = oldposx + MoveLayerX
-                Layer(layerId)\y = oldposy + MoveLayerY
-                ScreenUpdate()
-              EndIf
-              key = 5
-            EndIf 
-          EndIf
+      EndIf
+      If KeyboardPushed(#PB_Key_G)
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Gradient) 
         EndIf
-        If KeyboardPushed(#PB_Key_Right)
-          If key > 0
-            key -1
-          Else
-            If Action = #Action_Move  
-              If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
-                MoveLayerX +1
-                If ActionKeyb = 0
-                  oldposx = layer(layerid)\x
-                  oldposy = layer(layerid)\y
-                  ActionKeyb = 1
-                EndIf             
-                Layer(layerId)\x = oldposx + MoveLayerX
-                Layer(layerId)\y = oldposy + MoveLayerY
-                ScreenUpdate()
-              EndIf            
-              key = 5
-            EndIf 
-          EndIf        
+      EndIf
+      If KeyboardPushed(#PB_Key_H)
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Hand) 
         EndIf
-        If KeyboardPushed(#PB_Key_Up)
-          If key > 0
-            key -1
-          Else
-            If Action = #Action_Move          
-              If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
-                MoveLayerY-1
-                If ActionKeyb = 0
-                  oldposx = layer(layerid)\x
-                  oldposy = layer(layerid)\y
-                  ActionKeyb = 1
-                EndIf              
-                Layer(layerId)\x = oldposx + MoveLayerX
-                Layer(layerId)\y = oldposy + MoveLayerY
-                ScreenUpdate()
-              EndIf  
-              key = 5
-            EndIf 
-          EndIf        
-        EndIf
-        If KeyboardPushed(#PB_Key_Down)
-          If key > 0
-            key -1
-          Else
-            If Action = #Action_Move          
-              If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
-                MoveLayerY+1
-                If ActionKeyb = 0
-                  oldposx = layer(layerid)\x
-                  oldposy = layer(layerid)\y
-                  ActionKeyb = 1
-                EndIf              
-                Layer(layerId)\x = oldposx + MoveLayerX
-                Layer(layerId)\y = oldposy + MoveLayerY
-                ScreenUpdate()
-              EndIf  
-              key = 5
-            EndIf 
-          EndIf        
-        EndIf
-        
-        ; raccourci outil
-        If KeyboardPushed(#PB_Key_B)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Brush) 
-          EndIf
-        EndIf
-        If KeyboardPushed(#PB_Key_E)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Eraser) 
-          EndIf
-        EndIf
-        If KeyboardPushed(#PB_Key_K)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Fill) 
-          EndIf
-        EndIf
-        If KeyboardPushed(#PB_Key_G)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Gradient) 
-          EndIf
-        EndIf
-        If KeyboardPushed(#PB_Key_H)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Hand) 
-          EndIf
+      EndIf      
+      If KeyboardPushed(#PB_Key_Z)
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Zoom) 
         EndIf      
-        If KeyboardPushed(#PB_Key_Z)
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Zoom) 
-          EndIf      
-        EndIf 
-        If KeyboardPushed(#PB_Key_V) ; move the layer
-          MoveLayerY = 0
-          MoveLayerX = 0
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Move) 
+      EndIf 
+      If KeyboardPushed(#PB_Key_V) ; move the layer
+        MoveLayerY = 0
+        MoveLayerX = 0
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Move) 
+        EndIf
+      EndIf
+      If KeyboardPushed(#PB_Key_M) ; tool selection cadre
+        If key = 0
+          key = 1
+          UpdateTool(#G_IE_Select) 
+        EndIf
+      EndIf
+      
+      ; raccourcis brush
+      If KeyboardPushed(#PB_Key_D)
+        If Brush(Action)\size > 1
+          If Brush(Action)\size >= 100
+            Brush(Action)\size -5         
+          ElseIf Brush(Action)\size < 100 And Brush(Action)\size > 20
+            Brush(Action)\size - 2          
+          Else
+            Brush(Action)\size-1          
           EndIf
+          If Brush(Action)\SizeMin >Brush(Action)\Size
+            Brush(Action)\SizeMin = Brush(Action)\Size
+          EndIf          
+          BrushUpdateImage(0,1) 
+          BrushUpdateColor() 
+          SetGadgetState(#G_BrushSize,Brush(Action)\size)
+          SetGadgetState(#G_BrushSizeMin,Brush(Action)\SizeMin)
         EndIf
-        If KeyboardPushed(#PB_Key_M) ; tool selection cadre
-          If key = 0
-            key = 1
-            UpdateTool(#G_IE_Select) 
+      EndIf
+      If KeyboardPushed(#PB_Key_F)
+        If Brush(Action)\size < 1000 
+          If Brush(Action)\size >=100
+            Brush(Action)\size +5          
+          ElseIf Brush(Action)\size < 100 And Brush(Action)\size > 20
+            Brush(Action)\size + 2            
+          Else
+            Brush(Action)\size+1            
           EndIf
-        EndIf
-        
-        ; raccourcis brush
-        If KeyboardPushed(#PB_Key_D)
-          If Brush(Action)\size > 1
-            If Brush(Action)\size >= 100
-              Brush(Action)\size -5         
-            ElseIf Brush(Action)\size < 100 And Brush(Action)\size > 20
-              Brush(Action)\size - 2          
-            Else
-              Brush(Action)\size-1          
-            EndIf
-            If Brush(Action)\SizeMin >Brush(Action)\Size
-              Brush(Action)\SizeMin = Brush(Action)\Size
-            EndIf          
-            BrushUpdateImage(0,1) 
-            BrushUpdateColor() 
-            SetGadgetState(#G_BrushSize,Brush(Action)\size)
-            SetGadgetState(#G_BrushSizeMin,Brush(Action)\SizeMin)
-          EndIf
-        EndIf
-        If KeyboardPushed(#PB_Key_F)
-          If Brush(Action)\size < 1000 
-            If Brush(Action)\size >=100
-              Brush(Action)\size +5          
-            ElseIf Brush(Action)\size < 100 And Brush(Action)\size > 20
-              Brush(Action)\size + 2            
-            Else
-              Brush(Action)\size+1            
-            EndIf
-            If Brush(Action)\SizeMin >Brush(Action)\Size
-              Brush(Action)\SizeMin = Brush(Action)\Size
-            EndIf 
-            BrushUpdateImage(0,1)
-            BrushUpdateColor()     
-            SetGadgetState(#G_BrushSize,Brush(Action)\size)
-            SetGadgetState(#G_BrushSizeMin,Brush(Action)\SizeMin)
-          EndIf        
-        EndIf
-        
+          If Brush(Action)\SizeMin >Brush(Action)\Size
+            Brush(Action)\SizeMin = Brush(Action)\Size
+          EndIf 
+          BrushUpdateImage(0,1)
+          BrushUpdateColor()     
+          SetGadgetState(#G_BrushSize,Brush(Action)\size)
+          SetGadgetState(#G_BrushSizeMin,Brush(Action)\SizeMin)
+        EndIf        
       EndIf
       
     EndIf
     
-    If KeyboardReleased(#PB_Key_All)
-      key = 0
-    EndIf
-    
+  EndIf
+  
+  If KeyboardReleased(#PB_Key_All)
+    key = 0
   EndIf
   ;}
   
@@ -1296,8 +1274,8 @@ EndIf
 FPS()
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 969
-; FirstLine = 96
-; Folding = 85YACAEAEg5AAJOAABAAS-4dAAAAAAAAAAg
+; CursorPosition = 337
+; FirstLine = 150
+; Folding = bYcw+-Ag0fvzsIOFAAAAAA1CAAAAAAAAAg-
 ; EnableXP
 ; EnableUnicode

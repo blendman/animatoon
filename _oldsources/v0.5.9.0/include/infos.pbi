@@ -20,25 +20,22 @@
 
 ;-- 1. PRIORITY// priorité
 
-; BUGS
-; - bug when hide/show panel -> canvas is moved on the left
+; BUGS & priority
+; - bug with merge layer  bottom, if the current layer blendmode has been "multiply" than is now normal->create a white rectangle over the next layer before merge.
+; - fill layer (alpha) with a color, to fill a sky with a background already painted
+; - brush "blending point" alpha et size // brush : fondu entre les points 'size, alpha)
+; - rectangle selection bug with zoom
 ; - gradient linear AR
 ; - bug UI when next opening if we move the splitters // à l'ouverture suivante, quand on déplace les splitters en Y (swatch par exemple)
-; - Bug with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
-; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
-; - bug with shape (when use shape (box, circle), I should use the position on the zoomed sprite, Not the zoomed position on the sprite Not zoomed)
-; - color with water : isn't seen in real time if layer bm <> normal
-
-
-; PRIORITY (new & changes)
-; - brush "blending point" alpha et size // brush : fondu entre les points 'size, alpha)
-; - Roughboard : should work like the "main canvas" ? (painting with mouse, and pick with ctrl+mouse).
-
-
-; NOT PRIORITY
-; - if there is selection (rectangle of other), the painting should be inside this selection
+; - (init.pb) Check the loadimage() if error // revoir la création et loading des images si erreur ! (init.pb)
 ; - in gadgets.pbi : sometimes, we are not in the surface to use point() // parfois, on est pas dans la surface pour faire point() : (bug debugger)
 ; Brush(Action)\color  = Point(x,y) et  Brush(Action)\ColorFG  = Point(x,y) 
+; - Bug with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
+; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
+; - when change doc (new, open, resize...) and use shape (box, circle), I should use the position on the zoomed sprite, 
+; Not the zoomed position on the sprite Not zoomed
+; - Roughboard : should work like the "main canvas" ? (painting with mouse, and pick with ctrl+mouse).
+
 
 ; BRUSH
 ; - trait fondu (vers alpha= 0 et size =1)
@@ -51,31 +48,24 @@
 
 ; TOOLS
 ; - bug linear gradient !!
-; - add pattern tool (stamp/tampon)
-; - add a kind ot pattern stamp-brush paint ( grey level + color, to add a kind of texture during the painting) // 
+; - add pattern tool (tampon)
+; - add a kind ot pattern stamp ( grey level + color, to add a kind of texture during the painting) // 
 ; (ajouter sorte de tampon (niveau de gris) + couleur, pour peindre de l'aquarelle (texture) avec une couleur.)
 ; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY  and IE_Options\confirmaction....
 
 ; PAPER
 ; - AR !!!! paper scale : ok when change trackbar paperScale
 
-; IMAGES
+; IMAGEs
 ; - Level is'nt good // niveau ne fonctionne pas très bien, voir en temps réel et mettre plus d'info sur les trackbar (on ne sait pas ce que c'est)
 
-; SELECTIONS
-; - add type : rectangle (defaut), ellipse, polygon, lasso, painting
-; - save selections and name it (save image or array of color+alpha)
-; - add option For tool : keep proportions, fixed size (rectangle, circle)
-; - add selection to the current selection, substract selection  
-
-; LAYERS
+; Layers
 ; - better blendmode with sprite (seems not possible, don't have shader on sprite with pb, try openGL ?): darken, linearlight, overlay (??)
 
 ; SCREEN/CANVAS
 ; - add a canvas for the preview (we have the choice : use a screen+sprite or a canvas+image) // ajouter un canvas output pour l'affichage sur canvas au lieu du screen (au choix) pour le preview et export.
 
-; INTERFACE (gadget, menu..)
-; - add mode advanced (current UI) and simple mode (just a simple tool panel + color)
+; Interface (gadget, menu..)
 ; - add trackbar for : brush size, alpha
 ; - add scrollarea gadget pour : brush (gen, tra, dyn), option paper
 ; - Give the choice for gadget for brush // donner le choix de l'interface (parametre sur onglet gen ou séparé (sur onglet tra et dyn))
@@ -86,86 +76,8 @@
 
 ;-- CHANGELOG
 
-; - brush : when use a sizewidth or height < 20px, brush has black border. -> create new image (square) With image resized drawn on it, use it As brush.
-; - WIP  new tool stamp (use pattern or copie a part of our image)
-; - wip : new tool "vector brush/paint" (see my example in branch "vector_drawing.pb")
-; - wip : new drawing type "clean" (see my example in branch "paintclean.pb")
-; - change panel layer : butons should be resized (position) when move splitters, scrollarea height smaller
 
-; 30/03/2021  0.5.9.3
-; // changes 
-; - I have cut/paste the code for "preference window" from loop.pb to window.pbi
-; - window pref : add the option to use RoghtButton to paint
-; - window pref : add a message when we change the langage (the langage for the gadgets is not changed in real time, for the moment).
-
-
-
-; 30/03/2021  0.5.9.2.2
-; // New 
-; - add Rightmouse to paint (by icesoft) in option
-; - options : save/load use Rightmousetopaint
-; - the program keep the UI (if panel are hiden or shown) in the next time we open it.
-; // changes 
-; - change the mousewheel (by icesoft)
-; // fixes
-; - when use Hideall/showAll (tab) the rightpanel (layer+swatch) isn't shown
-; - bug flickering with the eraser
-; - flickering tool selection On layer multiply with a layer over.
-; - movecanvas : when clic mouseleftup over certains gadgets (canvas), we can continue to move the canvas
-; - paint : when clic mouseleftup over certains gadget(canvas), we can continue to paint.
-
-; 29/03/2021  0.5.9.2.1
-; // New 
-; - menu : add window : show/hide (tool param, colors, layers, swatch)
-; - menu : add window : #Menu_SHowHideAllUI -> bug to fixe , the rightpanel isn't shown when I use TAB two times.
-; - options : save/load Show UI (panel tool, colors, layers, swatchs
-; - event : when clic on show/hide, it show/hide the panel and if needed reisze the canvas/screen.
-; // tests
-; - new drawing type : clean (file paintoon.pb) (not integrated for the moment)
-
-
-; 27/03/2021  0.5.9.2
-; // tests
-; - new drawing type : clean (file paintoon.pb) with good space between dots, fadeout alpha, fadeIn Size... (not integrated for the moment)
-
-
-; 26/03/2021  0.5.9.1
-; // test 
-; - wip new tool "vector brush/paint" (vectordrawing02.pb)
-
-
-; 25/03/2021  0.5.9.1
-; // New
-; - pattern panel : add gadgets : buton "new pattern", scrollarea and canvas to show the patterns. 
-; - pattern canvas : load the pattern images from pattern folder And draw it on the canvas (freeimage after drawing on canvas to free memory). 
-; - pattern canvas : when clic on pattern, set the selection, and load the image of pattern, create the the pattern image for stamps too.
-; wip - stamp tool : when paint on layer, use the pattern selected to paint.
-; // Changes
-; - some code cleaning, comments added (english)
-; - change some variable name , to have english name (and not french name, even if french is so great ^^)
-; // Fixes
-; - bug with grid when change document (resize, new, open, crop...) : need to recreate sprite grid 
-
-
-; 24/03/2021  0.5.9.0.1
-; // new
-; - add a background to the alpha of a layer (to create easily a full sky for example)
-; // changes
-; - paste : create a new layer, not paste on the current layer
-; - paste : if we have a selection and copy it, the new portion of copy is paste in selectionX/selectionY, no more in (0,0)
-; - selection : when paste a selection, the selection rectangle now disappear
-; - (init.pb) Check the loadimage() if error // revoir la création et loading des images si erreur ! (init.pb)
-; // Fixes
-; - fixe bug flickering when selection on layer with blendmode <> normal
-; - fixe bug flickering when using eraser on layer with blendmode multiply over under another layer
-; - rectangle selection bug with zoom
-; - bug with merge layer bottom, if the current layer blendmode has been "multiplied" then is now normal-> create a white rectangle over the Next layer before merge.
-; // tests
-; - image adjustement (darken, lighten : not used because its same as brightness)
-
-
-
-; 24/03/2021  0.5.9.0
+; 24/03/2021 0.5.9.0
 ; // New
 ; - WindowEditorPaper() : we can add a new color, it will be added to the file of the BGcolor (and saved) and the canvas BGcolor is updated. 
 ; - WindowEditorPaper() : when clic on color add a box salection, we can't select a color > number of color (for example, the canvas color)
@@ -1612,8 +1524,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 101
-; FirstLine = 75
+; CursorPosition = 86
+; FirstLine = 60
 ; Folding = 7+
 ; EnableXP
 ; DisableDebugger

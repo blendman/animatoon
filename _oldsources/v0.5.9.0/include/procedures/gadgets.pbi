@@ -860,7 +860,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddSpinGadget(#G_BrushRandRotate, Brush(Action)\randRot, lang("Random Rotation"),xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
       i+ub    
       AddSpinGadget(#G_BrushRotate, Brush(Action)\rotate, lang("Rotation of the brush"),xa1,h1+i,wb,20,0,360,#PB_Spin_Numeric)
-      AddCheckBox(#G_BrushRotateAngle,xa1+wb+5,h1+i,wb,20, lang("Angle"), Brush(Action)\RotateByAngle, lang("Rotate the brush in function of the Angle"))
+      AddCheckBox(#G_BrushRotateAngle,xa1+wb+5,h1+i,wb,20, lang("Angle"), Brush(Action)\RotateParAngle, lang("Rotate the brush in function of the Angle"))
       i+ub +10
       
       ; Stroke (trait)
@@ -1138,57 +1138,6 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   
   
 EndProcedure
-Procedure UpdateUIShowHide(fullUi=0, update=1)
-  
-  ; to update the UI (show/hide panel)
-  
-  ; check if we hide full UI (with tab for example)
-  If fullUi = 1
-    OptionsIE\ShowPanelColors   = OptionsIE\ShowFullUI
-    OptionsIE\ShowPanelToolparameters = OptionsIE\ShowFullUI
-    OptionsIE\ShowPanelLayers   = OptionsIE\ShowFullUI
-    OptionsIE\ShowPanelswatchs  = OptionsIE\ShowFullUI
-  EndIf
-  
-  
-  ; splitters left
-  If OptionsIE\ShowPanelToolparameters Or OptionsIE\ShowPanelColors
-    HideGadget(#G_SplitToolCol, 0)
-  ElseIf OptionsIE\ShowPanelToolparameters= 0 And OptionsIE\ShowPanelColors = 0
-    HideGadget(#G_SplitToolCol, 1)
-  EndIf
-  
-  ; Panel colors
-  HideGadget(#G_PanelCol, 1-OptionsIE\ShowPanelColors)
-  SetMenuItemState(#Menu_Main, #menu_ShowColor, OptionsIE\ShowPanelColors)
-  
-  ;  tools parameters
-  HideGadget(#G_PanelTool, 1-OptionsIE\ShowPanelToolparameters)
-  SetMenuItemState(#Menu_Main, #menu_ShowToolParameters, OptionsIE\ShowPanelToolparameters)
-  
-  
-  ; splitters Right
-  If OptionsIE\ShowPanelLayers Or OptionsIE\ShowPanelswatchs
-    HideGadget(#G_SplitLayerRB, 0)
-  ElseIf OptionsIE\ShowPanelLayers= 0 And OptionsIE\ShowPanelswatchs = 0
-    HideGadget(#G_SplitLayerRB, 1)
-  EndIf
-  
-  ; panel layer
-  HideGadget(#G_PanelLayer, 1-OptionsIE\ShowPanelLayers)
-  SetMenuItemState(#Menu_Main, #menu_ShowLayers, OptionsIE\ShowPanelLayers)
-  
-  ; panel swatch
-  HideGadget(#G_PanelSwatch, 1-OptionsIE\ShowPanelswatchs)
-  SetMenuItemState(#Menu_Main, #menu_ShowSwatchs, OptionsIE\ShowPanelswatchs)
-  
-  
-  ; then update the canvas/screen size 
-  If update 
-    IE_UpdateGadget(0)
-  EndIf
-
-EndProcedure
 Procedure IE_GadgetAdd()
   
   ; procédure qui sert à ajouter les gadgets (panel, toolbar...) au lancement de l'application
@@ -1203,9 +1152,7 @@ Procedure IE_GadgetAdd()
     toolbarH = 30
   EndIf
   
-  wp1 = 175
-  
-  w = WindowWidth(#WinMain) - wp1 ; ScreenX
+  w = WindowWidth(#WinMain) - ScreenX
   h = WindowHeight(#WinMain) - 25 - ToolbarH
   
   h1 = 0
@@ -1217,7 +1164,7 @@ Procedure IE_GadgetAdd()
   bw = 22
   
   ; toolbar top :: toolbar du haut
-  If ContainerGadget(#G_ToolBar, 0, -1, W+ScreenX, ToolBarH, #PB_Container_BorderLess)
+  If ContainerGadget(#G_ToolBar,0, -1, W+ScreenX, ToolBarH, #PB_Container_BorderLess)
     
     SetGadgetColor(#G_ToolBar,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     
@@ -1302,7 +1249,7 @@ Procedure IE_GadgetAdd()
   
   ; panel tool parameters
   ;If ContainerGadget(#G_Cont_Brush,0,ToolbarH,ScreenX-5,PanelToolsH_IE) 
-  If PanelGadget(#G_PanelTool, 0, ToolbarH, wp1, PanelToolsH_IE) ;h-25)
+  If PanelGadget(#G_PanelTool,0, ToolbarH, ScreenX, PanelToolsH_IE) ;h-25)
     SetGadgetColor(#G_PanelTool,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     CloseGadgetList()
     CreateToolPanel() ; create the panel tool (action dy default = brush, so the panel with the brush parameters are created
@@ -1312,10 +1259,10 @@ Procedure IE_GadgetAdd()
   
   
   ; panel colors
-  If PanelGadget(#G_PanelCol, 0, toolbarH+PanelToolsH_IE+5, wp1, H-25-PanelToolsH_IE)
+  If PanelGadget(#G_PanelCol,0,toolbarH+PanelToolsH_IE+5, ScreenX, H-25-PanelToolsH_IE)
     
-    SetGadgetColor(#G_PanelCol, #PB_Gadget_BackColor, OptionsIE\ThemeGadCol)
-    AddGadgetItem(#g_PanelCol, 0, Lang("Color"))
+    SetGadgetColor(#G_PanelCol,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
+    AddGadgetItem(#g_PanelCol,0,Lang("Color"))
     ; color
     xa=20
     ColW = 48
@@ -1337,11 +1284,11 @@ Procedure IE_GadgetAdd()
   EndIf
   
   h = WindowHeight(#WinMain) -50-ToolbarH
-  If SplitterGadget(#G_SplitToolCol, 0, ToolbarH, wp1, h, #G_PanelTool, #G_PanelCol) : EndIf
+  If SplitterGadget(#G_SplitToolCol, 0, ToolbarH, ScreenX, h, #G_PanelTool,#G_PanelCol) : EndIf
   
   
   ; panel layer, presets, options (paper)
-  If PanelGadget(#G_PanelLayer, 0, 0, wp1-5, PanelLayerH_IE)
+  If PanelGadget(#G_PanelLayer, 0, 0, ScreenX-5, PanelLayerH_IE)
     
     SetGadgetColor(#G_PanelLayer,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     
@@ -1492,7 +1439,7 @@ Procedure IE_GadgetAdd()
   h - PanelLayerH_IE -25
   
   ;If PanelGadget(#G_PanelSwatch, w+10,ToolbarH+PanelLayerH_IE+5,ScreenX-10,h)
-  If PanelGadget(#G_PanelSwatch, 0, 0, wp1-5, h)
+  If PanelGadget(#G_PanelSwatch, 0,0,ScreenX-5,h)
     
     SetGadgetColor(#G_PanelSwatch,#PB_Gadget_BackColor,OptionsIE\ThemeGadCol)
     
@@ -1520,7 +1467,7 @@ Procedure IE_GadgetAdd()
       CloseGadgetList()
     EndIf
     
-    ; The roughboard/ scratch Board
+    
     AddGadgetItem(#G_PanelSwatch,1,Lang("Rough"))
     yy = 5
     i = 5
@@ -1550,11 +1497,11 @@ Procedure IE_GadgetAdd()
             
           EndIf
         EndIf        
-        w1 = ImageWidth(#image_RB)
-        h1 = ImageHeight(#image_RB)
-        ResizeGadget(#G_RoughtBoard,#PB_Ignore,#PB_Ignore,w1,h1)
-        SetGadgetAttribute(#G_SA_Rb,  #PB_ScrollArea_InnerWidth ,w1)
-        SetGadgetAttribute(#G_SA_Rb,  #PB_ScrollArea_InnerHeight ,h1)
+        w = ImageWidth(#image_RB)
+        h = ImageHeight(#image_RB)
+        ResizeGadget(#G_RoughtBoard,#PB_Ignore,#PB_Ignore,w,h)
+        SetGadgetAttribute(#G_SA_Rb,  #PB_ScrollArea_InnerWidth ,w)
+        SetGadgetAttribute(#G_SA_Rb,  #PB_ScrollArea_InnerHeight ,h)
         If StartDrawing(CanvasOutput(#G_RoughtBoard))
           DrawImage(ImageID(#image_RB),0,0)
           StopDrawing()
@@ -1567,23 +1514,7 @@ Procedure IE_GadgetAdd()
     
     
     AddGadgetItem(#G_PanelSwatch,2,Lang("Pattern"))
-    yy = 5
-    i = 5
-    bw = 22
-    AddButonImage(#G_patternAdd,i,yy,bw,bw, #ico_New,#PB_Button_Default,         lang("Add a new pattern"))                    :  i=i+wbt
     
-    i=5
-    ; add a scrollarea and canvasfor patterns
-    If ScrollAreaGadget(#G_SA_Pattern,i,30,wsa,h-180,wsa-ScrolSwInt,h-180)
-      
-      If CanvasGadget(#G_PatternCanvas,0,0,PanelLayerW_IE-10,h-50)
-        
-        CreatePatterns()
-        
-      EndIf  
-      
-      CloseGadgetList()
-    EndIf
     
     
     
@@ -1592,66 +1523,36 @@ Procedure IE_GadgetAdd()
   
   
   h = WindowHeight(#WinMain) - 50 - ToolbarH
-  If SplitterGadget(#G_SplitLayerRB, W+10, ToolbarH, wp1-5, h, #G_PanelLayer, #G_PanelSwatch)
-    SetGadgetState(#G_SplitLayerRB, PanelLayerH_IE)
+  If SplitterGadget(#G_SplitLayerRB,W+10,ToolbarH, ScreenX-5,h,#G_PanelLayer,#G_PanelSwatch)
+    SetGadgetState(#G_SplitLayerRB,PanelLayerH_IE)
   EndIf
   ; If SplitterGadget(#G_SplitLayerRB,WindowWidth(0)-150,ToolbarH, ScreenX-10,600,#G_PanelLayer,#G_PanelSwatch,#PB_Splitter_Separator) : EndIf
   
   
 EndProcedure
-Procedure IE_UpdateGadget(gadget=1)
-  
+Procedure IE_UpdateGadget()
   
   Shared ToolbarH  
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
   
   
-  ; resize the container which contain the screen // on resize le container qui contient le screen
-  PanelRight = 1
-  PanelLeft = 1
-  screenx2 = 175
-  x1 = PanelToolsW_IE+15
-  If (OptionsIE\ShowPanelColors=0 And OptionsIE\ShowPanelToolparameters = 0)
-    PanelLeft = 0
-    ScreenX =0
-    x1 = 0
-  Else
-    screenX = 175
-  EndIf
-  If (OptionsIE\ShowPanelLayers=0 And OptionsIE\ShowPanelswatchs = 0)
-    PanelRight = 0
-  EndIf
+  x = WindowWidth(#WinMain) - ScreenX +5
+  ; h = WindowHeight(#WinMain) - ToolbarH - PanelLayerH_IE - 50; StatusBarHeight(#Statusbar)
+  h = WindowHeight(#WinMain) - ToolbarH - 50; StatusBarHeight(#Statusbar)
+  ResizeGadget(#G_SplitLayerRB,x,#PB_Ignore,#PB_Ignore,h)
+  ;ResizeGadget(#G_PanelLayer,x,#PB_Ignore,#PB_Ignore,#PB_Ignore)
+  ;ResizeGadget(#G_PanelSwatch,x,#PB_Ignore,#PB_Ignore,h)
+  ; h = WindowHeight(#WinMain) - ToolbarH - PanelToolsH_IE - 50; StatusBarHeight(#Statusbar)
+  ;ResizeGadget(#G_Panelcol,#PB_Ignore,#PB_Ignore,#PB_Ignore,h)
+  ResizeGadget(#G_SplitToolCol,#PB_Ignore,#PB_Ignore,#PB_Ignore,h)
   
-  
-  ; resize splitters
-  x = WindowWidth(#WinMain) - screenx2 +5
-  h = WindowHeight(#WinMain) - ToolbarH - 50 ; StatusBarHeight(#Statusbar)
-  If gadget = 1
-    ResizeGadget(#G_SplitToolCol, #PB_Ignore, #PB_Ignore, #PB_Ignore, h)
-    ResizeGadget(#G_SplitLayerRB, x, #PB_Ignore, #PB_Ignore, h)
-  EndIf
-  
-  
-  ; define the w and H of the container-Screen
-  oldW = GadgetWidth(#G_ContScreen)
+  ; on resize le container qui contient le screen
+  W = WindowWidth(#WinMain) - ScreenX*2 ; -10
   H = WindowHeight(#WinMain) - StatusBarHeight(#Statusbar)-12 - OptionsIE\ToolbarH -6
-  W = WindowWidth(#WinMain) - ScreenX2 * panelRight - (ScreenX+10)*panelLeft
   
-  ; resize the container screen
-  ResizeGadget(#G_ContScreen, x1, #PB_Ignore, w, h)
-  
-  ; need to move the layer position 
-  If gadget=0
-    If screenX = 0
-      CanvasX + 180
-    Else
-      CanvasX - 180
-    EndIf
-    ScreenUpdate()
-  EndIf
+  ResizeGadget(#G_ContScreen,#PB_Ignore,#PB_Ignore,w, h)
   
 EndProcedure
-
 Procedure IE_SaveSplitter(LayerH,ToolH, BarH)
   
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
@@ -1675,7 +1576,266 @@ EndProcedure
 
 
 
-; paper & utils (grid..) are now in layer.pbi
+; Utilitaires (grid, marker,repere...)
+Macro UpdateGrid()
+  ;z.d = OptionsIE\zoom * 0.01
+  
+  If StartDrawing(SpriteOutput(#Sp_Grid))
+    DrawingMode(#PB_2DDrawing_AlphaChannel)
+    Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+    
+    
+    DrawingMode(#PB_2DDrawing_AlphaBlend)  
+    
+    u.d = (doc\w/OptionsIE\gridW);/(doc\zoom/100)
+    v.d = (doc\h/OptionsIE\gridH);/(doc\zoom/100)
+                                 ; MessageRequester("",Str(u) + "/"+Str(v) + "/"+Str(OptionsIE\gridW))
+    c = OptionsIE\gridColor
+    col = RGBA(Red(c),Green(c),Blue(c),255)
+    For i = 0 To u
+      For j = 0 To v
+        Line(i * OptionsIE\gridW   ,0,1,doc\h ,col)
+        Line(0,j * OptionsIE\gridH  , doc\w ,1,col)
+      Next j
+    Next i  
+    StopDrawing()
+  EndIf 
+EndMacro
+Macro CreateGrid()
+  If CreateSprite(#Sp_Grid,doc\w,doc\h,#PB_Sprite_AlphaBlending) 
+    UpdateGrid()
+  EndIf
+EndMacro
+
+
+; paper
+
+Procedure IE_UpdatePaperList()
+  
+  ; to update the list of paper
+  size =0
+  If ExamineDirectory(0, GetCurrentDirectory() + "data\paper\", "*.*")  
+    
+    While NextDirectoryEntry(0)
+      
+      If DirectoryEntryType(0) = #PB_DirectoryEntry_File
+        
+        Name$ = DirectoryEntryName(0)
+        AddGadgetItem(#G_ListPaper, -1, Name$)
+        
+        ReDim Thepaper(size)
+        Thepaper(size)\name$ = Name$
+        size = ArraySize(Thepaper())+1
+      EndIf
+      
+    Wend
+    FinishDirectory(0)
+    
+  EndIf
+  
+EndProcedure
+Procedure PaperDraw()
+  
+  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
+  z.d = OptionsIE\zoom*0.01
+  
+  ; draw the color of the background
+  ZoomSprite(#Sp_PaperColor,doc\w*z,doc\h*z)
+  DisplayTransparentSprite(#Sp_PaperColor,canvasX,canvasY, 255)
+  
+  ;   draw the paper
+  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha) ; multiply
+  ZoomSprite(#Sp_Paper,doc\w*z,doc\h*z)
+  DisplayTransparentSprite(#Sp_Paper,canvasX,canvasY, paper\alpha)
+  
+EndProcedure
+Procedure PaperUpdate(load=0)
+  
+  
+  ; if we load a new image for the background
+  If load >= 1    
+    
+    If LoadImage(#Img_Paper, GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)
+      
+      If load = 1
+        
+        If IsGadget(#G_paperScale)
+          SetGadgetState(#G_paperScale, 10)
+        EndIf
+        
+        If IsSprite(#Sp_Paper)
+          FreeSprite(#Sp_Paper)
+        EndIf
+        If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending) = 0
+          MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
+        EndIf
+         
+       EndIf
+       
+     EndIf
+     
+  EndIf
+  
+  ; define some variable
+  z.d = 1 ; OptionsIE\zoom*0.01
+  scale.d = 1
+  
+  ; than change the image on the sprite.
+  If IsGadget(#G_paperScale)
+    
+    If paper\scale <1
+      paper\scale = GetGadgetState(#G_paperScale)
+    EndIf
+    
+    scale = paper\scale
+    scale = scale /10
+    ;   Else
+    ;     Debug "paperscale gadget pas ok"
+  EndIf
+  ;    Debug "paperscale "+StrD(scale)
+  
+  
+  ; <------- attention : need to check if scale isn't too large or not enough large
+  
+  
+  
+  ; create a tempImage for paper.
+  tempImgPaper = CopyImage(#Img_Paper, #PB_Any)
+  
+  w = ImageWidth(#Img_Paper)
+  h = ImageHeight(#Img_Paper)
+  w1.d= ImageWidth(#Img_Paper) * scale
+  h1.d = ImageHeight(#Img_Paper) * scale
+  If w1 > 5000
+    w1= 5000
+  EndIf
+  If h1 > 5000
+    h1= 5000
+  EndIf
+  
+  If IsImage(tempImgPaper)
+    
+    ; resize the image 
+    ResizeImage(tempImgPaper, w1, h1)
+    ; tempImgPaper = UnPreMultiplyAlpha(tempImgPaper) ; not need because image has no alpha chanel ^^, it's a bacground.
+    w = ImageWidth(tempImgPaper)
+    h = ImageHeight(tempImgPaper)
+    
+;      MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
+    
+    ; update the color of the BG
+    If StartDrawing(SpriteOutput(#Sp_PaperColor))
+      Box(0, 0, OutputWidth(), OutputHeight(), paper\color) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
+      StopDrawing()
+    EndIf
+    
+    
+    ; draw on the sprite the new background
+    If StartDrawing(SpriteOutput(#Sp_Paper))
+      
+      ; DrawingMode(#PB_2DDrawing_Default)
+      
+      ; Box(0, 0, SpriteWidth(#Sp_Paper), SpriteHeight(#Sp_Paper), RGBA(255, 255, 255, 255))
+      
+      DrawingMode(#PB_2DDrawing_AlphaBlend )
+      
+      For i=0 To (doc\w/w)*z +1
+        
+        
+        For j = 0 To (doc\h/h)*z +1
+          ; ZoomSprite(#Sp_Paper,w*z,h*z)
+          ; DisplaySprite(#Sp_Paper,i*w*z+canvasX,j*h*z+canvasY)
+          
+          ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
+          DrawImage(ImageID(tempImgPaper),i*w,j*h)
+          
+        Next j 
+        
+        
+      Next i       
+      
+      StopDrawing()
+      
+    EndIf
+    
+    ; delete tempImage
+    FreeImage(tempImgPaper)
+    
+  EndIf
+
+
+EndProcedure
+Procedure PaperCreate(delete=0)
+  
+  ; to create the papaer sprite
+  If IsImage(#img_paper)
+    
+    ; need to recreate the sprite (if we change
+    If delete =1
+      If IsSprite(#Sp_Paper)
+        FreeSprite(#Sp_Paper)
+      EndIf
+    EndIf
+    
+    If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending)
+      ;       If StartDrawing(SpriteOutput(#Sp_Paper))
+      ;         DrawImage(ImageID(#Img_Paper),0,0)
+      ;         StopDrawing()
+      ;       EndIf      
+      PaperUpdate() 
+    Else
+      MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
+    EndIf
+    
+  EndIf
+  
+EndProcedure
+Procedure PaperInit(load=1)
+  
+  If load=1
+    If LoadImage(#Img_Paper,GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)=0
+      MessageRequester(lang("Error"), lang("Unable to load the image paper"))
+      OptionsIE\Paper$ = "paper0.png"
+      If LoadImage(#Img_Paper,GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)=0
+        If CreateImage(#img_paper, 64, 64) = 0
+          MessageRequester(lang("Error"), lang("Unable to create the image paper"))
+        Else
+          If StartDrawing(ImageOutput(#img_paper))
+          EndIf
+          
+        EndIf
+        
+      EndIf
+    EndIf
+  EndIf
+  
+  ; create the color background
+  If Not IsSprite(#Sp_PaperColor)
+    If CreateSprite(#Sp_PaperColor, doc\w,doc\h, #PB_Sprite_AlphaBlending)
+      If StartDrawing(SpriteOutput(#Sp_PaperColor))
+        Box(0,0, OutputWidth(), OutputHeight(), RGBA(255,255,255,255))
+        StopDrawing()
+      EndIf    
+    EndIf
+  EndIf
+  
+;   ; create the paper
+;   PaperCreate()
+;   
+;   ; Create a temporary layer/sprite, for temporary operation (selection, box, circle...)
+;   ; puis, je crée le layertempo, un sprite pour les opérations comme sélection, box, cercle, gradient, etc...
+;   CreateLayertempo()
+  
+  ; create the paper and layertemporary
+  RecreateLayerUtilities()
+  
+  
+  ; then create the grid
+  CreateGrid()
+  
+EndProcedure
+; WindowBackgroundEditor() : see include\procedures\window.pbi
+
 
 ; update general UI
 Procedure UpdateBrushPreview()
@@ -1809,7 +1969,7 @@ Procedure SetToolParamToGad()
         SetGadgetState(#G_BrushScatter,\Scatter)
         SetGadgetState(#G_BrushRandRotate,\RandRot)
         SetGadgetState(#G_BrushRotate,\Rotate)
-        SetGadgetState(#G_BrushRotateAngle,\RotateByAngle)
+        SetGadgetState(#G_BrushRotateAngle,\RotateParAngle)
         
         ; stroke
         SetGadgetState(#G_brushIntensity,\Intensity)
@@ -1942,8 +2102,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1156
-; FirstLine = 52
-; Folding = AAAA5AAMAAAAAAAAAAAAAAA9BEwAAA+DAAA5
+; CursorPosition = 1646
+; FirstLine = 131
+; Folding = B95A5AAMAAAAAAAAAAAAAAAAYgxHAA+h6DCOAAA5
 ; DisableDebugger
 ; EnableUnicode

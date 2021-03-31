@@ -36,9 +36,7 @@ XIncludeFile "procedures\swatch.pbi"
 
 XIncludeFile "procedures\roughboard.pbi"
 
-XIncludeFile "procedures\patterns.pbi"
-
-XIncludeFile "procedures\gadgets.pbi"  
+XIncludeFile "procedures\gadgets.pbi" ; + paper
 
 XIncludeFile "procedures\brush.pbi"
 
@@ -48,7 +46,7 @@ XIncludeFile "procedures\imgfilters.pbi"
 
 XIncludeFile "procedures\paint.pbi"
 
-XIncludeFile "procedures\layer.pbi" ; + paper, grid...
+XIncludeFile "procedures\layer.pbi"
 
 XIncludeFile "procedures\selection.pbi"
 
@@ -319,15 +317,10 @@ Procedure ScreenUpdate(updateLayer=0)
     
   EndIf
   
-  ; draw on the screen
   ScreenDraw()  
   
-  If OptionsIE\Selection <> 1
-    
-    ; show the screen / on affiche l'ecran
-    FlipBuffers()
-    
-  EndIf
+  ; show the screen / on affiche l'ecran
+  FlipBuffers()
   
 EndProcedure
 Procedure ScreenZoom()
@@ -442,9 +435,8 @@ XIncludeFile "procedures\window.pbi"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 241
-; FirstLine = 48
-; Folding = gAAAKKAw
+; CursorPosition = 29
+; Folding = AAAAAAA5
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

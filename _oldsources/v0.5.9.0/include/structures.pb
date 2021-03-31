@@ -192,7 +192,6 @@ Structure sOptions
   Name$
   Version$
   ModeAdvanced.a
-  UseRighmouseToPaint.a
   ConfirmAction.a
   
   DoScript.a ; 1 = save, 2 = run
@@ -238,9 +237,6 @@ Structure sOptions
   SwatchColumns.a
   SwatchNbColumns.a
   
-  ; pattern
-  PatternFile$
-  
   ; bordure
   BordureX.w
   BordureY.w
@@ -257,13 +253,6 @@ Structure sOptions
   ; color  
   selectColor.a ; what is the selector color used ?
   
-  
-  ; show/hide panel UI
-  ShowPanelToolparameters.a
-  ShowPanelColors.a
-  ShowPanelLayers.a
-  ShowPanelswatchs.a
-  ShowFullUI.a
   
   ; Tools options
   
@@ -321,6 +310,7 @@ Structure sOptions
   ; path et file
   PathSave$
   PathOpen$
+  ; FileBGcolor$
   
 EndStructure
 Global OptionsIE.sOptions
@@ -398,128 +388,95 @@ Structure Brush
   Image$
   Group$
   
-  ToolID.a ; the id of the tool, 
-  
-  
-  
   ; alpha
-  Alpha.a ; alpha of the BG color
-  AlphaOld.a
-  alphaMax.a
-  AlphaFG.a ; alpha of the Foreground color (use for gradient for example)
-  AlphaBlend.w
-  AlphaPressure.a ; pression with graphic tablet (wacom)
-  AlphaFactorVsTime.w
-  AlphaVsTime.w
-  AlphaRand.a ; random alpha
-  AlphaMin.a ; minimum alpha
+  Alpha.a : AlphaOld.a : alphaMax.a
+  AlphaFG.a : AlphaBlend.w
+  AlphaPressure.a
+  AlphaFactorVsTime.w : AlphaVsTime.w
+  AlphaRand.a : AlphaMin.a
   
   ; size
-  Size.w ; sise defined in the UI 
-  Sizepressure.a ; to know if we use the pressure or not of the tablet
-  SizeRand.w ; use random size
-  SizeW.w ; width of size
-  sizeH.w ; height of size
-  SizeRndFactor.w
-  SizeMin.w ; minimum size
-  SizeOld.w
-  SizeNew.w ; to see if the size has changed, if yes : I resize the image and set sizeOld = sizeNew.
-  FinalSize.w ; needed for some action with pressure tablet
+  Size.w 
+  Sizepressure.a : SizeRand.w
+  SizeW.w : sizeH.w
+  SizeRndFactor.w : SizeMin.w
+  SizeOld.w : SizeNew.w ; to see if the size has changed, if yes : I resize the image and set sizeOld = sizeNew.
+  FinalSize.w           ; needed for some action with pressure tablet
   
   
-  Transition.a ;  ???
+  Transition.a
   
   ; dynamics
-  Scatter.w ; the scatter of brush
-  ScatterMin.w ; the minimum scatter
+  Scatter.w : ScatterMin.w
   
-  Rotate.w ; the rotation 
-  RotateMin.w ; the minimum rotation
-  RandRot.w ; use random rotation
-  RotateByAngle.a ; use rotation by angle
-                   ; rotation can be cumulated; if we use randrot and rotatebyangle, we will have a random rotation by angle
+  Rotate.w : RotateMin.w
+  RandRot.w : RotateParAngle.a
   
   ; rendu
-  Hardness.a ; hardness of the brush (pixel dark are darker
-  Softness.a ; softness of the brush (pixel light are lighter)
-  Intensity.w
-  Smooth.a ; if we use image resized with "smooth" parameter
-  Trim.a ; if we "trim" the brush to not have border with alpha =0
+  Hardness.a : Softness.a
+  Intensity.w : Smooth.a
+  Trim.a
   
   ; stroke
-  Pas.w ; = the space between two dots
-  Trait.a ; If we use a "stroke"
-  StrokeTyp.a ; the type of line (rough, gersam...).
-  Stroke.a ; ???
+  Pas.w : Trait.a
+  StrokeTyp.a : Stroke.a
   
   
-  ; position and center
-  X.w
-  Y.w
-  W.w ; final width of the image after transform (<> sizeW)
-  H.w ; final height after tranform // taille final après transformation, ne pas confondre avec SizeW et SizeH
-  OldW.w ; 
-  OldH.w ; nécessaire pour vérifier si on doit resize le brush
+  ; position and size
+  X.w : Y.w
+  W.w : H.w ; taille final après transformation, ne pas confondre avec SizeW et SizeH
+  OldW.w : OldH.w ; nécessaire pour vérifier si on doit resize le brush
   
   ; Center
-  CenterX.w
-  CenterY.w
-  CenterSpriteX.w
-  CenterSpriteY.w
+  CenterX.w : CenterY.w
+  CenterSpriteX.w : CenterSpriteY.w
   
   ; colors
   Mix.w
-  MixType.a ; Type of mmix // le type de mélange : 1 = vers notre couleur à nouveau, 0= vers la couleur du fond
+  MixType.a ; le type de mélange : 1 = vers notre couleur à nouveau, 0= vers la couleur du fond
   MixFade.w ; pour le fade du mix
-  Visco.w ; viscosity of the color (the time to change to the new color)
-  ViscoCur.w
-  Water.a ; if we add some water (erase a few colors on the layer)
-  Wash.a ; is the brush washed when mouse UP ? to get the orginial color (color BG) // lave-t-on le brush chaque fois qu'on relève la souris (il reprend la couleur originale)
+  Visco.w : ViscoCur.w
+  Water.a
+  Wash.a ; lave-t-on le brush chaque fois qu'on relève la souris (il reprend la couleur originale)
   MixLayer.a
   
-  ; The colors, for mixtype =0 //  pour le mixtype = 0
+  ; pour le mixtype = 0
   Col.sColor
   ColorBG.sColor ; couleur qu'on a pris sur le couleur selector
   NewCol.sColor
   OldCol.sColor
-  ColTmp.sColor ; temporary color not used //couleur temporaire pas utilisé ?
+  ColTmp.sColor ; couleur temporaire pas utilisé ?
   
   ColRnd.sColor ; random color
   
-  ; Needed for mixtype= 1 // on garde, car je m'en sers pour le mixtype = 1
-  ColorOld.i ; fade to mix // pour le fade vers le mix
-  ColorNext.i ; fade to mix // pour le fade vers le mix
+  ;on garde, car je m'en sers pour le mixtype = 1
+  ColorOld.i ; pour le fade vers le mix
+  ColorNext.i; pour le fade vers le mix
   Color.i
-  ColorQ.i ; temporary color with mixing // couleur temporaire, avec mixing
+  ColorQ.i ; couleur temporaire, avec mixing
   Randcolor.w
   
   ColorFG.i
   
   
-  ; other parameters // autres paramètres
-  symetry.a ; if we use symetry
+  ; autres paramètres
+  symetry.a
   Filter.a
   
   
   ; les actions et type d'outil
-  Tool.a ; the type of tool // si brush = pinceau =>
+  Tool.a ; si brush = pinceau =>
          ; Action.a ; on peint, on déplace un calque, etc...
   
   
-  ; image used bu brush (paint) // l'image utilisé pour le brush
+  ; l'image utilisé pour le brush
   BrushNum.w    ; le numéro du brush utilisé dans le dossier "data\brush..."
   BrushNumMax.w ; le nombre max de brush dans le dossier "data\brush..."
   BrushDir$     ; directory des brush
   BrushForm.a   ; circle, square
   
-  KeepAlpha.a ; if =1, we paint with drawingmode clipalpha.
+  KeepAlpha.a
   
-  ; tools extra parameters
-  ; lock the position
-  LockX.a 
-  LockY.a
-  ; use the proportion (box, ellipse...)
-  Proportion.a
   
   
   ; Spray
@@ -584,14 +541,6 @@ EndWith
 
 
 ;}
-
-; pattern
-Structure sPattern
-  name$
-  img.i ; the image on the canvas ?
-EndStructure
-Global Dim Pattern.sPattern(0)
-
 
 
 ; color, swatch
@@ -821,9 +770,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 194
-; FirstLine = 41
-; Folding = AKAAAgw
-; Markers = 380
+; CursorPosition = 312
+; FirstLine = 87
+; Folding = ACAAAQ5
+; Markers = 370
 ; EnableXP
 ; EnableUnicode

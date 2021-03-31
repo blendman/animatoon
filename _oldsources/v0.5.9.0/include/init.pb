@@ -24,9 +24,7 @@ LoadImage2(#ico_loop,  OptionsIE\Theme$ +"\icones\loop.png")
 
 
 If LoadImage(#Img_Checker,  "data/paper/checker1.png") = 0
-  
   MessageRequester(lang("Error"), Lang("Unable to load the paper0.png"))
-  
   If CreateImage(#Img_Checker, 64, 64) = 0
     MessageRequester(lang("Error"), Lang("Unable to create the image checker"))
   EndIf
@@ -70,18 +68,18 @@ LoadImage2(#ico_IE_Text,       OptionsIE\Theme$ +"\icones\text.png")
 
 
 ; layer icones
-LoadImage2(#ico_LayerView,     OptionsIE\Theme$ +"\icones\view.png")
-LoadImage2(#ico_LayerLocked,   OptionsIE\Theme$ +"\icones\locked.png")
-LoadImage2(#ico_LayerLockAlpha,OptionsIE\Theme$ +"\icones\lockAlpha.png")
-LoadImage2(#ico_LayerLockMove, OptionsIE\Theme$ +"\icones\lockMove.png")
-LoadImage2(#ico_LayerLockPaint,OptionsIE\Theme$ +"\icones\lockPaint.png")
-LoadImage2(#ico_LayerUp,       OptionsIE\Theme$ +"\icones\up.png")
-LoadImage2(#ico_LayerDown,     OptionsIE\Theme$ +"\icones\down.png")
-LoadImage2(#ico_LayerMask,     OptionsIE\Theme$ +"\layerbtn3.jpg")
+LoadImage(#ico_LayerView,     OptionsIE\Theme$ +"\icones\view.png")
+LoadImage(#ico_LayerLocked,   OptionsIE\Theme$ +"\icones\locked.png")
+LoadImage(#ico_LayerLockAlpha,OptionsIE\Theme$ +"\icones\lockAlpha.png")
+LoadImage(#ico_LayerLockMove, OptionsIE\Theme$ +"\icones\lockMove.png")
+LoadImage(#ico_LayerLockPaint,OptionsIE\Theme$ +"\icones\lockPaint.png")
+LoadImage(#ico_LayerUp,       OptionsIE\Theme$ +"\icones\up.png")
+LoadImage(#ico_LayerDown,     OptionsIE\Theme$ +"\icones\down.png")
+LoadImage(#ico_LayerMask,     OptionsIE\Theme$ +"\layerbtn3.jpg")
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 79
-; FirstLine = 50
+; CursorPosition = 21
+; FirstLine = 4
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

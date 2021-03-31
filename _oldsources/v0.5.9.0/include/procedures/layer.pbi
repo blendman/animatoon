@@ -1,271 +1,5 @@
 ﻿
-
-; Utilitaires (grid, marker,repere...)
-Macro UpdateGrid()
-  ;z.d = OptionsIE\zoom * 0.01
-  
-  If StartDrawing(SpriteOutput(#Sp_Grid))
-    DrawingMode(#PB_2DDrawing_AlphaChannel)
-    Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-    
-    
-    DrawingMode(#PB_2DDrawing_AlphaBlend)  
-    
-    u.d = (doc\w/OptionsIE\gridW);/(doc\zoom/100)
-    v.d = (doc\h/OptionsIE\gridH);/(doc\zoom/100)
-                                 ; MessageRequester("",Str(u) + "/"+Str(v) + "/"+Str(OptionsIE\gridW))
-    c = OptionsIE\gridColor
-    col = RGBA(Red(c),Green(c),Blue(c),255)
-    For i = 0 To u
-      For j = 0 To v
-        Line(i * OptionsIE\gridW   ,0,1,doc\h ,col)
-        Line(0,j * OptionsIE\gridH  , doc\w ,1,col)
-      Next j
-    Next i  
-    StopDrawing()
-  EndIf 
-EndMacro
-Macro CreateGrid()
-  
-  ; to create the gris
-  FreeSprite2(#Sp_Grid)
-  
-  If CreateSprite(#Sp_Grid,doc\w,doc\h,#PB_Sprite_AlphaBlending) 
-    UpdateGrid()
-  EndIf
-EndMacro
-
-
-; paper
-
-Procedure IE_UpdatePaperList()
-  
-  ; to update the list of paper
-  size =0
-  If ExamineDirectory(0, GetCurrentDirectory() + "data\paper\", "*.*")  
-    
-    While NextDirectoryEntry(0)
-      
-      If DirectoryEntryType(0) = #PB_DirectoryEntry_File
-        
-        Name$ = DirectoryEntryName(0)
-        AddGadgetItem(#G_ListPaper, -1, Name$)
-        
-        ReDim Thepaper(size)
-        Thepaper(size)\name$ = Name$
-        size = ArraySize(Thepaper())+1
-      EndIf
-      
-    Wend
-    FinishDirectory(0)
-    
-  EndIf
-  
-EndProcedure
-Procedure PaperDraw()
-  
-  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
-  z.d = OptionsIE\zoom*0.01
-  
-  ; draw the color of the background
-  ZoomSprite(#Sp_PaperColor,doc\w*z,doc\h*z)
-  DisplayTransparentSprite(#Sp_PaperColor,CanvasX,CanvasY, 255)
-  
-  ;   draw the paper
-  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha) ; multiply
-  ZoomSprite(#Sp_Paper,doc\w*z,doc\h*z)
-  DisplayTransparentSprite(#Sp_Paper,CanvasX,CanvasY, paper\alpha)
-  
-EndProcedure
-Procedure PaperUpdate(load=0)
-  
-  
-  ; if we load a new image for the background
-  If load >= 1    
-    
-    If LoadImage(#Img_Paper, GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)
-      
-      If load = 1
-        
-        If IsGadget(#G_paperScale)
-          SetGadgetState(#G_paperScale, 10)
-        EndIf
-        
-        If IsSprite(#Sp_Paper)
-          FreeSprite(#Sp_Paper)
-        EndIf
-        If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending) = 0
-          MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
-        EndIf
-         
-       EndIf
-       
-     EndIf
-     
-  EndIf
-  
-  ; define some variable
-  z.d = 1 ; OptionsIE\zoom*0.01
-  scale.d = 1
-  
-  ; than change the image on the sprite.
-  If IsGadget(#G_paperScale)
-    
-    If paper\scale <1
-      paper\scale = GetGadgetState(#G_paperScale)
-    EndIf
-    
-    scale = paper\scale
-    scale = scale /10
-    ;   Else
-    ;     Debug "paperscale gadget pas ok"
-  EndIf
-  ;    Debug "paperscale "+StrD(scale)
-  
-  
-  ; <------- attention : need to check if scale isn't too large or not enough large
-  
-  
-  
-  ; create a tempImage for paper.
-  tempImgPaper = CopyImage(#Img_Paper, #PB_Any)
-  
-  w = ImageWidth(#Img_Paper)
-  h = ImageHeight(#Img_Paper)
-  w1.d= ImageWidth(#Img_Paper) * scale
-  h1.d = ImageHeight(#Img_Paper) * scale
-  If w1 > 5000
-    w1= 5000
-  EndIf
-  If h1 > 5000
-    h1= 5000
-  EndIf
-  
-  If IsImage(tempImgPaper)
-    
-    ; resize the image 
-    ResizeImage(tempImgPaper, w1, h1)
-    ; tempImgPaper = UnPreMultiplyAlpha(tempImgPaper) ; not need because image has no alpha chanel ^^, it's a bacground.
-    w = ImageWidth(tempImgPaper)
-    h = ImageHeight(tempImgPaper)
-    
-;      MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
-    
-    ; update the color of the BG
-    If StartDrawing(SpriteOutput(#Sp_PaperColor))
-      Box(0, 0, OutputWidth(), OutputHeight(), paper\color) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
-      StopDrawing()
-    EndIf
-    
-    
-    ; draw on the sprite the new background
-    If StartDrawing(SpriteOutput(#Sp_Paper))
-      
-      ; DrawingMode(#PB_2DDrawing_Default)
-      
-      ; Box(0, 0, SpriteWidth(#Sp_Paper), SpriteHeight(#Sp_Paper), RGBA(255, 255, 255, 255))
-      
-      DrawingMode(#PB_2DDrawing_AlphaBlend )
-      
-      For i=0 To (doc\w/w)*z +1
-        
-        
-        For j = 0 To (doc\h/h)*z +1
-          ; ZoomSprite(#Sp_Paper,w*z,h*z)
-          ; DisplaySprite(#Sp_Paper,i*w*z+canvasX,j*h*z+canvasY)
-          
-          ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
-          DrawImage(ImageID(tempImgPaper),i*w,j*h)
-          
-        Next j 
-        
-        
-      Next i       
-      
-      StopDrawing()
-      
-    EndIf
-    
-    ; delete tempImage
-    FreeImage(tempImgPaper)
-    
-  EndIf
-
-
-EndProcedure
-Procedure PaperCreate(delete=0)
-  
-  ; to create the papaer sprite
-  If IsImage(#img_paper)
-    
-    ; need to recreate the sprite (if we change
-    If delete =1
-      If IsSprite(#Sp_Paper)
-        FreeSprite(#Sp_Paper)
-      EndIf
-    EndIf
-    
-    If CreateSprite(#Sp_Paper, doc\w, doc\h, #PB_Sprite_AlphaBlending)
-      ;       If StartDrawing(SpriteOutput(#Sp_Paper))
-      ;         DrawImage(ImageID(#Img_Paper),0,0)
-      ;         StopDrawing()
-      ;       EndIf      
-      PaperUpdate() 
-    Else
-      MessageRequester(Lang("error"), Lang("Unable to create paper (sprite)"))
-    EndIf
-    
-  EndIf
-  
-EndProcedure
-Procedure PaperInit(load=1)
-  
-  If load=1
-    If LoadImage(#Img_Paper,GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)=0
-      MessageRequester(lang("Error"), lang("Unable to load the image paper"))
-      OptionsIE\Paper$ = "paper0.png"
-      If LoadImage(#Img_Paper,GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)=0
-        If CreateImage(#img_paper, 64, 64) = 0
-          MessageRequester(lang("Error"), lang("Unable to create the image paper"))
-        Else
-          If StartDrawing(ImageOutput(#img_paper))
-          EndIf
-          
-        EndIf
-        
-      EndIf
-    EndIf
-  EndIf
-  
-  ; create the color background
-  If Not IsSprite(#Sp_PaperColor)
-    If CreateSprite(#Sp_PaperColor, doc\w,doc\h, #PB_Sprite_AlphaBlending)
-      If StartDrawing(SpriteOutput(#Sp_PaperColor))
-        Box(0,0, OutputWidth(), OutputHeight(), RGBA(255,255,255,255))
-        StopDrawing()
-      EndIf    
-    EndIf
-  EndIf
-  
-;   ; create the paper
-;   PaperCreate()
-;   
-;   ; Create a temporary layer/sprite, for temporary operation (selection, box, circle...)
-;   ; puis, je crée le layertempo, un sprite pour les opérations comme sélection, box, cercle, gradient, etc...
-;   CreateLayertempo()
-  
-  ; create the paper and layertemporary
-  RecreateLayerUtilities()
-  
-  
-  ; then create the grid
-  CreateGrid()
-  
-EndProcedure
-; WindowBackgroundEditor() : see include\procedures\window.pbi
-
-
-
+; Paper: see gadgets.pbi
 
 ; others sprite/image thant the layer, but drawn on the screen/canvas (sprite temporary, paper...)
 Procedure CreateLayertempo_()
@@ -292,20 +26,19 @@ Procedure RecreateLayerUtilities()
   CreateLayertempo_()
   
   ; recreate the paper
-  PaperUpdate(1) 
+  PaperUpdate(1) ; in gadgets.pbi
   
   ; recreate the grid ?
-  CreateGrid() 
   
   ; and other sprite ??
   
 EndProcedure
+; paper : see gadget.pbi
 
 
 
-; to draw the image of layer (normal og "background repeated layer")
+
 Macro Layer_DrawImg(u,alpha)
-  
   If layer(u)\Typ = #Layer_TypBG
     For i=0 To layer(u)\w / layer(u)\W_Repeat 
       For j =0 To layer(u)\h / layer(u)\H_Repeat 
@@ -315,7 +48,6 @@ Macro Layer_DrawImg(u,alpha)
   Else
     DrawAlphaImage(ImageID(layer(u)\image),0,0,alpha)
   EndIf  
-  
 EndMacro
 
 
@@ -386,16 +118,15 @@ Procedure Layer_ConvertToBm(i)
     
     ; d'abord, on doit ajouter une box de la couleur nécessaire, pour certain BM
     ;Select Layer(i)\bm
+        
+        ;Case #Bm_Darken
+        ;Box(0,0,doc\w,doc\h,RGB(255,255,255))
+        
+        ;       Case 
+        
+   ; EndSelect
     
-    ;Case #Bm_Darken
-    ;Box(0,0,doc\w,doc\h,RGB(255,255,255))
     
-    ;       Case 
-    
-    ; EndSelect
-    
-    ; erase the image
-    Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
     
     ; For the alpha mask // puis pour le mask alpha
     If layer(layerid)\MaskAlpha =1
@@ -412,9 +143,7 @@ Procedure Layer_ConvertToBm(i)
     
     ;  DrawingMode(#PB_2DDrawing_AlphaBlend)
     DrawAlphaImage(ImageID(layer(i)\Image),0,0)    
-    
     StopDrawing()    
-    
   EndIf
   
 EndProcedure
@@ -1250,20 +979,17 @@ Procedure Layer_Merge(mode=0)
    Else
      
     ; ok, we have enough layers to merge.
-    If mode = 0 ; Only Two layers (from top to bottom) // seulement 2 layer vers le bas
+    If mode = 0 ; Only Two layers (from top to bottom) :: seulement 2 layer vers le bas
       
       
-;       For i =0 To ArraySize(layer())
-;         If i = layerId Or i = layerId-1
-;           Debug "Calque N° "+Str(i)
-;         EndIf
-;       Next
+      For i =0 To ArraySize(layer())
+        If i = layerId Or i = layerId-1
+          Debug "Calque N° "+Str(i)
+        EndIf
+      Next
       
       ; check if 2 layer are viewed
-      If layerid = 0 
-        MessageRequester(lang("Error"), lang("Can't merge a layer at the bottom of the layer list."))
-        
-      ElseIf layer(layerId)\view = 0 Or layer(layerId-1)\view = 0 
+      If layer(layerId)\view = 0 Or layer(layerId-1)\view = 0 
         
         MessageRequester(lang("Error"), lang("Your layers must be seen before to merge them."))
         
@@ -1339,7 +1065,6 @@ Procedure Layer_Merge(mode=0)
 
       
     EndIf
-    
   EndIf
   
 EndProcedure
@@ -1623,35 +1348,7 @@ Procedure Layer_TransformToLine()
   ScreenUpdate()
   
 EndProcedure
-Procedure Layer_AddBGToalpha()
-  
-  ; To add a background (color, pattern...) To the alpha of our layer
-  
-  temp = CopyImage(layer(layerid)\Image, #PB_Any)
-  
-  If IsImage(temp)
-    If StartDrawing(ImageOutput(layer(layerid)\Image))
-      
-      DrawingMode(#PB_2DDrawing_AllChannels)
-      Box (0, 0, OutputWidth(), OutputHeight(), RGBA(Red(brush(action)\Color), Green(brush(action)\color), Blue(brush(action)\color), brush(action)\alpha))
-      
-      DrawingMode(#PB_2DDrawing_AlphaBlend)
-      DrawImage(ImageID(temp), 0,0)
-      
-      StopDrawing()
-    EndIf
-  EndIf
-  
-  ; free image temp
-  
-  freeimage2(temp)
-  
-  ; then update 
-  NewPainting = 1
-  ScreenUpdate()
-  
-  
-EndProcedure
+
 
 ; temporary layer
 Procedure Layer_DrawTempo()
@@ -1702,17 +1399,13 @@ Procedure Layer_SelectAlpha()
   
 EndProcedure
 
-
-
-
-
-
 ; windows
 ; window properties for layer (windowprop) : see window.pbi
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 71
-; Folding = gAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+
+; CursorPosition = 28
+; FirstLine = 3
+; Folding = RAAAAAAAAAAAAAAAAAAAAAAA-
 ; EnableXP
 ; EnableUnicode

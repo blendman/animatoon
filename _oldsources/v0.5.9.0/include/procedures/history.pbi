@@ -5,7 +5,7 @@
 ; date : 01/07/2015
 ; modified : 02/07/2015
 
-; not finished at all ^^
+
 
 ; Scripts (actions)
 
@@ -34,8 +34,6 @@ Procedure SaveScript(Event)
       
       If EventMenu() <> #Menu_ActionStop And EventMenu() <>#Menu_ActionRun And EventMenu() <>#Menu_ActionSave
         
-        Debug EventType()
-        
         n = ArraySize(Script(Nscript)\Event())
         
         Debug "on ajoute 1 event "+Str(n)
@@ -51,11 +49,10 @@ Procedure SaveScript(Event)
           Case  #PB_Event_Gadget
             id = EventGadget()
             Debug "on a utilisé le gadget "+Str(id)
-            
-        EndSelect 
-        
+        EndSelect  
         Script(Nscript)\Event(n)\id = id
         ReDim Script(Nscript)\Event(n+1)
+        
         
       EndIf
       
@@ -104,7 +101,7 @@ EndProcedure
 Procedure SaveHistory(event)
   
 EndProcedure
-Procedure UndoHistory(event, sens=1)
+Procedure UndoHistory(event,sens=1)
   
 EndProcedure
 
@@ -137,8 +134,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 37
-; FirstLine = 12
-; Folding = +B5
+; CursorPosition = 6
+; FirstLine = 1
+; Folding = AA5
 ; EnableXP
 ; EnableUnicode

@@ -251,18 +251,16 @@ Procedure WindowPref()
   
   Shared animBarre.a
   
-  winW = 700
-  winH = 400
-  If OpenWindow(#Win_Pref, 0, 0, winw, winH, Lang("Preferences"), #PB_Window_ScreenCentered|#PB_Window_SystemMenu)
+  If OpenWindow(#Win_Pref,0,0,400,300,Lang("Preferences"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu)
     
-    If PanelGadget(#G_PrefPanel, 5, 5, winW-10, winH-10)
+    If PanelGadget(#G_PrefPanel,5,5,390,290)
       
       ;{ General
-      AddGadgetItem(#G_PrefPanel, 0, lang("General"))
+      AddGadgetItem(#G_PrefPanel,0,lang("General"))
       
-      FrameGadget(#G_Frame_Lang, 5, 5, 100, 40, lang("Langage")) : y1 = 20
+      FrameGadget(#G_Frame_Lang,5,5,100,40,lang("Langage"))
       
-      ComboBoxGadget(#G_Cob_Lang, 15, y1, 80, 20) : y1+35
+      ComboBoxGadget(#G_Cob_Lang,15,20,80,20)
       
       Directory$ = "data\Lang\"   
       If ExamineDirectory(0, Directory$, "*.ini")  
@@ -277,12 +275,7 @@ Procedure WindowPref()
         Wend
         FinishDirectory(0)
       EndIf
-      SetGadgetState(#G_Cob_Lang, pos)
-      
-      text$ = Lang("Use right button to paint")
-      CheckBoxGadget(#G_pref_UseRightbutonTopaint, 10, y1, Len(text$)*8, 20, text$) : y1+20
-      SetGadgetState(#G_pref_UseRightbutonTopaint, OptionsIE\UseRighmouseToPaint)
-      
+      SetGadgetState(#G_Cob_Lang,pos)
       ;}
       
       ;{ Grille
@@ -297,105 +290,30 @@ Procedure WindowPref()
       
       ;{ Preset
       AddGadgetItem(#G_PrefPanel,-1,lang("Brush Preset"))
-      text$ = Lang("Save Color Brush")
-      CheckBoxGadget(#G_BrushPreset_Save_color, 10, 10, Len(text$)*8, 20, text$)
+      CheckBoxGadget(#G_BrushPreset_Save_color,10,10,Len(Lang("SaveColorBrush"))*6,20,Lang("SaveColorBrush"))
       ;}
       
       ;{ Animation
+      AddGadgetItem(#G_PrefPanel,-1,Lang("Animation"))
       
-      ; keep for the futur version with animation :)
+      ComboBoxGadget(#G_WAnim_CoBFrameTimeline,10,10,80,20)
+      AddGadgetItem(#G_WAnim_CoBFrameTimeline,-1,lang("Frame"))
+      AddGadgetItem(#G_WAnim_CoBFrameTimeline,-1,lang("Seconde"))
+      SetGadgetState(#G_WAnim_CoBFrameTimeline,0)
       
-      ;       AddGadgetItem(#G_PrefPanel,-1,Lang("Animation"))
-      ;       
-      ;       ComboBoxGadget(#G_WAnim_CoBFrameTimeline,10,10,80,20)
-      ;       AddGadgetItem(#G_WAnim_CoBFrameTimeline,-1,lang("Frame"))
-      ;       AddGadgetItem(#G_WAnim_CoBFrameTimeline,-1,lang("Seconde"))
-      ;       SetGadgetState(#G_WAnim_CoBFrameTimeline,0)
-      ;       
-      ;       ComboBoxGadget(#G_WAnim_CBTimelineBar, 10,40,80,20)
-      ;       AddGadgetItem(#G_WAnim_CBTimelineBar,-1,lang("Barre"))
-      ;       AddGadgetItem(#G_WAnim_CBTimelineBar,-1,lang("Line"))
-      ;       SetGadgetState(#G_WAnim_CBTimelineBar,animBarre)
-      ;       
-      ;       SpinGadget(#G_WPref_SizeFrame,10,80,30,20,4,24,#PB_Spin_Numeric)
-      ;       SetGadgetState(#G_WPref_SizeFrame,OptionsIE\SizeFrameW)
+      ComboBoxGadget(#G_WAnim_CBTimelineBar, 10,40,80,20)
+      AddGadgetItem(#G_WAnim_CBTimelineBar,-1,lang("Barre"))
+      AddGadgetItem(#G_WAnim_CBTimelineBar,-1,lang("Line"))
+      SetGadgetState(#G_WAnim_CBTimelineBar,animBarre)
+      
+      SpinGadget(#G_WPref_SizeFrame,10,80,30,20,4,24,#PB_Spin_Numeric)
+      SetGadgetState(#G_WPref_SizeFrame,OptionsIE\SizeFrameW)
       
       ;}
       
       
       CloseGadgetList()      
-      
     EndIf
-    
-    Repeat
-      
-      Event = WindowEvent()
-      EventGadget = EventGadget()
-      
-      Select event
-          
-        Case #PB_Event_Gadget
-          
-          gad = 0
-          
-          Select EventGadget
-              
-            Case #G_Cob_Lang
-              lang$ = GetGadgetText(#G_Cob_Lang)
-              If lang$ <>  OptionsIE\lang$
-                SaveOptions()
-                UpdateLanguageUI() 
-                
-                ; temporary message
-                ; I have to update all the gadgets with the new langage
-                MessageRequester(lang("Infos"), Lang("you need to restart Animatoon to see the changes of langage for gadgets"))
-              EndIf
-              ; in Menu.pbi
-              ; OpenLang()
-              ; AddMenuMain()
-              
-            Case #G_GridW              
-              OptionsIE\gridW = GetGadgetState(#G_GridW)
-              ScreenUpdate()
-              
-            Case #G_GridH
-              OptionsIE\gridH = GetGadgetState(#G_GridH)
-              ScreenUpdate()
-              
-            Case #G_GridColor
-              OptionsIE\GridColor = ColorRequester(OptionsIE\gridColor)
-              ScreenUpdate()
-              
-            Case #G_pref_UseRightbutonTopaint
-              OptionsIE\UseRighmouseToPaint = GetGadgetState(eventgadget)
-              SaveOptions()
-              
-            Case #G_BrushPreset_Save_color                  
-              ;OptionsIE\brushPresetsavecolor = GetGadgetState(#G_BrushPreset_Save_color)
-              
-              ; animation
-            Case #G_WAnim_CBTimelineBar
-              OptionsIE\AnimBarre = GetGadgetState(#G_WAnim_CBTimelineBar)
-              ;UpdateTimeLine()
-              
-              
-            Case #G_WPref_SizeFrame
-              OptionsIE\SizeFrameW = GetGadgetState(#G_WPref_SizeFrame)
-              ;AddTimeLine(WindowWidth(#WinMain))                
-              ;UpdateTimeLine()
-              
-          EndSelect          
-          
-             
-        Case #PB_Event_CloseWindow
-          quit = 1
-          
-      EndSelect
-      
-      
-    Until quit = 1
-    
-    CloseWindow(#Win_Pref)
     
   EndIf
   
@@ -424,7 +342,6 @@ Macro WinLayerPropCont(newtyp)
       FreeGadget(cont)
     EndIf
     
-    ; create again the container and its gadgets
     xx = 160 : yy = 5
     www = w1-GadgetWidth(canvas)-GadgetWidth(btnok)-30
     hhh = h1-50
@@ -810,12 +727,9 @@ Procedure WindowBackgroundEditor()
           
           ; then draw the paper image.
           nb = ArraySize(Thepaper())
-          
           For i = 0 To ArraySize(Thepaper())
-            
             tempImg = LoadImage(#PB_Any, paperpath$ + Thepaper(i)\name$)
             ResizeImage(tempImg, w2-5, w2-5)
-            
             x = Mod(i, Round(wcanvas/w2, #PB_Round_Down))*w2
             y = (i/(wcanvas/w2))*w2
             DrawImage(ImageID(tempImg), x, y)
@@ -828,12 +742,11 @@ Procedure WindowBackgroundEditor()
             ; draw the name of the image
             DrawingMode(#PB_2DDrawing_Transparent)
             DrawText(x+10, y1, Thepaper(i)\name$, RGB(255,255,255))
-            
-            FreeImage(tempImg)
           Next
           
           StopDrawing()
         EndIf
+        FreeImage(tempImg)
         
       EndIf
       CloseGadgetList()
@@ -1208,8 +1121,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 282
-; FirstLine = 32
-; Folding = AwftAAAAAAAAAA+
+; CursorPosition = 706
+; FirstLine = 180
+; Folding = 1JAQM--4z3ZY+-
 ; EnableXP
 ; EnableUnicode
