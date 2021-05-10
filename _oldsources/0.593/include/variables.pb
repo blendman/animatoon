@@ -1,11 +1,8 @@
 ﻿
 ;-- variables
-Global ScreenX.w, ScreenY.w, NewPainting.a, ScreenResized.a
-
-Global CanvasX.w, CanvasY.w, OldCanvasX.w, OldCanvasY.w, CanvasW.w, CanvasH.w, CanvasHasChanged.a 
+Global ScreenX.w, ScreenY.w, NewPainting.a, CanvasX.w, CanvasY.w, OldCanvasX.w, OldCanvasY.w, CanvasW.w, CanvasH.w, ScreenResized
 ; canvasX, canvasY : position of the canvas (and the layers, grid...)
 ; OldCanvasX, OldCanvasY : old position of canvas, need for zoom and pan.
-; CanvasHasChanged : if we have paint or do a modification on canvas (if optionsie\usecanvas =1)
 ; NewPainting : needed to know if we have paint again, after moving the canvas for example.
 
 ; position nof the container-screen
@@ -30,7 +27,7 @@ Global NewList Pakets.PACKET()
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 7
+; CursorPosition = 3
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

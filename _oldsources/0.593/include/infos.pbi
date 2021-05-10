@@ -18,18 +18,21 @@
 
 ;{ ************************* CHANGELOG ********************************
 
-;-- 1. PRIORITY // priorité
+;-- 1. PRIORITY// priorité
 
-
-; OPTIMISATIONS
-; - I need to modify how to work the painting and rendering system, which use too much stardrawing/stopdrawing (with screen/sprite).
-; - add the system from drawing_optimised (for canvas : paint on small image for preview or in image at the size of the rendering surface when zoomed)
-; - add the system from "paintoon.pb" (brush with space)
+; BUGS
+; - bug when hide/show panel -> canvas is moved on the left
+; - gradient linear AR
+; - bug UI when next opening if we move the splitters // à l'ouverture suivante, quand on déplace les splitters en Y (swatch par exemple)
+; - Bug with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
+; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
+; - bug with shape (when use shape (box, circle), I should use the position on the zoomed sprite, Not the zoomed position on the sprite Not zoomed)
+; - color with water : isn't seen in real time if layer bm <> normal
 
 
 ; PRIORITY (new & changes)
 ; - brush "blending point" alpha et size // brush : fondu entre les points 'size, alpha)
-; - Roughboard : should work like the "main canvas" ? (painting with mouse, and pick with alt+mouse).
+; - Roughboard : should work like the "main canvas" ? (painting with mouse, and pick with ctrl+mouse).
 
 
 ; NOT PRIORITY
@@ -54,20 +57,22 @@
 ; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY  and IE_Options\confirmaction....
 
 ; PAPER
-; WIp - paper scale : ok when change trackbar paperScale
+; - AR !!!! paper scale : ok when change trackbar paperScale
 
 ; IMAGES
 ; - Level is'nt good // niveau ne fonctionne pas très bien, voir en temps réel et mettre plus d'info sur les trackbar (on ne sait pas ce que c'est)
 
 ; SELECTIONS
-; - add type : polygon, lasso, painting
+; - add type : rectangle (defaut), ellipse, polygon, lasso, painting
 ; - save selections and name it (save image or array of color+alpha)
-; - add option For tool : keep proportions, fixed size (rectangle, circle), position (x/y) and size
+; - add option For tool : keep proportions, fixed size (rectangle, circle)
 ; - add selection to the current selection, substract selection  
 
 ; LAYERS
-; - better blendmode with sprite (seems not possible, don't have shader on sprite with pb, try openGL ?) : darken, linearlight, overlay (??)
+; - better blendmode with sprite (seems not possible, don't have shader on sprite with pb, try openGL ?): darken, linearlight, overlay (??)
 
+; SCREEN/CANVAS
+; - add a canvas for the preview (we have the choice : use a screen+sprite or a canvas+image) // ajouter un canvas output pour l'affichage sur canvas au lieu du screen (au choix) pour le preview et export.
 
 ; INTERFACE (gadget, menu..)
 ; - add mode advanced (current UI) and simple mode (just a simple tool panel + color)
@@ -79,7 +84,7 @@
 ; nbre d'heure, nbre de jour, dernier jour ouvert, Nbre de documents créés.
 
 
-;-- CHANGE todo
+;-- CHANGELOG
 
 ; - brush : when use a sizewidth or height < 20px, brush has black border. -> create new image (square) With image resized drawn on it, use it As brush.
 ; - WIP  new tool stamp (use pattern or copie a part of our image)
@@ -87,252 +92,11 @@
 ; - wip : new drawing type "clean" (see my example in branch "paintclean.pb")
 ; - change panel layer : butons should be resized (position) when move splitters, scrollarea height smaller
 
-
-; BUGS
-; - bug when hide/show panel -> canvas/screen is moved on the left
-; - gradient linear AR
-; - bug UI when next opening if we move the splitters // à l'ouverture suivante, quand on déplace les splitters en Y (swatch par exemple)
-; - Bug with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
-; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
-; - color with water : isn't seen in real time if layer bm <> normal
-; - Fill : bug PB with border in rgb(0,0,0)              
-; - bug shape circle with outline > 2 (pixel alpha = 0 in outline)
-; - shape : line preview when drawing isn't the same as the final line for line size > 3 (blue border ?)
-; wip - stamp tool : when paint on layer, use the pattern selected to paint.
-; - center the view bug when UI panel (right or left) is hiden
-; - reset the view bug when UI panel (right or left) is hiden
-; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
-
-; CANVAS
-; - add the zoom
-; - add other blendmode
-; - add blendmode from wilbert code (asm)
-
-; optimisations (canvas) :
-; ok - clipoutput (canvas) : tests ok : pas vraiment de différent (gain 1 fps)
-; - copy zone affichée : gain 6fps -> 14fps (layer multiply)
-; ok, mais non - clipsprite (screen) : tests ok, mais ça n'apporte rien niveau optimisation 
-
-
-
-
-; 05/05/2021  0.5.9.6.2
-;// Fixes
-; - When add more than 8 layers, the canvas-layer height should be changed.
-; - preference : the autosatime can't be > 1.
-
-
-; 28/04/2021  0.5.9.6
-; // New
-; - brush editor window : add panel (images, size, alpha, dynamics, colors), add some gadgets (add random noise (+min, max))
-; // Changes
-; - change fillarea : can fill area with or without alpha channel (rest a bug with black color as shape).
-; // Fixes
-; - some little bugfixes
-
-
-; 27/04/2021  0.5.9.5.6
-; // Changes
-; - delete the paper image to gain memory.
-; // Fixes
-; - Doc_Open() : fix some bugs hhen open an image (instead of a document .ani)
-
-
-; 25/04/2021  0.5.9.5.5
-; // Changes
-; - sprite paper color is now 10x10 instead of document size (because only a colored box).
-
-
-; 24/04/2021  0.5.9.5.4
-; // Fixes
-; - when change rendering system : bug with some image layers
-; - checker isn't drawn on layer image
-
-
-; 23/04/2021  0.5.9.5.3
-; // New
-; - add Canvas_CreateImageMiniForMove(), canvasdraw()
-; // changes
-; - Movecanvas : now, if optionsie\usecavans =1 : use a "mini" image (all visible layers merged on this mini image)
-; - replace CanvasMain_Update() by canvasupdate() (with new addition (chef if usecanvas, update the canvasmini image)
-; - paper : only create paper sprite if we use the screen as preview system
-; - layer : when clear, layer()\haschanged = 0 now, to not save an empty layer (with autosave)
-; - add PaperCreate(), PaperUpdate(1) and setbm to sprite when change rendering system from canvas to screen
-; // fixes
-; - when export image, the sprites with multiply bm get a black background instead of a white bg
-; - when change rendering system in preference window,  sprites (bm multiply) get a black background instead of a white bg
-
-
-; 22/04/2021  0.5.9.5.2
-; // changes
-; - when export image, Layer_UpdateForRenderingSystem()
-; - Layer_UpdateForRenderingSystem() : add free sprite/image of paper
-; - new document : free all the sprite (event the paper sprite ) or image, depending of the rendering system used
-; - new document : add reset zoom, canvas position
-; // Fixes
-; - export image : when usecanvas= 1, crash because no sprite to make the rendering on the screen. -> change export : if usecanvas, no screen export.
-; - fix a bug in Layer_ConvertToBm() (use layerId as id, instead of i)
-
-
-; 21/04/2021  0.5.9.5.1
-; // New
-; - Window preference : add gadgets for : autosave, autosavetime, theme
-; // Changes
-; - when change rendering system : if use canvas : delete the sprite, if use screen : recreate the sprite, and delete some images for canvas (paper repeted)
-; - add window infos when : opendoc, savedoc.
-; - opendoc optimisation (no more copy image loaded, directly use it)
-
-
-
-; 20/04/2021  0.5.9.5
-; // Changes
-; - Big optimisations : delete unused images. On big document (3500x2500pixels, with 6 layers, I get from 1,5Go ram to 500mo ram)
-; - change and improve a lot the gadget layerListcanvas (layerList)
-; - now, when layer_add(), I dont' create all the image, only layer()\image (not imagetemp, imageBm, etc..) to gain memory and ram.
-; - autosave : add text on autosavewindow when save a layer (layer()\name$)
-; - autosave : after opendoc() save only if layer has changed
-; - change ScreenUpdate() : by default updateCanvas = 0 and no more layer(layerID)\haschanged = 1
-; - shape : only create layertempo_ if use toolwhich use this sprite.
-; - delete layertempo_ when not used
-; - create #Img_PaperForMainCanvas only if optionsIE\usecanvas =1
-; // fixes
-; - autosave : only save the changed image.
-
-
-; 14 -> 20.4.2021 : work on animatoon test brush editor and optimisations.
-
-
-; 14/04/2021  0.5.9.4.1
-; // New
-; // Changes
-; - OptionsIE : add OpenDocPatternPos to keep the pattern position when open a doc.
-; - when autosave, now open a little window to say "autosave" (close after autosave)
-; // Fixes
-; - autosaveTime double each time it autosave !
-; - opendoc : should verify if document has changed and propose to save it
-; - newdoc  : should verify if document has changed and propose to save it
-
-
-; 09/04/2021  0.5.9.4
-; // Fixes
-; - tool selection type isn't updated when open the program
-; - bug with selection ellipse and Cut/copy/paste
-; - autosave : when save one time, it doesnt save no more
-
-
-
-; 08/04/2021  0.5.9.3.9
-; // Fixes
-; - tool parameter (for selection) isn't updated with the correct parameter when change the tool to selection
-
-
-
-; 07/04/2021  0.5.9.3.8
-; // New
-; - add selection circle
-; - add gadgets options for selection (type : rectangle, ellipse)
-; - edit/cut : now cut the image with the selection (rectangle or ellipse) (not paste for the moment) 
-; // Changes
-; - add selection enumeration
-; - Add 2 buttons on window preference (ok, cancel)
-; - Add WindowID(#WinMain) to windows : preference, bgeditor
-; - main menu : set layers transformations (mirror H, V, Rotation) on a submenu "transformations"
-; // Fixes
-; - when open a document (created with canvas) with layers with alpha and blendmode <> normal, sometimes, the alpha isn't correct with screen (need to be updated).
-; - select/deselect all : the preview rectangle was inverted
-; - select rectangle + cut : the uncutted part became white
-; - background windows : trackbar scale change the gadgets for alpha.
-; - background windows : fixe bugs with string gadget -> change value to 1 instead of the current value of gadget.
-; - background windows : when clic on red cross to close window, the parameters of the paper are not restored
-; - when open, the paper doesn't use the scale saved.
-
-
-
-; 06/04/2021  0.5.9.3.7
-; // Changes
-; - Add optionsIE\UsePaperForRendering to know if we use the paper in the rendering of final image (saved in pref.ini)
-; - Add some verification when create the saved image (from screen : if grabsprite, if savepsrite, if load...)
-; - code cleaning and some comments added (in english)
-; // Fixes
-; - with eraser, we can't move the screen no more
-; - when save the document as image (ful with layers), it's saved only if extension = "".
-; - bug with pick color (alt+clic) don't use the layer with normal blendmode
-
-
-
-; 05/04/2021  0.5.9.3.6
-; // Fixes
-; - picker doesn't work on canvas
-; - pick color with brush (alt+clic) doesn't work on canvas.
-; - bug with selection and cut, with zoom or very small document (64*64)
-
-
-
-; 04/04/2021  0.5.9.3.5
-; // Fixes
-; - when we change in pref the preview-rendering system (from screen to canvas) : the alpha of the layers (images) are erased
-; - when we use canvas, the color (tool brush) isn't washed
-; - when open a document, we need to update the layer()\ImageTemp now (with the new canvas for drawing)
-; - fixe a bug when delete a layer, sometimes, the layerID is > arraysize (layer()).
-; - export image (all layers+bg) -> the image saved from canvas is empty (alpha = 0)
-; - export image (all layers+BG) -> the paper isn't drawn
-; - export image (all layers+BG) -> layer with a blendmode <> normal become invisible
-; - when export image (all layers+background) -> the image saved from screen is only background if we have not change first from canvas to screen
-
-
-
-; 03/04/2021  0.5.9.3.4
-; // Changes
-; - some optimisations (gain +5fps (Screen : 50-60fps, canvas 25-30 (before was 20-25)))
-; // Fixes
-; - fixe bugs with blendmode for canvas (darken, ColorLight, colorburn)
-; // Tests (branch)
-; - Blendmodes, optimisation (blendmode, drawing on canvas), brush editor, circle brush
-
-
-; 02/04/2021  0.5.9.3.3
-; // Fixes
-; - when we change in pref the preview-rendering system, the sprite aren't updated
-; - Canvas blendmode : fixe the bugs with darken blendmode
-; - fixe bugs in procedure blendmode for canvas (darken, ColorLight, colorburn)
-; - fixe the alpha bug with cnavas and blendmode <> normal (alpha didn't work)
-
-
-; 02/04/2021  0.5.9.3.2
-; // Fixes
-; - Canvas Blendmode : fixes the bugs with multiply, add, screen, overlay... (the other blendmode are still bugged : darken...)
-; - canvas : when change blendmode, update the layer-image with a colored box if needed 
-; (black For the "lighten" blendmode (add, screen...), white For the "darken" (multiply..), grey for some (overlay))
-; - canvas : a lot of optimisation to get a better FPS (more like with Screen+sprite) in loop_mousekey.pb.
-
-
-; 01/04/2021  0.5.9.3.1
-; // Fixes
-; - Canvas : tests to fixe the Blendmode with canvas...
-; - the image on the canvas is'nt updated when change in pref the rendering system (screen+Sprite or canvas+images)
-; some bugs with canvas are fixed
-
-
-; 31/03/2021  0.5.9.3
-; // New
-; - preference : add a combobox to choose the rendering surface (screen or Canvas)
-; - options : save/load Usecanvas.
-; - add a canvas as preview "rendering system" (we can choose to use the screen+sprite or a canvas+images)
-; - add CanvasMain_Update() to update the mainCanvas if used
-; - new main canvas : paper (scale, alpha, color, image)
-; - new main canvas : layer parameters (ok : view, opacity, position, Blendmode aren't ok)
-; - new main canvas : movecanvas (not zoom)
-; - new main canvas : somz tools and drawing are ok  (brush, shapes, move layer...)
-; // Changes 
-; - change mouse wheeldelta to have + or -10% when zoom.
+; 30/03/2021  0.5.9.3
+; // changes 
 ; - I have cut/paste the code for "preference window" from loop.pb to window.pbi
 ; - window pref : add the option to use RoghtButton to paint
 ; - window pref : add a message when we change the langage (the langage for the gadgets is not changed in real time, for the moment).
-; // Fixes
-; - bug with shape (box, circle, line), I should use the position on the zoomed sprite, Not the zoomed position on the sprite Not zoomed)
-; - bug with shape (box, circle, line) : the temporary sprite wasn't zoomed
-; - bug with shape (box, circle, line) and zoom
-; - shape : size of the line preview when drawing isn't the same as the final line
 
 
 
@@ -349,7 +113,6 @@
 ; - flickering tool selection On layer multiply with a layer over.
 ; - movecanvas : when clic mouseleftup over certains gadgets (canvas), we can continue to move the canvas
 ; - paint : when clic mouseleftup over certains gadget(canvas), we can continue to paint.
-
 
 ; 29/03/2021  0.5.9.2.1
 ; // New 
@@ -1849,8 +1612,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 118
-; FirstLine = 71
+; CursorPosition = 101
+; FirstLine = 75
 ; Folding = 7+
 ; EnableXP
 ; DisableDebugger

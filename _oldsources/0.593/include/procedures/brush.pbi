@@ -44,8 +44,7 @@ Procedure BrushChangeColor(change=0,color=-1)
           If a >0
             
             ; à revoir !!! c'est cool, ca fait un fondu vers du noise (diminution alpha et taille !!
-            
-            a - Random(a*0.01, 0)*brush(action)\AlphaVsTime
+            ; a - Random(a*0.02,0)
             
             If Brush(Action)\Intensity>=0
               If a < Brush(Action)\intensity           
@@ -64,11 +63,10 @@ Procedure BrushChangeColor(change=0,color=-1)
               a - Brush(Action)\softness*0.5
             EndIf
             
-;             test ajout de grain
-            If a >0
-             ;a - a*0.01 ; Random(a*0.1,0)
-              a - Random(a*0.1,0)*brush(action)\AlphaVsTime
-            EndIf
+            ; test ajout de grain
+            ;If a >0
+            ;a - a*0.01 ; Random(a*0.1,0)
+            ; EndIf
             
           EndIf
           
@@ -175,7 +173,32 @@ Procedure BrushUpdateImage(load=0,color=0)
   Brush(Action)\OldW = sw 
   Brush(Action)\OldH = sh
   
-  
+  ; If Brush(Action)\Smooth; pour pallier le bug du smooth :( 
+  If StartDrawing(ImageOutput(#BrushCopy))
+    DrawingMode(#PB_2DDrawing_AlphaClip)
+    Box(0,0,sw,sh,RGBA(Red(Brush(Action)\colorQ),Green(Brush(Action)\colorQ),Blue(Brush(Action)\colorQ),255))
+    
+    ;       
+    ;; ATTENTION A REVOIR !
+    
+    ;         ; TEST add noise
+    ;         DrawingMode(#PB_2DDrawing_AlphaChannel)
+    ;         For i= 0 To sw-1
+    ;           For j=0 To sh-1
+    ;             a = Alpha(Point(i,j))
+    ;             gris = Random(50,0)
+    ;             If a > 0
+    ;               a - Random(a*0.8, a*0.5)
+    ; ;               Box(i, j, 1,1,RGBA(gris, gris, gris, a))
+    ;               Plot(i,j, RGBA(gris, gris, gris, a))
+    ;             EndIf
+    ;           Next j
+    ;         Next
+    
+    
+    StopDrawing()
+  EndIf
+  ; EndIf
   
   ;EndIf
   
@@ -191,39 +214,7 @@ Procedure BrushUpdateImage(load=0,color=0)
     RotateSprite(#Sp_BrushCopy,Brush(Action)\rotate,#PB_Absolute)
   EndIf
   
-  ZoomSprite(#Sp_BrushCopy, w, h)
-  
-  
-  ; If Brush(Action)\Smooth; pour pallier le bug du smooth :( 
-  If StartDrawing(ImageOutput(#BrushCopy))
-    DrawingMode(#PB_2DDrawing_AlphaClip)
-    Box(0,0,sw,sh,RGBA(Red(Brush(Action)\colorQ),Green(Brush(Action)\colorQ),Blue(Brush(Action)\colorQ),255))
-    
-    ;       
-    ;; ATTENTION A REVOIR !
-    
-    ; TEST add noise
-    If brush(action)\AddNoiseRandomOnImagebrush > 0
-      DrawingMode(#PB_2DDrawing_AlphaChannel)
-      For i= 0 To sw-1
-        For j=0 To sh-1
-          a = Alpha(Point(i,j))
-          
-          gris = 255 ; Random(255,0)
-          If a > 0
-            a - Random(a* brush(action)\AddNoiseOnImgMax*0.1, a* brush(action)\AddNoiseOnImgMin*0.1)
-            ;               Box(i, j, 1,1,RGBA(gris, gris, gris, a))
-            Plot(i,j, RGBA(gris, gris, gris, a))
-          EndIf
-        Next j
-      Next
-    EndIf
-              
-    
-    StopDrawing()
-  EndIf
-  ; EndIf
-  
+  ZoomSprite(#Sp_BrushCopy,w,h)
   
   If load = 1    
     UpdateBrushPreview()
@@ -904,8 +895,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 211
-; FirstLine = 153
-; Folding = 6-Pqf9HcAg6gAMw
+; CursorPosition = 812
+; FirstLine = 802
+; Folding = --------------
 ; EnableXP
 ; EnableUnicode

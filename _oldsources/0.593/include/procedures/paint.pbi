@@ -144,53 +144,28 @@ Procedure UsePickColorTogetColor(mx, my)
   
   Z.d = OptionsIE\Zoom*0.01
   
-  If OptionsIE\usecanvas = 0
-    
-    Select brush(#Action_Pipette)\Type
-        
-      Case 0 ; current layer only
-        If StartDrawing(ImageOutput(layer(layerId)\Image))
-          DrawingMode(#PB_2DDrawing_AlphaBlend)
-          GetColor((mx - CanvasX)/z, (my - CanvasY)/z)
-          StopDrawing()
-        EndIf
-        
-      Case 1 ; all layers
-        If StartDrawing(ScreenOutput())
-          DrawingMode(#PB_2DDrawing_AlphaBlend)
-          GetColor(mx,my)
-          StopDrawing()
-        EndIf
-        
-      Case 2 ; all above ; to add later 
-        
-    EndSelect
-    
-  ElseIf OptionsIE\usecanvas = 1
-    
-    Select brush(#Action_Pipette)\Type
-        
-      Case 0 ; current layer only
-        StatusBarText(0, 3, Str((mx - CanvasX)/z) +"/"+Str((my - CanvasY)/z))
-        If StartDrawing(ImageOutput(layer(layerId)\Image))
-          DrawingMode(#PB_2DDrawing_AlphaBlend)
-          GetColor((mx - CanvasX)/z, (my - CanvasY)/z)
-          StopDrawing()
-        EndIf
-        
-      Case 1 ; all layers
-        If StartDrawing(CanvasOutput(#G_CanvasMain))
-          DrawingMode(#PB_2DDrawing_AlphaBlend)
-          GetColor(mx,my)
-          StopDrawing()
-        EndIf
-        
-      Case 2 ; all above ; to add later 
-        
-    EndSelect
-    
-  EndIf
-
+  
+  Select brush(#Action_Pipette)\Type
+      
+    Case 0 ; current layer only
+      If StartDrawing(ImageOutput(layer(layerId)\Image))
+        DrawingMode(#PB_2DDrawing_AlphaBlend)
+        GetColor((mx - CanvasX)/z, (my - CanvasY)/z)
+        StopDrawing()
+      EndIf
+      
+    Case 1 ; all layers
+      If StartDrawing(ScreenOutput())
+        DrawingMode(#PB_2DDrawing_AlphaBlend)
+        GetColor(mx,my)
+        StopDrawing()
+      EndIf
+      
+      
+    Case 2 ; all above ; to add later 
+      
+  EndSelect
+  
   ; then update the color
   BrushUpdateColor()
   
@@ -591,12 +566,10 @@ EndProcedure
 
 
 Procedure LineAA(X, Y, Width, Hight, Color, Thickness = 1)
-  
   Protected SensX, SensY, n, nn, Epaisseur.f, x2.f, y2.f, Couleur_Fond.l, Application.f, Distance.f
-  ; by LSI ?
+  
   ; On mets la droite toujours dans le même sens pour l'analyse
   ; La sauvegarde du sens permettra de dessiner la droite ensuite dans le bon sens
-  
   If Width >= 0
     SensX = 1
   Else
@@ -613,15 +586,13 @@ Procedure LineAA(X, Y, Width, Hight, Color, Thickness = 1)
   
   ; Demi épaisseur de la ligne
   Epaisseur.f = Thickness / 2
-  If Epaisseur < 1
-    Epaisseur = 1
-  EndIf
-  
   
   ; calcul pour le changement de repère qui permet de connaitre l'épaisseur du trait et de gérer l'AA
   Distance.f = Sqr(Width * Width + Hight * Hight)
   CosAngle.f = Width / Distance
   SinAngle.f = -Sin(ACos(CosAngle))
+  ; Angle = GetAngle(Width+x,Hight+y,x,y)
+  ; SinAngle.f = -Sin(Angle)
   
   ; Dessin de la ligne
   For n = -Thickness To Width + Thickness
@@ -1480,6 +1451,10 @@ EndProcedure
 
 
 
+
+
+
+
 ; color, blending
 Procedure.l ColorBlending(Couleur1.l, Couleur2.l, Echelle.f) ; Mélanger 2 couleurs
                                                              ; by Le soldat inconnu, thanks !
@@ -1515,6 +1490,9 @@ EndProcedure
 
 
 
+
+
+
 ; shapes : box, ellipse, shpae, line...
 Macro DrawShape(sprite=1)
   
@@ -1534,7 +1512,6 @@ Macro DrawShape(sprite=1)
   ; BackColor(Brush(Action)\ColorFG)
   
   Select Action
-      
     Case #Action_Box
       RoundBox(x,y,w,h,brush(action)\size,brush(action)\size,col)
       If Brush(action)\ShapeOutSize >=1
@@ -1546,24 +1523,23 @@ Macro DrawShape(sprite=1)
       EndIf
       
     Case #Action_Line
-      z=1
       Select OptionsIE\ShapeTyp
-        Case 0 ; thickness line
-               ;NormalL_OLd(x,y,w+x,h+y,col,brush(action)\Alpha, brush(action)\Size*z)  
-              LineAA(x, y, w, h, col, brush(action)\Size*z)  
+        Case 2 ; simple line 
+          w1 = (1-OptionsIE\ShapeParam) * Random(layer(layerid)\w)
+          h1 = OptionsIE\ShapeParam * Random(layer(layerid)\h)
+          w2= (1-OptionsIE\ShapeParam) * w
+          h2= OptionsIE\ShapeParam * h
+          ;NormalL_OLd(x+w1,y+h1,w2+x+w1,h2+y+h1,col,brush(action)\Alpha, brush(action)\Size*z)  
+          LineAA(x+w1,y+h1,w2+w1,h2+h1,col, brush(action)\Size*z)
           
         Case 1 ; radial       
                ; LineXY(x,y,w+x,h+y,col)
                ; NormalL_OLd(x,y,w+x,h+y,col,brush(action)\Alpha, brush(action)\Size*z)  
           LineAA(x,y,w,h,col,brush(action)\Size*z)
           
-        Case 2 ; simple line 
-          w1 = (1-OptionsIE\ShapeParam) * Random(layer(layerid)\w)
-          h1 = OptionsIE\ShapeParam * Random(layer(layerid)\h)
-          w2= (1-OptionsIE\ShapeParam) * w
-          h2= OptionsIE\ShapeParam * h
-          ; NormalL_OLd(x+w1,y+h1,w2+x+w1,h2+y+h1,col,brush(action)\Alpha, brush(action)\Size*z)  
-          LineAA(x+w1,y+h1,w2+w1,h2+h1,col, brush(action)\Size*z)
+        Case 0 ; thickness line
+               ;NormalL_OLd(x,y,w+x,h+y,col,brush(action)\Alpha, brush(action)\Size*z)  
+          LineAA(x,y,w,h,col, brush(action)\Size*z)
           
       EndSelect
       
@@ -1602,15 +1578,16 @@ Macro DrawShape(sprite=1)
   
   
 EndMacro
+
 Procedure CreateShape()
   
   z.d = OptionsIE\Zoom * 0.01
   
   OptionsIE\Shape = 0
-  x = OptionsIE\ShapeX ;/z -canvasX/z
-  y = OptionsIE\ShapeY ;/z -canvasY/z
-  w = OptionsIE\shapeW ;/z
-  h = OptionsIE\shapeH ;/z
+  x = OptionsIE\ShapeX/z -canvasX/z
+  y = OptionsIE\ShapeY/z -canvasY/z
+  w = OptionsIE\shapeW/z
+  h = OptionsIE\shapeH/z
   col = RGBA(Brush(Action)\ColorBG\R,Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B,Brush(Action)\alpha)
   
   If StartDrawing(ImageOutput(layer(layerid)\image))
@@ -1624,6 +1601,7 @@ Procedure CreateShape()
   ScreenUpdate(1)
   
 EndProcedure
+
 
 
 
@@ -1808,9 +1786,9 @@ Procedure FillArea2(xx, yy, MinX, MinY, MaxX, MaxY, c=0, tolerance=0)
     Px(0) = xx
     Py(0) = yy
     
-    FrontColor(RGBA(Red(c), Green(c), Blue(c), brush(action)\alpha))
+    FrontColor(RGBA(Red(c),Green(c),Blue(c),brush(action)\alpha))
     
-    lim = Point(xx,yy)
+    lim=Point(xx,yy)
     ;lim = RGB(Red(li),Green(li),Blue(li))
     ;c= RGB(Red(c),Green(c),Blue(c))
     
@@ -1933,54 +1911,6 @@ Procedure FillArea2(xx, yy, MinX, MinY, MaxX, MaxY, c=0, tolerance=0)
     
   EndIf
   
-  
-EndProcedure
-Procedure FillArea_Ext(xx, yy, color, tolerance=10)
-  
-  ; get the color
-  DrawingMode(#PB_2DDrawing_AllChannels)
-  
-  ; get the color at mouse
-  col = Point(xx,yy)
-  alpha = Alpha(col)
-  r = Red(col)
-  g = Green(col)
-  b = Blue(col)
-  colorPicked = RGB(r,g,b)
-  
-  
-  ; the color to set
-  r = Red(color)
-  g = Green(color)
-  b = Blue(color)
-  c = RGBA(r,g,b,Brush(Action)\Alpha)
-  
-    
-  If alpha = 0  
-    If colorPicked = 0
-;       DrawingMode(#PB_2DDrawing_Default)
-;       c1 = RGB(r,g,b)
-;       FillArea(xx, yy, -1, c1)
-;       
-;       DrawingMode(#PB_2DDrawing_AllChannels)
-;       FillArea(xx, yy, -1, c)
-      ok=1
-    Else
-     ok = 1
-    EndIf
-    
-  Else
-    DrawingMode(#PB_2DDrawing_Default)
-    ; set the color
-    ok = 1
-  EndIf
-  
-    ; set the color
-  If ok = 1
-    FillArea(xx, yy, -1, c)
-  EndIf
-  
- 
   
 EndProcedure
 
@@ -2135,8 +2065,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1966
-; FirstLine = 99
-; Folding = Q5AAAAAAAAAAAQDOAAAAAAA9AAwPAA9AA9
+; CursorPosition = 1037
+; FirstLine = 89
+; Folding = AAAAAAAAAAAAgGcAAIAAAA5BAAeAAAAg
 ; EnableXP
 ; EnableUnicode

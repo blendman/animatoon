@@ -297,7 +297,7 @@ Macro IE_GetImagePixelColor(img)
 EndMacro
 
 
-;{ Image adjustement // reglages
+;{ Image reglages
 Procedure IE_InvertColor(img, al = 0, col = 1)
   
   IE_GetImagePixelColor(img)
@@ -988,7 +988,7 @@ EndProcedure
 
 
 
-; IMAGE adjustements
+; IMAGE
 Macro IE_CloseWin()
   
   For _uu_ = #Win_Contrast To #Win_ImgAdjustementLast
@@ -1361,9 +1361,13 @@ Procedure IE_WinLevel()
   
 EndProcedure
 
+
 Procedure IE_WinHueSaturation()
   
+  
+  
   ; not finished at all !!!!
+  
   
   W1 = 300
   IE_CloseWin()
@@ -1833,43 +1837,27 @@ EndProcedure
 
 
 ;{ filtre, mask...
-Procedure Filtre_MaskAlpha(x, y, SourceColor, TargetColor)
-  ; by LSI ?
-  ProcedureReturn (SourceColor & $00FFFFFF) | (Alpha(SourceColor)*Alpha(TargetColor)/255)<<24
+Procedure Filtre_MaskAlpha(x, y, CouleurSource, CouleurDestination)
+  ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
 EndProcedure
 
-; filter To mix alpha for the selection and Cut/copy
-Procedure Filtre_AlphaSel(x, y, SourceColor, TargetColor)
-  
-  ProcedureReturn RGBA(Red(SourceColor), Green(SourceColor), Blue(SourceColor), (Alpha(SourceColor)*Alpha(TargetColor)/255))
-EndProcedure
-Procedure FiltreInverseBlendAlpha(x, y, SourceColor, TargetColor) 
-  ; filter To mix alpha for the selection and Cut/copy
-  ; don't work
-  alpha = 255- ((Alpha(TargetColor)-Alpha(SourceColor)))
-  If alpha >= 0 
-      ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha)
-  Else
-    ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), 0)
-  EndIf
+Procedure Filtre_AlphaSel(x, y, CouleurSource, CouleurDestination)
+  ProcedureReturn (CouleurSource & $00FFFFFF) | (Alpha(CouleurSource)*Alpha(CouleurDestination)/255)<<24
 EndProcedure
 
-
-  ; filter To mix alpha for the eraser tool
-Procedure Filtre_MelangeAlpha2(x, y, CouleurSource, CouleurDestination) 
-  ;; filter To mix alpha for the eraser tool
-  ; By Le Soldat inconnu
-  ; modif by blendman
+Procedure Filtre_MelangeAlpha2(x, y, CouleurSource, CouleurDestination) ;; filter To mix alpha for the eraser tool
+                                                                        ; By Le Soldat inconnu
+                                                                        ; modif by blendman
   If Alpha(CouleurDestination)-Alpha(CouleurSource)>=0    
     ProcedureReturn RGBA(Red(CouleurDestination), Green(CouleurDestination), Blue(CouleurDestination), Alpha(CouleurDestination)-Alpha(CouleurSource))
   Else
     ProcedureReturn RGBA(Red(CouleurDestination), Green(CouleurDestination), Blue(CouleurDestination), 0)
   EndIf
 EndProcedure
-Procedure FiltreMelangeAlpha2(x, y, SourceColor, TargetColor) 
-  ; filter To mix alpha for the eraser tool
-  ; By Le Soldat inconnu
-  ; modif by blendman
+
+Procedure FiltreMelangeAlpha2(x, y, SourceColor, TargetColor) ; filter To mix alpha for the eraser tool
+                                                              ; By Le Soldat inconnu
+                                                              ; modif by blendman
   If Alpha(TargetColor) - Alpha(SourceColor) >= 0    
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha(TargetColor)-Alpha(SourceColor))
   Else
@@ -1877,8 +1865,7 @@ Procedure FiltreMelangeAlpha2(x, y, SourceColor, TargetColor)
   EndIf
 EndProcedure
 
-; filter To mix alpha for the pattern tool
-Procedure FiltreMelangeAlphaPat(x, y, SourceColor, TargetColor) 
+Procedure FiltreMelangeAlphaPat(x, y, SourceColor, TargetColor) ; filter To mix alpha for the pattern tool
   If Alpha(TargetColor) + Alpha(SourceColor) <= 255    
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha(SourceColor)+Alpha(TargetColor))
   Else
@@ -1886,7 +1873,6 @@ Procedure FiltreMelangeAlphaPat(x, y, SourceColor, TargetColor)
   EndIf
 EndProcedure
 
-; other filters
 Procedure FiltreWater(x, y, SourceColor, TargetColor)
   ; By Le Soldat inconnu
   ; modif by blendman
@@ -2196,7 +2182,7 @@ Procedure bm_add(x, y, SourceColor, TargetColor)
     If result >0     
       Red = Min(Red(TargetColor) * 255 / (result), 255)
     ElseIf result =0
-      red = Min(Red(TargetColor) * 255, 255)
+      red=Min(Red(TargetColor) * 255, 255)
     EndIf   
   EndIf
   
@@ -2205,7 +2191,7 @@ Procedure bm_add(x, y, SourceColor, TargetColor)
   Else
     result= 255 - Blue(SourceColor)
     If result >0
-      blue = Min(Blue(TargetColor) * 255 / (result), 255)
+      blue=Min(Blue(TargetColor) * 255 / (result), 255)
     ElseIf result =0
       blue = Min(Blue(TargetColor) * 255, 255)     
     EndIf   
@@ -2226,8 +2212,8 @@ Procedure bm_add(x, y, SourceColor, TargetColor)
 EndProcedure
 
 Procedure bm_multiply(x, y, SourceColor, TargetColor)
-  ; ProcedureReturn RGBA((Red(SourceColor)*Red(TargetColor))/255,(Green(SourceColor)*Green(TargetColor))/255,(Blue(SourceColor)*Blue(TargetColor))/255, Alpha(SourceColor)*Alpha(TargetColor)/255)
-  ProcedureReturn RGBA((Red(SourceColor)*Red(TargetColor))/255,(Green(SourceColor)*Green(TargetColor))/255,(Blue(SourceColor)*Blue(TargetColor))/255, Alpha(SourceColor))
+  ;ProcedureReturn RGBA((Red(SourceColor)*Red(TargetColor))/255,(Green(SourceColor)*Green(TargetColor))/255,(Blue(SourceColor)*Blue(TargetColor))/255, Alpha(SourceColor)*Alpha(TargetColor)/255)
+  ProcedureReturn RGBA((Red(SourceColor)*Red(TargetColor))/255,(Green(SourceColor)*Green(TargetColor))/255,(Blue(SourceColor)*Blue(TargetColor))/255, Alpha(TargetColor))
 EndProcedure
 
 Macro overlay(color_source,color_targ, colo)
@@ -2247,16 +2233,15 @@ Procedure bm_overlay(x, y, SourceColor, TargetColor)
   ProcedureReturn RGBA(red, green, blue, Alpha(TargetColor))
 EndProcedure
 
-Procedure bm_ColorBurn(x, y, SourceColor,TargetColor)
-  ; color = top <= 0? 0 :  max(255 - ((255 - bottom) * 255 / top), 0)
-  
+Procedure bm_ColorBurn(x,y,SourceColor,TargetColor)
+  ; color = top <= 0? 0 :  SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   top = Red(SourceColor)
   bottom = Red(TargetColor)
   
   If  top <=0
     Red = 0
   Else       
-    Red = max(255 - ((255 - bottom) * 255 / top), 0)
+    Red = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   top = Blue(SourceColor)
@@ -2264,7 +2249,7 @@ Procedure bm_ColorBurn(x, y, SourceColor,TargetColor)
   If  top <=0
     blue = 0
   Else
-    blue = max(255 - ((255 - bottom) * 255 / top), 0)
+    blue = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   top = Green(SourceColor)
@@ -2272,7 +2257,7 @@ Procedure bm_ColorBurn(x, y, SourceColor,TargetColor)
   If  top <= 0
     Green = 0
   Else    
-    Green = max(255 - ((255 - bottom) * 255 / top), 0)
+    Green = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   ProcedureReturn RGBA(red, green, blue, Alpha(TargetColor))
@@ -2285,7 +2270,7 @@ Procedure bm_ColorLight(x,y,SourceColor,TargetColor)
   If  top <=0
     Red = 0
   Else       
-    Red = max(255 - ((255 - bottom) * 255 / top), 0)
+    Red = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   top = Blue(TargetColor)
@@ -2293,7 +2278,7 @@ Procedure bm_ColorLight(x,y,SourceColor,TargetColor)
   If  top <=0
     blue = 0
   Else
-    blue = max(255 - ((255 - bottom) * 255 / top), 0)
+    blue = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   top = Green(TargetColor)
@@ -2301,7 +2286,7 @@ Procedure bm_ColorLight(x,y,SourceColor,TargetColor)
   If  top <= 0
     Green = 0
   Else    
-    Green = max(255 - ((255 - bottom) * 255 / top), 0)
+    Green = SetMaximum(255 - ((255 - bottom) * 255 / top), 0)
   EndIf
   
   ProcedureReturn RGBA(red, green, blue, Alpha(TargetColor))
@@ -2319,7 +2304,7 @@ EndProcedure
 Procedure bm_Exclusion(x, y, SourceColor, TargetColor)
   ; color = 255 - ( ( ( 255 - bottom ) * ( 255 - top ) / 255 ) + ( bottom * top / 255 ) )
   
-  ProcedureReturn RGBA(red, green, blue, Alpha(TargetColor))
+  ProcedureReturn RGBA(red,green,blue,Alpha(TargetColor))
 EndProcedure
 
 Procedure bm_lighten(x, y, SourceColor, TargetColor)
@@ -2331,10 +2316,10 @@ Procedure bm_lighten(x, y, SourceColor, TargetColor)
 EndProcedure
 
 Procedure bm_darken(x, y, SourceColor, TargetColor)
-  ;  color = max( bottom, top )
-  red = max(Red(TargetColor),Red(SourceColor))
-  blue = max(Blue(TargetColor),Blue(SourceColor))
-  green = max(Green(TargetColor),Green(SourceColor))
+  ;  color = SetMaximum( bottom, top )
+  red = SetMaximum(Red(TargetColor),Red(SourceColor))
+  blue = SetMaximum(Blue(TargetColor),Blue(SourceColor))
+  green = SetMaximum(Green(TargetColor),Green(SourceColor))
   ProcedureReturn RGBA(red,green,blue, Alpha(TargetColor))
 EndProcedure
 
@@ -2388,10 +2373,61 @@ EndProcedure
 
 
 
+Procedure SetBm(i,sprite=1)
+  
+  DrawingMode(#PB_2DDrawing_AlphaBlend)  
+  
+  ; bm sprite
+  If Sprite = 1
+    
+    Select layer(i)\bm
+        
+      Case #Bm_Normal
+        Box(0,0,doc\w,doc\w,RGBA(0,0,0,0))
+        
+      Case #Bm_Lighten,#Bm_Add, #bm_screen,#Bm_ColorBurn 
+        Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
+        
+      Case #Bm_Multiply, #bm_darken
+        Box(0,0,doc\w,doc\h,RGBA(255,255,255,255))
+        
+      Case #bm_Overlay, #Bm_LinearBurn, #Bm_Inverse, #Bm_LinearLight
+        Box(0,0,doc\w,doc\h,RGBA(127,127,127,255))
+        
+    EndSelect
+    
+  Else
+    ; bm image
+    Select layer(i)\bm
+        
+      Case #bm_custom
+        Box(0,0,doc\w,doc\h, RGBA(Brush(action)\ColorBG\R,Brush(action)\ColorBG\G,Brush(action)\ColorBG\B,Brush(action)\alpha))
+        
+      Case #Bm_Normal
+        Box(0,0,doc\w,doc\h, RGBA(0,0,0,0))
+        
+      Case #Bm_Add, #Bm_Screen, #Bm_Darken
+        Box(0, 0, doc\w, doc\h, RGBA(0,0,0,255))                
+        ;
+      Case #Bm_Multiply, #Bm_ColorBurn, #bm_lighten, #Bm_Colorlight
+        Box(0, 0, doc\w, doc\h, RGBA(255,255,255,255))   
+        
+      Case #Bm_Overlay, #Bm_LinearBurn, #Bm_Inverse, #Bm_Exclusion, #bm_Difference, #Bm_Hardlight, #Bm_Clearlight,#Bm_LinearLight
+        Box(0, 0, doc\w, doc\h, RGBA(127,127,127,255)) 
+        
+    EndSelect   
+    
+  EndIf
+  
+  
+EndProcedure
+
+
+
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 355
-; FirstLine = 26
-; Folding = AwHQIAAAAAAAOAAAAAAAAAAAAAAQAIAAAAAAAAAAAAAA-
+; CursorPosition = 993
+; FirstLine = 89
+; Folding = DwHQoPAQgAAAOwKQACA5-PAAAAAAAAAAAAAAAAAAAAAA9
 ; EnableXP
 ; EnableUnicode

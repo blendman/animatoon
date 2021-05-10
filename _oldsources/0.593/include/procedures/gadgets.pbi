@@ -158,21 +158,6 @@ Macro FreeGadget2(gad)
   
 EndMacro
 
-Procedure AddStringGadget(gad, x, y, w, h, text$, name$, tip$)
-  
-  If name$ <> ""
-    w1 = Len(name$)*6
-    gad2 = TextGadget(#PB_Any, x, y, w1, h, name$)
-    x+w1
-  EndIf
-  
-  If StringGadget(gad, x, y, w, h, text$)
-    GadgetToolTip(gad, tip$)
-  EndIf
-  ProcedureReturn gad2
-EndProcedure
-
-
 ; Utile (create gadget)
 Procedure TG(x,y,txt$,col=-1) 
   
@@ -1107,26 +1092,6 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       
       ;}
       
-    Case #Action_Select
-      ;{
-;       If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Options"))
-;         i+20
-;         AddSpinGadget(#G_ActionX, 0, lang("X position"),5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-;         AddSpinGadget(#G_ActionY, 0, lang("y Position"),5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-;         i + ub+15
-;       EndIf     
-      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,60,Lang("Type"))
-        i+20  
-        ComboBoxGadget(#G_ActionTyp,5,h1+i, 100, cbbh)
-        AddGadgetItem(#G_ActionTyp,0, Lang("Rectangle"))
-        AddGadgetItem(#G_ActionTyp,1, Lang("Circle"))
-        ;  AddGadgetItem(#G_ActionTyp,2, Lang("All layers above")) wip, to be finished
-        SetGadgetState(#G_ActionTyp, brush(#Action_Select)\type)
-        GadgetToolTip(#G_ActionTyp, Lang("Define the type of selection"))
-        i+ub+15
-      EndIf
-      ;}
-      
     Case #action_pipette
       ;{ 
       If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,60,Lang("Type"))
@@ -1161,7 +1126,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   
   
   ; change the color, in function of the tools
-  If action < #Action_Line Or action > #Action_Fill
+  If action<#Action_Line Or action>#Action_Fill
     Brush(action)\color = Brush(#Action_Brush)\color
     Brush(action)\Col\R = Brush(#Action_Brush)\Col\R
     Brush(action)\Col\G = Brush(#Action_Brush)\Col\G
@@ -1375,13 +1340,6 @@ Procedure IE_GadgetAdd()
   If SplitterGadget(#G_SplitToolCol, 0, ToolbarH, wp1, h, #G_PanelTool, #G_PanelCol) : EndIf
   
   
-  ; canvas preview renderings & drawings
-  If CanvasGadget(#G_CanvasMain, ScreenX-100000*(1-OptionsIE\UseCanvas), ScreenY, CanvasW, CanvasH, 
-                  #PB_Canvas_Border|#PB_Canvas_Keyboard)
-    
-  EndIf
-  
-  
   ; panel layer, presets, options (paper)
   If PanelGadget(#G_PanelLayer, 0, 0, wp1-5, PanelLayerH_IE)
     
@@ -1447,9 +1405,9 @@ Procedure IE_GadgetAdd()
       w1 = 220
     EndIf
     
-    If ScrollAreaGadget(#G_LayerList, i, yy, ScreenX-25, w1-20, ScreenX-45, 200, 10, #PB_ScrollArea_Single) 
-      If CanvasGadget(#G_LayerListCanvas, 0, 0, ScreenX-20, 200)
-      EndIf
+    If ScrollAreaGadget(#G_LayerList, i, yy, ScreenX-25, w1-20, ScreenX-45, 600, 10, #PB_ScrollArea_Single) 
+      
+      
       CloseGadgetList()
     EndIf      
     yy+GadgetHeight(#G_LayerList)+5
@@ -1675,13 +1633,12 @@ Procedure IE_UpdateGadget(gadget=1)
   
   
   ; define the w and H of the container-Screen
-  oldW = GadgetWidth(#G_ContScreen) 
+  oldW = GadgetWidth(#G_ContScreen)
   H = WindowHeight(#WinMain) - StatusBarHeight(#Statusbar)-12 - OptionsIE\ToolbarH -6
   W = WindowWidth(#WinMain) - ScreenX2 * panelRight - (ScreenX+10)*panelLeft
   
   ; resize the container screen
-  ResizeGadget(#G_ContScreen, x1 - 100000 * OptionsIE\UseCanvas, #PB_Ignore, w, h)
-  ResizeGadget(#G_CanvasMain, x1 - 100000 * (1-OptionsIE\UseCanvas), #PB_Ignore, w, h)
+  ResizeGadget(#G_ContScreen, x1, #PB_Ignore, w, h)
   
   ; need to move the layer position 
   If gadget=0
@@ -1985,8 +1942,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1449
-; FirstLine = 110
-; Folding = AAAAAHAgBAAAAAAAAAAAAAAAABa5BAAIAAAAw
+; CursorPosition = 1156
+; FirstLine = 52
+; Folding = AAAA5AAMAAAAAAAAAAAAAAA9BEwAAA+DAAA5
 ; DisableDebugger
 ; EnableUnicode

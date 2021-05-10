@@ -93,27 +93,29 @@ If GetActiveWindow() = #WinMain
       
       If MoveCanvas >= 1
         
-        ;{ move the canvas // on bouge le canvas
+        ;{ on bouge le canvas
         
         If MoveCanvas=1 
           Movecanvas = 2
           OldCanvasX = Mx - CanvasX
           OldCanvasY = My - CanvasY
           If NewPainting = 1
-            ScreenUpdate(0, 0)
+            ScreenUpdate()
           EndIf
         EndIf
         CanvasX = Mx - OldCanvasX
         CanvasY = My - OldCanvasY 
         
         ScreenDraw()
-        CanvasUpdate(1)
+        
         
         ;}
         
       Else
         
-        ;{ We do an action : drawing, clear, move a layer // On fait une action : peindre, effacer, bouger un layer, etc.. / 
+        ;{ On fait une action : peindre, effacer, bouger un layer, etc.. / We do an action : drawing, clear, move a layer
+        
+        OptionsIE\ImageHasChanged = 1
         
         
         If Action <= #Action_Eraser ; (pen, brush, particule, spray, effacer, )
@@ -123,18 +125,18 @@ If GetActiveWindow() = #WinMain
           
           ;{ Clear the screen (option real time) // on efface l'écran (options tps réel)
           
-          If clear = 1 And OptionsIE\UseCanvas = 0
+          If clear = 1
             If action <> #Action_Eraser
               ClearScreen(RGB(120,120,120))
               
-              ; draw the background // Puis on affiche le fond (paper)          
+              ; Puis on affiche le fond (paper)          
               PaperDraw()
               
-              ; layer bottom // on affiche les calques du dessous
+              ; on affiche les calques du dessous
               For i = 0 To ArraySize(layer())
                 If layer(i)\ordre <= layer(layerId)\ordre
                   If layer(i)\view 
-                    Layer_Draw_OnScreen(i)
+                    Layer_Draw(i)
                   EndIf
                 EndIf
               Next i 
@@ -147,6 +149,7 @@ If GetActiveWindow() = #WinMain
           
           If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
             
+            Layer(layerId)\Haschanged = 1 ; For autosave // pour l'autosave OU pour updater l'image du layer
             
             If alt = 1 ; pick the color // on prend la couleur
               
@@ -156,17 +159,11 @@ If GetActiveWindow() = #WinMain
               
             Else ; we draw (brush, eraser, floodfill, box, etc...)
               
-              CanvasHasChanged = 1
-              
               Select Action
                   
                   ;{ -------------- Brush, eraser // dessin, gomme             
                   
                 Case #Action_Brush, #Action_Eraser, #Action_Pen
-                  
-                  OptionsIE\ImageHasChanged = 1
-                  
-                  Layer(layerId)\Haschanged = 1 ; For autosave // pour l'autosave OU pour updater l'image du layer
                   
                   ;{ brush, eraser, pen
                   
@@ -241,12 +238,19 @@ If GetActiveWindow() = #WinMain
                     ;******** then we paint // puis on dessine
                     ; NewPainting = 1
                     
+                    ;{ draw on the screenout, if needed, but not good and slow //pour dessiner sur le screenoutput(), si besoin, (attention lent ?)
+                    ;                     If StartDrawing(ScreenOutput())
+                    ;                       DrawingMode(#PB_2DDrawing_AlphaBlend)                      
+                    ;                       Circle(mx-Brush(Action)\centerSpriteX,My-Brush(Action)\centerSpriteY,Brush(Action)\size,color)
+                    ;                       StopDrawing()
+                    ;                     EndIf
+                    ;}
+                    
+                    
                     ; first : mix colors // d'abord, on va mélanger les couleurs en tps réel 
                     color = Brush(Action)\color  
-                    
                     ;If Brush(Action)\mix > 0 
-                    If clear=1 And OptionsIE\UseCanvas = 0
-                      
+                    If clear=1
                       Select Brush(Action)\MixLayer ; check the layer to pick the color for mixing //on vérifie sur quels layers on peut prendre la couleur
                           
                         Case 0 ; all under // tous ceux en dessous (defaut)
@@ -258,7 +262,7 @@ If GetActiveWindow() = #WinMain
                           For i = 0 To ArraySize(layer())
                             If layer(i)\ordre <= layer(layerId)\ordre
                               If layer(i)\view 
-                                Layer_Draw_OnScreen(i)
+                                Layer_Draw(i)
                               EndIf
                             EndIf
                           Next i 
@@ -269,17 +273,17 @@ If GetActiveWindow() = #WinMain
                           ; Puis on affiche le fond (paper)          
                           PaperDraw()                    
                           ; on affiche le calque
-                          Layer_Draw_OnScreen(LayerId)
+                          Layer_Draw(LayerId)
                           
                           
                         Case 2 ; all //tous
                           ClearScreen(RGB(120,120,120))                    
                           ; Puis on affiche le fond (paper)          
-                          PaperDraw()                     
+                          PaperDraw()                    
                           ; on affiche les calques du dessous
                           For i = 0 To ArraySize(layer())
                             If layer(i)\view 
-                              Layer_Draw_OnScreen(i)
+                              Layer_Draw(i)
                             EndIf
                           Next i 
                           
@@ -292,7 +296,7 @@ If GetActiveWindow() = #WinMain
                           For i = 0 To ArraySize(layer())
                             If layer(i)\view 
                               If layer(i)\OkForColorPick
-                                Layer_Draw_OnScreen(i)
+                                Layer_Draw(i)
                               EndIf
                             EndIf
                           Next i 
@@ -300,7 +304,7 @@ If GetActiveWindow() = #WinMain
                       EndSelect
                       
                     Else
-                       
+                      
                       
                     EndIf
                     
@@ -319,17 +323,16 @@ If GetActiveWindow() = #WinMain
                     EndIf
                     
                     ; we have to display again the layer under the current // Puis, on réaffiche les calques du dessous, ben oui
-                    If clear =1 And OptionsIE\UseCanvas = 0
+                    If clear =1
                       ClearScreen(RGB(120,120,120)) 
                       
                       ; Puis on affiche le fond (paper)          
-                      PaperDraw() 
-                      
+                      PaperDraw()                  
                       ; on affiche les calques du dessous
                       For i = 0 To ArraySize(layer())
                         If layer(i)\ordre <= layer(layerId)\ordre
                           If layer(i)\view 
-                            Layer_Draw_OnScreen(i)
+                            Layer_Draw(i)
                           EndIf
                         EndIf
                       Next i 
@@ -398,158 +401,154 @@ If GetActiveWindow() = #WinMain
                       
                       z = OptionsIE\Zoom*0.01
                       
-                      If OptionsIE\UseCanvas = 0
+                      If clear = 0
                         
-                        If clear = 0  
+                        ;{ technic pas tps réel, on dessine sur le screen
+                        
+                        zoum.d = 100
+                        zoum = 100/OptionsIE\zoom 
+                        
+                        ;xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
+                        ;yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
+                        
+                        xx = Mx - canvasX * zoum  - Brush(Action)\CenterX 
+                        yy = MY - canvasY * zoum  - Brush(Action)\CenterY 
+                        
+                        If StartDrawingOnImageNotClear = 0
+                          StartDrawingOnImageNotClear = 1
+                          StartX5 = xx
+                          StartY5 = yy
+                        EndIf
+                        
+                        
+                        dist  = point_distance(xx,yy,StartX5,StartY5) ; to find the distance between two brush dots
+                        d.d   = point_direction(xx,yy,StartX5,StartY5); to find the direction between the two brush dots
+                        sinD.d = Sin(d)                
+                        cosD.d = Cos(d)
+                        angle = GetAngle(xx,yy,StartX5,StartY5)*#PI/180
+                        
+                        For u = 0 To dist-1
                           
-                          ;{ technic pas tps réel, on dessine sur le screen
+                          Scx.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
+                          Scy.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
+                          CheckAlpha()
                           
+                          
+                          x_result.d= sinD * u + xx + scx + canvasX*zoum - (FinalSize*Brush(Action)\W*z)/2 + Brush(Action)\centerSpriteX/z 
+                          y_result.d= cosD * u + yy + scy + canvasY*zoum - (FinalSize*Brush(Action)\H*z)/2 + Brush(Action)\centerSpriteY/z
+                          
+                          
+                          RotateSprite(#Sp_BrushCopy, Random(Brush(Action)\randRot),1)
+                          ZoomSprite(#Sp_BrushCopy,FinalSize*Brush(Action)\W*z,FinalSize*Brush(Action)\H*z) 
+                          
+                          
+                          If Action = #Action_Eraser
+                            col = RGB(250,250,250)
+                          Else
+                            col = Color
+                          EndIf
+                          
+                          DisplayTransparentSprite(#Sp_BrushCopy,x_result,y_result,alpha,Col) 
+                          
+;                           FinalSize - FinalSize*ratio*u
+                          
+                          v+1
+                          u + b
+                        Next u
+                        
+                        StartX5 = XX
+                        StartY5 = YY
+                        brushsiz_old = brushsiz
+                        ;}
+                        
+                      Else
+                        
+                        If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
+                          
+                          
+                          ;{ calcul de position x et y / et on capture le premier point
                           zoum.d = 100
                           zoum = 100/OptionsIE\zoom 
                           
-                          ;xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
-                          ;yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
+                          xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
+                          yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
                           
-                          xx = Mx - canvasX * zoum  - Brush(Action)\CenterX 
-                          yy = MY - canvasY * zoum  - Brush(Action)\CenterY 
-                          
-                          If StartDrawingOnImageNotClear = 0
-                            StartDrawingOnImageNotClear = 1
-                            StartX5 = xx
-                            StartY5 = yy
+                          If StartDrawingOnImage = 0
+                            StartDrawingOnImage = 1
+                            StartX1 = xx
+                            StartY1 = yy
                           EndIf
                           
+                          ;                               dist = point_distance(xx,yy,startX1,startY1) 
+                          ;                               
+                          ;                               Brushsiz = FinalSize
+                          ;                               ratio.d = Abs(Brushsiz_old - Brushsiz)
+                          ;                               ratio/dist
+                          ;                               If dist > 0 And ratio > 0
+                          ;                                 FinalSize * ratio
+                          ;                               EndIf                              
+                          ;                               ;Brushsiz_old = FinalSize
+                          ;                               brush(action)\FinalSize = FinalSize
+                          ;                               
+                          ;                               Debug "dist "+Str(dist)+"/ ratio : "+StrD(ratio)
                           
-                          dist  = point_distance(xx,yy,StartX5,StartY5) ; to find the distance between two brush dots
-                          d.d   = point_direction(xx,yy,StartX5,StartY5); to find the direction between the two brush dots
-                          sinD.d = Sin(d)                
-                          cosD.d = Cos(d)
-                          angle = GetAngle(xx,yy,StartX5,StartY5)*#PI/180
-                          
-                          For u = 0 To dist-1
-                            
-                            Scx.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
-                            Scy.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
-                            CheckAlpha()
-                            
-                            
-                            x_result.d= sinD * u + xx + scx + canvasX*zoum - (FinalSize*Brush(Action)\W*z)/2 + Brush(Action)\centerSpriteX/z 
-                            y_result.d= cosD * u + yy + scy + canvasY*zoum - (FinalSize*Brush(Action)\H*z)/2 + Brush(Action)\centerSpriteY/z
-                            
-                            
-                            RotateSprite(#Sp_BrushCopy, Random(Brush(Action)\randRot),1)
-                            ZoomSprite(#Sp_BrushCopy,FinalSize*Brush(Action)\W*z,FinalSize*Brush(Action)\H*z) 
-                            
-                            
-                            If Action = #Action_Eraser
-                              col = RGB(250,250,250)
-                            Else
-                              col = Color
-                            EndIf
-                            
-                            DisplayTransparentSprite(#Sp_BrushCopy,x_result,y_result,alpha,Col) 
-                            
-                            ;                           FinalSize - FinalSize*ratio*u
-                            
-                            v+1
-                            u + b
-                          Next u
-                          
-                          StartX5 = XX
-                          StartY5 = YY
-                          brushsiz_old = brushsiz
                           ;}
                           
-                        Else
+                          ;If FinalSize > 0
                           
-                          If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
+                          ; sinon, on dessine directement sur le sprite qu'on va afficher ensuite
+                          If StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
                             
+                            w = FinalSize * Brush(Action)\size
                             
-                            ;{ calcul de position x et y / et on capture le premier point
-                            zoum.d = 100
-                            zoum = 100/OptionsIE\zoom 
+                            Select Brush(Action)\Stroke 
+                                
+                              Case #Stroke_Rough                                  
+                                DoPaint(xx,yy,StartX1,StartY1,size,Color)
+                                
+                              Case #Stroke_LineAA                                  
+                                LineLSI(xx,yy,StartX1,StartY1,Color,FinalSize*Brush(Action)\size,alpha)                             
+                                
+                              Case #Stroke_Knife
+                                ; InkLine(xx-w/2,yy-w/2,StartX1-w/2,StartY1-w/2,FinalSize*Brush(Action)\size,Color) ; ligne droite, bug un peu                              
+                                InkLine(xx,yy,StartX1,StartY1,FinalSize*Brush(Action)\size,Color) ; ligne droite, bug un peu                              
+                                
+                              Case #Stroke_Dash
+                                ;                                   zoum.d = 100
+                                ;                                   zoum = 100/OptionsIE\zoom 
+                                ;                                   xx = (mx - canvasX)*zoum -w/2 ;-Brush(Action)\CenterX 
+                                ;                                   yy = (my - canvasY)*zoum -w/2 ;-Brush(Action)\CenterY 
+                                ;                                   If  StartDrawingOnImage = 1                                    
+                                ;                                     StartDrawingOnImage = 2
+                                ;                                     StartX1 = xx
+                                ;                                     StartY1 = yy
+                                ;                                   EndIf
+                                pas  = brush(Action)\pas                                  
+                                DashDraw(xx, yy, StartX1, StartY1, pas, FinalSize*Brush(Action)\size, color)
+                                
+                            EndSelect
                             
-                            xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
-                            yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
-                            
-                            If StartDrawingOnImage = 0
-                              StartDrawingOnImage = 1
-                              StartX1 = xx
-                              StartY1 = yy
-                            EndIf
-                            
-                            ;                               dist = point_distance(xx,yy,startX1,startY1) 
-                            ;                               
-                            ;                               Brushsiz = FinalSize
-                            ;                               ratio.d = Abs(Brushsiz_old - Brushsiz)
-                            ;                               ratio/dist
-                            ;                               If dist > 0 And ratio > 0
-                            ;                                 FinalSize * ratio
-                            ;                               EndIf                              
-                            ;                               ;Brushsiz_old = FinalSize
-                            ;                               brush(action)\FinalSize = FinalSize
-                            ;                               
-                            ;                               Debug "dist "+Str(dist)+"/ ratio : "+StrD(ratio)
-                            
-                            ;}
-                            
-                            ;If FinalSize > 0
-                            
-                            ; sinon, on dessine directement sur le sprite qu'on va afficher ensuite
-                            If StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-                              
-                              w = FinalSize * Brush(Action)\size
-                              
-                              Select Brush(Action)\Stroke 
-                                  
-                                Case #Stroke_Rough                                  
-                                  DoPaint(xx,yy,StartX1,StartY1,size,Color)
-                                  
-                                Case #Stroke_LineAA                                  
-                                  LineLSI(xx,yy,StartX1,StartY1,Color,FinalSize*Brush(Action)\size,alpha)                             
-                                  
-                                Case #Stroke_Knife
-                                  ; InkLine(xx-w/2,yy-w/2,StartX1-w/2,StartY1-w/2,FinalSize*Brush(Action)\size,Color) ; ligne droite, bug un peu                              
-                                  InkLine(xx,yy,StartX1,StartY1,FinalSize*Brush(Action)\size,Color) ; ligne droite, bug un peu                              
-                                  
-                                Case #Stroke_Dash
-                                  ;                                   zoum.d = 100
-                                  ;                                   zoum = 100/OptionsIE\zoom 
-                                  ;                                   xx = (mx - canvasX)*zoum -w/2 ;-Brush(Action)\CenterX 
-                                  ;                                   yy = (my - canvasY)*zoum -w/2 ;-Brush(Action)\CenterY 
-                                  ;                                   If  StartDrawingOnImage = 1                                    
-                                  ;                                     StartDrawingOnImage = 2
-                                  ;                                     StartX1 = xx
-                                  ;                                     StartY1 = yy
-                                  ;                                   EndIf
-                                  pas  = brush(Action)\pas                                  
-                                  DashDraw(xx, yy, StartX1, StartY1, pas, FinalSize*Brush(Action)\size, color)
-                                  
-                              EndSelect
-                              
-                            EndIf
-                            
-                            ;EndIf
-                            
-                          Else                            
-                            
-                            ;{ calcul de position x et y / et on capture le premier point
-                            zoum.d = 100
-                            zoum = 100/OptionsIE\zoom                            
-                            xx = (mx - canvasX) * zoum ;-Brush(Action)\CenterX 
-                            yy = (My - canvasY) * zoum ;-Brush(Action)\CenterY  
-                            If Gersamclic = 0
-                              Gersamclic = 1
-                              StartX2 = xx
-                              StartY2 = yy
-                            EndIf
-                            ;}
-                            CheckAlpha()                            
-                            GersamDraw(xx,yy,StartX2,StartY2,FinalSize*Brush(Action)\size,Color,alpha)
+                          EndIf
+                          
+                          ;EndIf
+                          
+                        Else                            
+                          
+                          ;{ calcul de position x et y / et on capture le premier point
+                          zoum.d = 100
+                          zoum = 100/OptionsIE\zoom                            
+                          xx = (mx - canvasX) * zoum ;-Brush(Action)\CenterX 
+                          yy = (My - canvasY) * zoum ;-Brush(Action)\CenterY  
+                          If Gersamclic = 0
+                            Gersamclic = 1
                             StartX2 = xx
                             StartY2 = yy
                           EndIf
-                          
+                          ;}
+                          CheckAlpha()                            
+                          GersamDraw(xx,yy,StartX2,StartY2,FinalSize*Brush(Action)\size,Color,alpha)
+                          StartX2 = xx
+                          StartY2 = yy
                         EndIf
                         
                       EndIf
@@ -560,7 +559,7 @@ If GetActiveWindow() = #WinMain
                     
                     
                     ;*****************  puis on dessine sur l'image active
-                    If FinalSize >0 And (OptionsIE\SaveImageRT Or OptionsIE\UseCanvas)
+                    If FinalSize >0 And OptionsIE\SaveImageRT
                       
                       
                       If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
@@ -570,8 +569,6 @@ If GetActiveWindow() = #WinMain
                         
                         If layer(layerid)\MaskAlpha =2
                           img = Layer(LayerId)\ImageAlpha
-                        Else
-                          
                         EndIf
                         
                         
@@ -630,9 +627,6 @@ If GetActiveWindow() = #WinMain
                         
                       EndIf 
                       
-                      ; update the main canvas if used
-                      ; CanvasMain_Update()
-                      
                     Else
                       
                       StartX1 = xx
@@ -641,11 +635,12 @@ If GetActiveWindow() = #WinMain
                     EndIf  
                     
                     
-                    
                   EndIf
                   
-                  ; draw the screen
-                  If clear = 1 And OptionsIE\UseCanvas = 0
+                  
+                  
+                  ; on affiche l'écran (nécessaire ?)
+                  If clear = 1 
                     If action = #Action_Eraser Or layer(LayerId)\MaskAlpha = 2
                       If layer(LayerId)\Bm <> #Bm_Normal Or layer(LayerId)\MaskAlpha = 2
                         Newpainting = 1
@@ -661,28 +656,18 @@ If GetActiveWindow() = #WinMain
                   ;{ --------------  other tools for drawing (particles, fill, text, gradient, box, circle...
                   ; // autres outils de dessin: particules, fill, text, gradient, box, circle...
                   
-                Case #Action_Fill 
-                  ; bug PB avec bordure en rgb(0,0,0)              
-                  ;{ fillarea
+                Case #Action_Fill ; bug PB avec bordure en rgb(0,0,0)              
+                                  ;{ fillarea
                   If clic = 0
-                    ;MessageRequester("", "ok fillarea")
                     clic = 1
                     newpainting = 1  
-                    Layer(layerId)\Haschanged = 1
                     
-                    ;IE_DrawBegin() 
-                    If StartDrawing(ImageOutput(layer(layerId)\Image))
-                      
-;                        DrawingMode(#PB_2DDrawing_Default)
-                       ;FillArea((mx-canvasX)/z, (my-canvasY)/z, -1, RGBA(Red(Brush(Action)\Color), Green(Brush(Action)\Color), Blue(Brush(Action)\Color), Brush(Action)\Alpha))
-                      
-                      FillArea_ext((mx-canvasX)/z, (my-canvasY)/z, Brush(Action)\Color)
-                     ; FillArea((mx-canvasX)/z, (my-canvasY)/z, Brush(Action)\Color)
+                    IE_DrawBegin() 
+                    
+                    FillArea((mx-canvasX)/z, (my-canvasY)/z, -1, Brush(Action)\Color)
                     
                     
-                    
-                    
-                    ;FillArea2((mx-canvasX)/z,(my-canvasY)/z,0,0,Layer(Layerid)\w,Layer(Layerid)\h,Brush(Action)\Color)                
+                    ; FillArea2((mx-canvasX)/z,(my-canvasY)/z,0,0,Layer(Layerid)\w,Layer(Layerid)\h,Brush(Action)\Color)                
                     IE_DrawEnd()  
                     
                     ScreenUpdate(1)
@@ -693,31 +678,30 @@ If GetActiveWindow() = #WinMain
                   If clic = 0
                     OptionsIE\LayerTyp = #Layer_TypText
                     OpenTxtEditor(Mx,my)
-                    OptionsIE\ImageHasChanged = 1
-                    Layer(layerId)\Haschanged = 1 ; For autosave // pour l'autosave OU pour updater l'image du layer
                     clic = 1
                   EndIf 
                   
                 Case #Action_Box, #Action_Circle, #Action_Line, #Action_Gradient  
                   ;{ Box, circle, line, gradient
-                  
-                  zoum.d = 100
-                  zoum = 100/OptionsIE\zoom 
-                  xx = (mx - canvasX)*zoum 
-                  yy = (My - canvasY)*zoum 
-                  
+                  ;If StartDrawingOnImage = 0
+                  ; StartDrawingOnImage =1
+                  ;startx = mx/z 
+                  ;startY = my/z
+                  ;OptionsIE\ShapeX = StartX
+                  ;OptionsIE\ShapeY = StartY
+                  ;EndIf
                   If OptionsIE\Shape = 0
                     OptionsIE\Shape = 1
-                    startx = xx
-                    startY = yy
+                    startx = mx 
+                    startY = my
                     OptionsIE\ShapeX = StartX
                     OptionsIE\ShapeY = StartY
                   EndIf              
                   NewPainting = 1
                   
-                  ;{ size // taille de la box - rx et ry
-                  rx = xx - StartX 
-                  ry = yy - StartY        
+                  ;{ taille de la box - rx et ry
+                  rx = mx - StartX 
+                  ry = my - StartY               
                   If shift
                     If action = #action_line
                       ry = 0
@@ -730,7 +714,7 @@ If GetActiveWindow() = #WinMain
                   
                   ;}
                   
-                  ;{ box with broder // box plain, avec bord...
+                  ;{ box plain, avec bord...
                   If Brush(Action)\ShapePlain  
                     If Brush(Action)\ShapeType = 0
                       ;Box(StartX, StartY, rx, ry, RGBA(Red(Brush(Action)\Color),Green(Brush(Action)\Color),Blue(Brush(Action)\Color),Brush(Action)\alpha)) 
@@ -794,6 +778,7 @@ If GetActiveWindow() = #WinMain
                   
                   ;}
                   
+                  
                   ;}
                   
               EndSelect
@@ -815,8 +800,6 @@ If GetActiveWindow() = #WinMain
             Case #Action_Move
               If layer(LayerID)\locked = 0 And layer(LayerID)\view = 1
                 layer(layerId)\selected = 1
-                CanvasHasChanged = 1
-                Layer(layerId)\Haschanged = 1
                 If Clic = 0
                   oldposx = mx/z - layer(layerid)\x
                   oldposy = my/z - layer(layerid)\y
@@ -854,8 +837,6 @@ If GetActiveWindow() = #WinMain
                   ; OldAngle = 
                   Clic = 1
                 EndIf
-                Layer(layerId)\Haschanged = 1
-                CanvasHasChanged = 1
                 Layer(layerId)\AngleX = mx/z 
                 Layer(layerId)\AngleY = my/z               
                 Angle = GetAngle(Layer(layerId)\AngleX,Layer(layerId)\AngleY,Layer(layerId)\AngleStartX ,Layer(layerId)\AngleStartY)
@@ -872,8 +853,6 @@ If GetActiveWindow() = #WinMain
                   clic=1                  
                 EndIf                
                 Layer(LayerId)\selected = 1
-                Layer(layerId)\Haschanged = 1
-                CanvasHasChanged = 1
                 Layer(layerId)\W = Mx/z -StartX ; - CanvasX
                 If shift = 1
                   ratio.d = Layer(LayerID)\NewH/Layer(LayerID)\NewW
@@ -944,70 +923,53 @@ If GetActiveWindow() = #WinMain
         
         ;}
         
-        ; then display the screen
-        If OptionsIE\UseCanvas = 0
-          
-          ;{ display the top layer , over the current layer //on affiche les calques du dessus
-          If OptionsIE\Shape=1 
-            ZoomSprite(#Sp_LayerTempo, Doc\W*z, Doc\H*z)
-            DisplayTransparentSprite(#Sp_LayerTempo, canvasX, canvasY, layer(layerid)\alpha)  
-          EndIf
-          
-          ; need to see the layer over our painting (if paint, box, line circle(),...)
-          If clear = 1 
-            If OptionsIE\Selection <> 1 ; And action <> #Action_Eraser
-              For i = 0 To ArraySize(layer())
-                If layer(i)\ordre > layer(layerId)\ordre
-                  If layer(i)\view 
-                    Layer_Draw_OnScreen(i)
-                  EndIf
-                EndIf
-              Next i 
-            EndIf
-          EndIf
-          
-          
-          
-          ;{ old
-          ;           If my <> OldMx Or My <> OldMy
-          ;             ;RotateSprite(OptionsIE\CursorSpriteId,Random(Brush(Action)\RandRot),0)
-          ;             SpriteBlendingMode(5,3)
-          ;             OPtionsIE\cursorX = 0
-          ;             ZoomSprite(OptionsIE\CursorSpriteId,OptionsIE\CursorW * Z, OptionsIE\CursorH * z)
-          ;             DisplayTransparentSprite(OptionsIE\CursorSpriteId,mx-(OptionsIE\CurSorW/2)*z,my-(OptionsIE\CursorH/2)*z,100)
-          ;             SpriteBlendingMode(0,8)
-          ;             
-          ;             OldMx = Mx
-          ;             OldMY = My
-          ;             
-          ;           EndIf
-          ;}
-          
-          ;}
-          
-          ;{ on affiche enfin les utilitaires (selection, grid, etc..
-          DrawUtil()
-          ;}
-          
+        
+        ;{ display the top layer , over the current layer //on affiche les calques du dessus
+        If OptionsIE\Shape=1 
+          DisplayTransparentSprite(#Sp_LayerTempo,canvasX,canvasY,layer(layerid)\alpha)  
         EndIf
+        
+        ; need to see the layer over our painting (if paint, box, line circle(),...)
+        If clear = 1 
+          If OptionsIE\Selection <> 1 ; And action <> #Action_Eraser
+            For i = 0 To ArraySize(layer())
+              If layer(i)\ordre > layer(layerId)\ordre
+                If layer(i)\view 
+                  Layer_Draw(i)
+                EndIf
+              EndIf
+            Next i 
+          EndIf
+        EndIf
+       
+        
+        
+        ;{ old
+        ;           If my <> OldMx Or My <> OldMy
+        ;             ;RotateSprite(OptionsIE\CursorSpriteId,Random(Brush(Action)\RandRot),0)
+        ;             SpriteBlendingMode(5,3)
+        ;             OPtionsIE\cursorX = 0
+        ;             ZoomSprite(OptionsIE\CursorSpriteId,OptionsIE\CursorW * Z, OptionsIE\CursorH * z)
+        ;             DisplayTransparentSprite(OptionsIE\CursorSpriteId,mx-(OptionsIE\CurSorW/2)*z,my-(OptionsIE\CursorH/2)*z,100)
+        ;             SpriteBlendingMode(0,8)
+        ;             
+        ;             OldMx = Mx
+        ;             OldMY = My
+        ;             
+        ;           EndIf
+        ;}
+        
+        ;}
+        
+        ;{ on affiche enfin les utilitaires (selection, grid, etc..
+        DrawUtil()
+        ;}
         
       EndIf
       
-      If OptionsIE\UseCanvas =0
-        
-        If MoveCanvas =0 And (action = #Action_Eraser And layer(layerid)\bm <> #Bm_Normal)  
-          ; not flipbuffers(), eraser has its flipbuffers (for layer blendmode <> normal)
-        Else
-          FlipBuffers() 
-        EndIf
+      If action = #Action_Eraser And layer(layerid)\bm <> #Bm_Normal; not flipbuffers(), eraser has its flipbuffers (for layer blendmode <> normal)
       Else
-        If MoveCanvas=0
-          ; need to update the layer()\imgtemp
-          If layer(layerId)\bm <> #Bm_Normal
-            Layer_ConvertToBm(layerId)              
-          EndIf
-          CanvasUpdate()
-        EndIf
+        FlipBuffers() 
       EndIf
         
       ;}
@@ -1065,7 +1027,7 @@ If GetActiveWindow() = #WinMain
     If inscreen = 1
       inscreen = 0
       ;ReleaseMouse(1) ; mac, linux ?
-      ; FlipBuffers()
+      FlipBuffers()
     EndIf
     ;}
     
@@ -1138,7 +1100,6 @@ If GetActiveWindow() = #WinMain
         If KeyboardPushed(#PB_Key_Space)
           If MoveCanvas = 0
             MoveCanvas = 1
-            Canvas_SetImageforMove()
           EndIf      
         EndIf
         If KeyboardReleased(#PB_Key_Space)
@@ -1327,17 +1288,16 @@ If GetActiveWindow() = #WinMain
     EndIf
     
   EndIf
-  
   ;}
   
   
 EndIf
 
-
+FPS()
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 675
-; FirstLine = 156
-; Folding = 855A-AEAAEAAAAwDACAAAQAawCEgAAAAAAAw
+; CursorPosition = 969
+; FirstLine = 96
+; Folding = 85YACAEAEg5AAJOAABAAS-4dAAAAAAAAAAg
 ; EnableXP
 ; EnableUnicode

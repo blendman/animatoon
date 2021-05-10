@@ -171,7 +171,6 @@ Structure sOptions
   SelectionY.w
   SelectionW.w
   SelectionH.w
-  SelectionType.a
   
   ; shapes (box, circle...)
   Shape.a
@@ -195,11 +194,6 @@ Structure sOptions
   ModeAdvanced.a
   UseRighmouseToPaint.a
   ConfirmAction.a
-  
-  ; to know if we use the screen as preview or a canvas (screen seems to be faster but some blendmode dosen't work) 
-  UseCanvas.a
-  UsePaperForRendering.a
-  
   
   DoScript.a ; 1 = save, 2 = run
   NbScript.w
@@ -327,7 +321,6 @@ Structure sOptions
   ; path et file
   PathSave$
   PathOpen$
-  OpenDocPatternPos.A
   
 EndStructure
 Global OptionsIE.sOptions
@@ -420,13 +413,6 @@ Structure Brush
   AlphaVsTime.w
   AlphaRand.a ; random alpha
   AlphaMin.a ; minimum alpha
-  
-  AddNoiseRandomOnImagebrush.a
-  AddNoiseOnImgMin.w
-  AddNoiseOnImgMax.w
-  AddNoiseOnImgGrey.w
-  AddNoise.a
-  
   
   ; size
   Size.w ; sise defined in the UI 
@@ -689,12 +675,11 @@ Structure sLayer
   
   ImageAlpha.i ; le canal alpha
   ImageStyle.i ; image pour le style
-  
   Sprite.i
   Ordre.w ; l'ordre du calque 0 = tout en bas, 100+ = tout en haut
   
   ImgLayer.i
-  ; IG_LayerMenu.i
+  IG_LayerMenu.i
   
   Typ.a ;normal(bitmap) = 0, texte = 1, background = 2, vecto = 3
   Repeated.a
@@ -836,9 +821,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 426
-; FirstLine = 51
-; Folding = AAADAgw
-; Markers = 387
+; CursorPosition = 194
+; FirstLine = 41
+; Folding = AKAAAgw
+; Markers = 380
 ; EnableXP
 ; EnableUnicode

@@ -1,4 +1,5 @@
 ﻿
+
 ; Menu
 Procedure AddMenu(clear=0)
   
@@ -78,9 +79,6 @@ Procedure AddMenu(clear=0)
     MenuItem(#Menu_SelectAll,     Lang("Select all")+Chr(9)+"Ctrl+A")
     MenuItem(#Menu_DeSelect,      Lang("Deselect")+Chr(9)+"Ctrl+D")
     MenuBar()
-    ; MenuItem(#Menu_SelectionsEditor, Lang("Selections (save/load)"))
-    MenuItem(#Menu_SelectAlphaLayer, Lang("Select the alpha of the layer"))
-
     ;MenuItem(#Menu_SelExtend,     Lang("Extend"))
     ;MenuItem(#Menu_SelContract,   Lang("Contract"))
     ;MenuItem(#Menu_SelInverse,    Lang("Inverse"))
@@ -124,7 +122,7 @@ Procedure AddMenu(clear=0)
     MenuTitle(Lang("Layer"))
     MenuItem(#Menu_LayerAdd,      Lang("Add a layer"))
     MenuItem(#Menu_LayerDel,      Lang("Delete the layer"))
-    ; MenuBar()
+    MenuBar()
     MenuItem(#Menu_LayerDuplicate,Lang("Duplicate the layer"))
     MenuBar()
     MenuItem(#Menu_LayerMoveDown, Lang("Move layer down"))
@@ -133,20 +131,14 @@ Procedure AddMenu(clear=0)
     MenuItem(#Menu_LayerMergeDown,Lang("Merge layer down"))
     ; MenuItem(#Menu_LayerMergeAllVisible,"Merge all visible Layer")
     MenuItem(#Menu_LayerMergeAll, Lang("Merge all layers"))
-    ; MenuItem(#Menu_LayerMergeLinked,"Merge all Layers linked")
+    ; MenuItem(#Menu_LayerMergeLinked,"Merge all Layer")
     MenuBar()
-    OpenSubMenu(lang("Transformations"))
     MenuItem(#Menu_MirorH,        Lang("Flip layer horizontaly"))
     MenuItem(#Menu_MirorV,        Lang("Flip layer verticaly"))
     MenuItem(#Menu_LayerRotate,   Lang("Rotate the layer"))
-    CloseSubMenu()
     MenuBar()
-    OpenSubMenu(lang("Alpha"))
-    MenuItem(#Menu_LayerTransformToLine,    Lang("Transform the image of the layer in line"))
+    MenuItem(#Menu_LayerTransformToLine,   Lang("Transform the image of the layer in line"))
     MenuItem(#Menu_LayerAddBackgroundOnAlpha,   Lang("Add a background on the alpha of the layer"))
-    MenuItem(#Menu_LayerEraseAlpha,         Lang("Erase the alpha of the layer"))
-    CloseSubMenu()
-    
     
     ; FILTERS
     MenuTitle(Lang("Filters"))
@@ -160,11 +152,11 @@ Procedure AddMenu(clear=0)
     CloseSubMenu()
     OpenSubMenu(lang("Noise"))
     MenuItem(#menu_IE_Noise,      Lang("Noise"))
-    ; MenuItem(#menu_IE_Clouds,     Lang("Clouds"))
+    MenuItem(#menu_IE_Clouds,     Lang("Clouds"))
     CloseSubMenu()
-;     OpenSubMenu(lang("Misc"))
-;     MenuItem(#menu_IE_Offset,      Lang("Offset"))
-;     CloseSubMenu()
+    OpenSubMenu(lang("Misc"))
+    MenuItem(#menu_IE_Offset,      Lang("Offset"))
+    CloseSubMenu()
     
     
     If plugin = 1
@@ -228,7 +220,6 @@ Procedure AddMenu(clear=0)
     ; MenuItem(#menu_ShowStatus,    Lang("Show status bar")) 
     MenuBar()
     MenuItem(#Menu_BackgroundEditor,   Lang("Background editor"))
-    MenuItem(#Menu_BrushEditor,   Lang("Brush editor"))
     
     
     ; HELP
@@ -340,6 +331,7 @@ Procedure UpdateLanguageUI()
 EndProcedure
 
 
+
 ;{ File + options (pref) & autosave
 
 Procedure.a GetFileExist(filename$)
@@ -387,12 +379,9 @@ Procedure ChangeCursor(load=0)
   EndWith
   
 EndProcedure
-Procedure InitProgram()
+Procedure InitScreen()
   
-  Shared PanelToolsW_IE, AutosaveTimeStart
-  
-  ; for autosave
-  AutosaveTimeStart = ElapsedMilliseconds()
+  Shared PanelToolsW_IE
   
   ; needed to have the screen centered
   PanelLayerW_IE  = 175
@@ -411,75 +400,13 @@ Procedure InitProgram()
   
 EndProcedure
 
-; Window info
-Procedure CreateWindowInfo(info$, name$="")
-  
-  ; to create a temporary window to draw information about action (saving, autosave, opening...)
-  w = 300
-  If name$ = ""
-    name$ = lang("Information")
-  EndIf
-  
-  If OpenWindow(#win_autosave, (WindowWidth(#WinMain)- w)/2, 170, w, 110, name$, #PB_Window_SystemMenu, WindowID(#WinMain))
-    
-    If StartDrawing(WindowOutput(#win_autosave))
-      DrawingMode(#PB_2DDrawing_Default)
-      Box(0,0,OutputWidth(),OutputHeight(), RGB(150,150,150))
-      DrawingMode(#PB_2DDrawing_Transparent)
-      DrawingFont(FontID(#FontArial20Bold))
-      DrawText(10, 5, info$, RGB(255, 255, 255))
-      StopDrawing()
-    EndIf
-  EndIf
-  
-EndProcedure
-Procedure UpdateWindowInfo(info$)
-  
-  ; count the number of line to draw
-  nb = CountString(info$, "#")
-  Dim txt$(nb)
-  
-  For i=0 To nb
-    
-    Txt$(i) = StringField(info$, i+1, "#")
-    ; check if need to resize the window
-    w = Len(txt$(i))*20 
-    h = 5+(1+nb*35)
-    
-    If h > WindowHeight( #win_autosave)
-      ResizeWindow(#win_autosave, #PB_Ignore, #PB_Ignore, #PB_Ignore, h)
-    EndIf
-    If w > WindowWidth( #win_autosave)
-      ResizeWindow(#win_autosave, #PB_Ignore, #PB_Ignore, w, #PB_Ignore)
-    EndIf
-    
-  Next
-  
-  If StartDrawing(WindowOutput(#win_autosave))
-      DrawingMode(#PB_2DDrawing_Default)
-      Box(0,0,OutputWidth(),OutputHeight(), RGB(150,150,150))
-      
-      ; draw the infos
-      DrawingMode(#PB_2DDrawing_Transparent)
-      DrawingFont(FontID(#FontArial20Bold))
-      For i = 0 To nb
-        DrawText(10, 5+30*i, txt$(i), RGB(255, 255, 255))
-      Next 
-      
-      StopDrawing()
-    EndIf
-    
-    FreeArray(txt$())
-    
-EndProcedure
-
-
 ; options
 Procedure OpenOptions()
   
   Shared PanelToolsW_IE, PanelToolsH_IE, PanelLayerW_IE, PanelLayerH_IE, BarAnimH_IE 
   
   If OpenPreferences("Pref.ini")
+    
     
     If ExaminePreferenceGroups()
       
@@ -511,8 +438,6 @@ Procedure OpenOptions()
             \ConfirmExit    = ReadPreferenceInteger("ConfirmExit",   1)
             \ModeAdvanced    = ReadPreferenceInteger("ModeAdvanced",   1)
             \UseRighmouseToPaint    = ReadPreferenceInteger("UseRighmouseToPaint",   0)
-            \UseCanvas    = ReadPreferenceInteger("UseCanvas",   0)
-            \UsePaperForRendering    = ReadPreferenceInteger("UsePaperForRendering",   1)
             
             
             ; autosave
@@ -830,9 +755,6 @@ Procedure OpenOptions()
       
     EndIf
     
-    ; change some parameters For selection
-    OptionsIE\SelectionType = Brush(#Action_Select)\Type
-    
     ClosePreferences()
     
   Else
@@ -894,8 +816,6 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("ConfirmExit",   \ConfirmExit)
     WritePreferenceInteger("ModeAdvanced",   \ModeAdvanced)
     WritePreferenceInteger("UseRighmouseToPaint",   \UseRighmouseToPaint)
-    WritePreferenceInteger("UseCanvas",   \UseCanvas)
-    WritePreferenceInteger("UsePaperForRendering",   \UsePaperForRendering)
     
     ; autosave
     WritePreferenceInteger("autosave",      \Autosave)
@@ -1094,48 +1014,7 @@ EndProcedure
 
 
 ; OPEN
-Procedure DocHasChanged()
-  ; verify if the current docuemtn has changed (or current layer)
-  
-  For i = 0 To ArraySize(layer())
-    If layer(i)\Haschanged
-      LayerHasChanged = 1
-      Break
-    EndIf
-  Next
-  
-  If OptionsIE\ImageHasChanged = 1 Or LayerHasChanged = 1
-    
-    answer =  MessageRequester(LAng("Infos"), 
-                        lang("The document has changed. Do you want to save your progress ? If Not, you will lost your work."), 
-                        #PB_MessageRequester_YesNoCancel|#PB_MessageRequester_Warning)
-    Select answer
-        
-      Case #PB_MessageRequester_Yes 
-        If Doc_Save() = 1
-          ProcedureReturn 0
-        Else
-          MessageRequester(lang("Error"), LAng("Unable to save the current document"))
-          ProcedureReturn 1
-        EndIf
-        
-      Case #PB_MessageRequester_No 
-        ProcedureReturn 0
-        
-      Case #PB_MessageRequester_Cancel    
-        ProcedureReturn 1
-        
-    EndSelect
-    
-  EndIf
-  
-  ProcedureReturn 0 
-  
-EndProcedure
-
 Procedure Doc_Open()
-  
-  Shared OpenLayer
   
   
   ; procedure to open a document.
@@ -1151,409 +1030,338 @@ Procedure Doc_Open()
   
   ; Pattern$ = "Files |*.txt;*.bat;*.pb;*.doc;*.png"
   
+  Pattern$ ="All Images format|*.jpg;*.png;*.bmp;*.abi;*.teo|JPG|*.jpg|PNG|*.png|BMP|*.bmp|"+
+            "Ani (Animatoon document)|*.ani|Ani (Animatoon - Old version)|*.ani|Abi (old animatoon file)|*.abi|Teo (Tile editor organisation)|*.teo"
   
   
-  If DocHasChanged() = 0
+  File$ = OpenFileRequester("Open an image or an animatoon document", OptionsIE\PathOpen$,Pattern$,0) 
+  Index = SelectedFilePattern()
+  
+  Debug "index :"+ Str(Index)
+  
+  If File$ <> ""
     
+    OptionsIE\PathOpen$ = GetPathPart(file$)
     
-    ; open a document/image
-    Pattern$ ="All Images format|*.jpg;*.png;*.bmp;*.abi;*.teo|JPG|*.jpg|PNG|*.png|BMP|*.bmp|"+
-              "Ani (Animatoon document)|*.ani|Ani (Animatoon - Old version)|*.ani|Abi (old animatoon file)|*.abi|Teo (Tile editor organisation)|*.teo"
+    Layer_FreeAll()
+    ; ClearGadgetItems(#G_LayerList)
     
+    DocName$  = GetFilePart(File$, #PB_FileSystem_NoExtension)
+    DocPath$  = GetPathPart(File$)
+    Ext$      = LCase(GetExtensionPart(File$))
+    Filemain$ = DocName$ + ".txt"
+    NewName$ = RemoveString(File$,".ani")+".zip"
+    OldName$ = File$
     
-    File$ = OpenFileRequester("Open an image or an animatoon document", OptionsIE\PathOpen$, Pattern$, OptionsIE\OpenDocPatternPos) 
-    Index = SelectedFilePattern()
-    OptionsIE\OpenDocPatternPos = index
-    
-    Debug "index :"+ Str(Index)
-    
-    If File$ <> ""
-      
-      OptionsIE\PathOpen$ = GetPathPart(file$)
-      
-      
-      CreateWindowInfo("Open document")
-      
-      ; we can erase the layers  
-      Layer_FreeAll()
-      ; ClearGadgetItems(#G_LayerList)
-      
-      ; change the variable OpenLayer
-      OpenLayer = 1
-      
-      DocName$  = GetFilePart(File$, #PB_FileSystem_NoExtension)
-      DocPath$  = GetPathPart(File$)
-      Ext$      = LCase(GetExtensionPart(File$))
-      Filemain$ = DocName$ + ".txt"
-      NewName$ = RemoveString(File$,".ani")+".zip"
-      OldName$ = File$
-      
-      Select Ext$
+    Select Ext$
+        
+        
+      Case "ani","abi","teo"
+        
+        If Ext$ = "abi"
+          MessageRequester(lang("Info"), lang("Not implemented yet"))
+        Else
           
-          
-        Case "ani","abi","teo"
-          
-          If Ext$ = "abi"
-            MessageRequester(lang("Info"), lang("Not implemented yet"))
+          If Index  = 4 ; new file format : *.ani
+                        ;{ ; new file format : *.ani
+            Debug "on dépacke le fichier " +  File$
+            
+            UseZipPacker()
+            
+            ZipFile$ = File$
+            Debug ZipFile$
+            ;Ne gérant pas la destination de la décompression on va créer un dossier de destination
+            ;Ce dossier sera un sous dossier du dossier courrant de l'application
+            ;Il portera le nom du fichier en cours de décompression
+            
+            ;Mémorisation du dossier à créer et sur lequel on se positionnera pour la décompression
+            path$ = GetPathPart(ZipFile$)
+            dirname$ = Mid(GetFilePart(ZipFile$), 1, Len(GetFilePart(ZipFile$))-Len(GetExtensionPart(ZipFile$))-1) + "_tmp_"
+            Directory$ = path$ + dirname$
+            Debug  "le répertoire dans lequel on va copier les éléments du zip : "+Directory$
+            
+            ;Création  du dossier de destination de la décompression
+            Resultat=CreateDirectory(Directory$)
+            
+            If resultat = 1 
+              Debug "on crée le répertoire "   
+            EndIf
+            
+            ;Mémorisation du dossier de destination de la décompression
+            ; CurrentDirectory$ = GetCurrentDirectory() + Directory$ + "\"
+            CurrentDirectory$ = Directory$ + "\"
+            
+            
+            Pack = OpenPack(#ZipFile, ZipFile$, #PB_PackerPlugin_Zip)
+            Dim nom$(n)
+            
+            
+            CurentDir$ = GetCurrentDirectory()
+            
+            ;Lecture séquentielle des entrées du fichier compressé
+            If ExaminePack(#ZipFile) 
+              
+              While NextPackEntry(#ZipFile)
+                
+                PackEntryName$ = PackEntryName(#ZipFile)
+                Debug PackEntryName$
+                
+                Select PackEntryType(#ZipFile)
+                    
+                  Case #PB_Packer_File
+                    SetCurrentDirectory(CurrentDirectory$)
+                    
+                    ;Création du/des dossiers si inexistant
+                    For i=1 To CountString(PackEntryName$, "/")
+                      Directory$ = StringField(PackEntryName$, i, "/")
+                      CreateDirectory(Directory$)
+                      SetCurrentDirectory(CurrentDirectory$ + Directory$)
+                    Next 
+                    
+                    SetCurrentDirectory(CurrentDirectory$)
+                    ReDim nom$(n)
+                    ; nom$(n) = PackEntryName$
+                    UncompressPackFile(#ZipFile, PackEntryName$)
+                    
+                  Case #PB_Packer_Directory ;C'est un dossier contenant des sous dossiers
+                    SetCurrentDirectory(CurrentDirectory$)
+                    
+                    ;Création du/des dossiers si inexistant
+                    For i=1 To CountString(PackEntryName$, "/")
+                      Directory$ = StringField(PackEntryName$, i, "/")
+                      CreateDirectory(Directory$)
+                      SetCurrentDirectory(CurrentDirectory$ + Directory$)
+                    Next
+                    
+                EndSelect
+              Wend 
+            EndIf
+            
+            SetCurrentDirectory(CurentDir$)
+            ; puis On ouvre le fichier texte
+            Filemain$ = Directory$ + "/"+Filemain$
+            ;}
           Else
-            
-            If Index  = 4 
-              ;{ new file format : *.ani
-              Debug "on dépacke le fichier " +  File$
-              
-              UseZipPacker()
-              
-              ZipFile$ = File$
-              Debug ZipFile$
-              
-              ; Ne gérant pas la destination de la décompression on va créer un dossier de destination
-              ; Ce dossier sera un sous dossier du dossier courrant de l'application
-              ; Il portera le nom du fichier en cours de décompression
-              
-              ; Mémorisation du dossier à créer et sur lequel on se positionnera pour la décompression
-              path$ = GetPathPart(ZipFile$)
-              dirname$ = Mid(GetFilePart(ZipFile$), 1, Len(GetFilePart(ZipFile$))-Len(GetExtensionPart(ZipFile$))-1) + "_tmp_"
-              Directory$ = path$ + dirname$
-              Debug  "le répertoire dans lequel on va copier les éléments du zip : "+Directory$
-              
-              ; Création  du dossier de destination de la décompression
-              Resultat=CreateDirectory(Directory$)
-              
-              If resultat = 1 
-                Debug "on crée le répertoire "   
-              EndIf
-              
-              ;Mémorisation du dossier de destination de la décompression
-              ; CurrentDirectory$ = GetCurrentDirectory() + Directory$ + "\"
-              CurrentDirectory$ = Directory$ + "\"
-              
-              
-              Pack = OpenPack(#ZipFile, ZipFile$, #PB_PackerPlugin_Zip)
-              Dim nom$(n)
-              
-              
-              CurentDir$ = GetCurrentDirectory()
-              
-              ;Lecture séquentielle des entrées du fichier compressé
-              If ExaminePack(#ZipFile) 
-                
-                While NextPackEntry(#ZipFile)
-                  
-                  PackEntryName$ = PackEntryName(#ZipFile)
-                  Debug PackEntryName$
-                  
-                  Select PackEntryType(#ZipFile)
-                      
-                    Case #PB_Packer_File
-                      SetCurrentDirectory(CurrentDirectory$)
-                      
-                      ; Création du ou des dossiers si inexistant
-                      For i=1 To CountString(PackEntryName$, "/")
-                        Directory$ = StringField(PackEntryName$, i, "/")
-                        CreateDirectory(Directory$)
-                        SetCurrentDirectory(CurrentDirectory$ + Directory$)
-                      Next 
-                      
-                      SetCurrentDirectory(CurrentDirectory$)
-                      ReDim nom$(n)
-                      ; nom$(n) = PackEntryName$
-                      UncompressPackFile(#ZipFile, PackEntryName$)
-                      
-                    Case #PB_Packer_Directory ;C'est un dossier contenant des sous dossiers
-                      SetCurrentDirectory(CurrentDirectory$)
-                      
-                      ; Création du ou des dossiers si inexistant
-                      For i=1 To CountString(PackEntryName$, "/")
-                        Directory$ = StringField(PackEntryName$, i, "/")
-                        CreateDirectory(Directory$)
-                        SetCurrentDirectory(CurrentDirectory$ + Directory$)
-                      Next
-                      
-                  EndSelect
-                Wend 
-              EndIf
-              
-              SetCurrentDirectory(CurentDir$)
-              ; puis On ouvre le fichier texte
-              Filemain$ = Directory$ + "/"+Filemain$
-              ;}
-            Else
-              pack = 2
-              Filemain$ = File$
-            EndIf
-            
-            
-            ; read the file and open the images
-            If ReadFile(0, Filemain$) 
-              
-              If pack >=1 
-                Debug "pack : "+Str(pack)
-                
-                Debug "on va lire le fichier"
-                
-                ; then we open the file
-                While Eof(0) = 0
-                  
-                  event = WaitWindowEvent(1)
-                  
-                  line$ = ReadString(0)
-                  info$ = StringField(line$, 1, "|")
-                  
-                  Debug info$
-                  Select info$
-                      
-                    Case "Version"; la version du logiciel
-                      
-                      versionDoc = Val(StringField(line$, 2, "|")) 
-                      VersionTeo = Val(OptionsIE\Version$) 
-                      If VersionTeo > versionDoc  
-                        ; MessageRequester(Lang("Info"), Lang("File outdated"))
-                      EndIf
-                      
-                      
-                    Case "Background"; info about the background (paper..)
-                      
-                      UpdateWindowInfo("Open doc : #Update the paper")
-
-                      OptionsIE\Paper$ = StringField(line$, 2, "|")
-                      paper\alpha = Val(StringField(line$, 3, "|"))
-                      paper\scale = Val(StringField(line$, 4, "|"))
-                      paper\intensity = Val(StringField(line$, 5, "|"))
-                      paper\Color = Val(StringField(line$, 6, "|"))
-                      ; update the background parameters
-                      SetGadgetState(#G_paperScale, paper\scale)
-                      SetGadgetText(#G_PaperScaleSG, Str(paper\scale))
-                      SetGadgetState(#G_PaperAlpha, paper\alpha)
-                      SetGadgetText(#G_PaperAlphaSG, Str(paper\alpha))
-                      SetGadgetState(#G_PaperIntensity, paper\intensity)
-                      SetGadgetText(#G_PaperIntensitySG, Str(paper\intensity))
-                      ; SetGadgetState(#G_ListPaper, paper\intensity)
-                      ; update the paper
-                      PaperUpdate(2)
-                      
-                    Case "Image";  informations on the document
-                      
-                      doc\W = Val(StringField(line$, 2, "|"))
-                      doc\H = Val(StringField(line$, 3, "|"))
-                      
-                      ; les calques
-                      NB = Val(StringField(line$, 4, "|")) ; nbre de layers
-                      LayerNb = 0
-                      LayerIdMax = 0
-                      OptionsIE\Zoom = Val(StringField(line$, 5, "|"))
-                      If OptionsIE\Zoom <=0
-                        OptionsIE\Zoom = 100
-                      EndIf
-                      canvasX = Val(StringField(line$, 6, "|"))
-                      canvasY = Val(StringField(line$, 7, "|"))
-                      
-                    Case "LayerVecto" 
-                      
-                    Case "Layer"  
-                      
-                      UpdateWindowInfo("Open doc : #Add a layer: #"+StringField(line$, 2, "|"))
-
-                      OptionsIE\LayerTyp = Val(StringField(line$, 17, "|"))
-                      
-                      Layer_Add()
-                      
-                      ; on redéfinit les infos des calques
-                      With Layer(LayerId)
-                        
-                        \Name$     = StringField(line$, 2, "|")
-                        \Alpha     = Val(StringField(line$, 3, "|"))
-                        \BM        = Val(StringField(line$, 4, "|"))
-                        \LockAlpha = Val(StringField(line$, 5, "|"))
-                        \locked    = Val(StringField(line$, 6, "|"))
-                        \LockMove  = Val(StringField(line$, 7, "|"))
-                        \LockPaint = Val(StringField(line$, 8, "|"))
-                        \ordre     = Val(StringField(line$, 9, "|"))
-                        \View      = Val(StringField(line$, 10, "|"))                    
-                        
-                        \X         = Val(StringField(line$, 11, "|"))
-                        \Y         = Val(StringField(line$, 12, "|"))                    
-                        \W         = Val(StringField(line$, 13, "|"))                    
-                        \H         = Val(StringField(line$, 14, "|"))                    
-                        \Group     = Val(StringField(line$, 15, "|"))
-                        \Link      = Val(StringField(line$, 16, "|"))
-                        \Typ       = Val(StringField(line$, 17, "|"))
-                        \Text$     = StringField(line$, 18, "|")
-                        \CenterX   = Val(StringField(line$, 19, "|"))
-                        \CenterY   = Val(StringField(line$, 20, "|"))                    
-                        \MaskAlpha = Val(StringField(line$, 21, "|"))                    
-                        \FontColor = Val(StringField(line$, 22, "|"))
-                        \FontName$ = StringField(line$, 23, "|")
-                        \FontSize  = Val(StringField(line$, 24, "|"))
-                        \FontStyle = Val(StringField(line$, 25, "|"))
-                        
-                        \FontID = LoadFont(#PB_Any,\FontName$,\FontSize,\FontStyle)
-                        
-                        
-                        If VersionDoc < VersionTeo 
-                          imageloaded$ = DocPath$+DocName$+"_"+\name$+".png"         
-                        Else                        
-                          imageloaded$ = DocPath$+dirname$+"/"+DocName$+"_Layer"+Str(ArraySize(layer()))+".png"
-                        EndIf
-                        
-                        temp =  LoadImage(#PB_Any, imageloaded$)
-                        ;                       If pack <> 2 And pack >=1
-                        ;                         Debug "on supprime le fichier : "+imageloaded$
-                        ;                         ;DeleteFile(imageloaded$)
-                        ;                       EndIf
-                        
-                        
-                        
-                        If temp = 0
-                          reponse = MessageRequester("Error", "unable to load the image " + imageloaded$ + ".png. Do you want To open by yourself ?",#PB_MessageRequester_YesNo)     
-                          If reponse = 6
-                            Layer_importImage(0)
-                          EndIf                  
-                        EndIf
-                        
-                        If temp
-                          
-                          ; <-- test
-                          ;                           FreeImage(layer(LayerId)\Image)
-                          ;                           If canvasX <0
-                          ;                             cx = -canvasX
-                          ;                           EndIf
-                          ;                           If canvasY <0
-                          ;                             cy = -canvasY
-                          ;                           EndIf
-                          ;                        
-                          ;                           layer(LayerId)\Image = GrabImage(temp, #PB_Any, cx, cy, GadgetWidth(#G_CanvasMain), GadgetHeight(#G_CanvasMain))
-                          ; -->
-                          
-                          
-                          ; copy image
-                          ;                           If StartDrawing(ImageOutput(layer(LayerId)\Image))
-                          ;                             DrawingMode(#PB_2DDrawing_AlphaBlend)
-                          ;                             DrawAlphaImage(ImageID(temp),0,0)
-                          ;                             StopDrawing()
-                          ;                           EndIf     
-                          ;                           FreeImage(temp)
-                          
-                          ; use image loaded
-                          layer(LayerId)\Image = temp
-                          
-                          
-                          If OptionsIE\UseCanvas
-                            If layer(LayerId)\bm <> #Bm_Normal
-                              Layer_ConvertToBm(LayerId)
-                            EndIf
-                          Else
-                            Layer_UpdateSprite(LayerId) 
-                          EndIf
-                        
-                        EndIf
-                        
-                        If \w =0 Or \h =0
-                          \w =ImageWidth(layer(LayerId)\Image)
-                          \h =ImageHeight(layer(LayerId)\Image)
-                        EndIf
-                        
-                      EndWith
-                      NewPainting = 1
-                      ; Layer_Update(LayerId)
-                      ScreenUpdate(1)
-                      
-                  EndSelect
-                  
-                Wend
-                
-                
-              EndIf
-              
-              ; close // on ferme le fichier
-              CloseFile(0)
-              
-              ; delete temporary folder // supprime le dossier temporaire
-              If pack >= 1 And pack <> 2
-                ;DeleteFile(Filemain$)
-                DeleteDirectory(Directory$,"",#PB_FileSystem_Recursive)
-              EndIf
-              
-              ; update list for layers
-              Layer_UpdateList()
-              
-              
-;               ; <--- temporaire test
-;               doc\w = GadgetWidth(#G_CanvasMain)
-;               doc\h = GadgetHeight(#G_CanvasMain)
-;               canvasX = 0
-;               canvasY = 0
-;               ;--> 
-              If OptionsIE\usecanvas =1
-                OptionsIE\Zoom = 100
-              EndIf
-              
-              
-              ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
-              RecreateLayerUtilities()
-              
-              
-              ;  update  screen
-              NewPainting =1
-              ScreenUpdate(0)
-              
-            Else
-              Debug "pas de fichier à lire : " +Filemain$
-              MessageRequester(lang("Error"),lang("No file to open. Please with the old .ani format."))
-              Layer_Add()
-              
-              ; I have to delete the sprite layer tempo (the sprite for temporary operations) and re create it (because it has new size)
-              RecreateLayerUtilities()
-              
-            EndIf
-            
-            FreeArray(nom$())
-            
+            pack = 2
+            Filemain$ = File$
           EndIf
           
-        Case "jpg", "png", "bmp"
-          ;{ on ouver une image 
-          OpenLayer = 0
-          tmp = LoadImage(#PB_Any, File$)
-          Doc\w = ImageWidth(tmp)
-          Doc\h = ImageHeight(tmp)
           
           
-          Layer_Add()
-          
-          ; then draw the image
-          If StartDrawing(ImageOutput(Layer(layerId)\Image))
-            DrawingMode(#PB_2DDrawing_AlphaBlend)
-            DrawAlphaImage(ImageID(tmp),0,0)
-            StopDrawing()
-          EndIf 
-          
-          FreeImage2(tmp)
-          
-          ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
-          RecreateLayerUtilities()
-          
-          
-          ; on update la liste des calques
-          Layer_UpdateList()
-          ; on update le screen
-          NewPainting =1
-          ScreenUpdate(0)
-          ;}
-          
-      EndSelect
-      
-      OpenLayer = 0
-      
-    EndIf 
-    
-    IE_StatusBarUpdate()
-    If IsWindow(#win_autosave)
-      CloseWindow(#win_autosave)
-    EndIf
-    
-    
-  EndIf
+          If ReadFile(0, Filemain$) 
+            
+            If pack >=1 
+              Debug "pack : "+Str(pack)
+              
+              Debug "on va lire le fichier"
+              
+              ; then we open the file
+              While Eof(0) = 0
+                
+                line$ = ReadString(0)
+                info$ = StringField(line$, 1, "|")
+                
+                Debug info$
+                Select info$
+                    
+                  Case "Version"; la version du logiciel
+                    
+                    versionDoc = Val(StringField(line$, 2, "|")) 
+                    VersionTeo = Val(OptionsIE\Version$) 
+                    If VersionTeo > versionDoc  
+                      ; MessageRequester(Lang("Info"), Lang("File outdated"))
+                    EndIf
+                    
+                    
+                  Case "Background"; info about the background (paper..)
+                    OptionsIE\Paper$ = StringField(line$, 2, "|")
+                    paper\alpha = Val(StringField(line$, 3, "|"))
+                    paper\scale = Val(StringField(line$, 4, "|"))
+                    paper\intensity = Val(StringField(line$, 5, "|"))
+                    paper\Color = Val(StringField(line$, 6, "|"))
+                    ; update the background parameters
+                    SetGadgetState(#G_paperScale, paper\scale)
+                    SetGadgetText(#G_PaperScaleSG, Str(paper\scale))
+                    SetGadgetState(#G_PaperAlpha, paper\alpha)
+                    SetGadgetText(#G_PaperAlphaSG, Str(paper\alpha))
+                    SetGadgetState(#G_PaperIntensity, paper\intensity)
+                    SetGadgetText(#G_PaperIntensitySG, Str(paper\intensity))
+                    ; SetGadgetState(#G_ListPaper, paper\intensity)
+                    ; update the paper
+                    PaperUpdate(2)
+                    
+                  Case "Image";  informations on the document
+                    
+                    doc\W = Val(StringField(line$, 2, "|"))
+                    doc\H = Val(StringField(line$, 3, "|"))
+                    
+                    ; les calques
+                    NB = Val(StringField(line$, 4, "|")) ; nbre de layers
+                    LayerNb = 0
+                    LayerIdMax = 0
+                    OptionsIE\Zoom = Val(StringField(line$, 5, "|"))
+                    If OptionsIE\Zoom <=0
+                      OptionsIE\Zoom = 100
+                    EndIf
+                    canvasX = Val(StringField(line$, 6, "|"))
+                    canvasY = Val(StringField(line$, 7, "|"))
+                    
+                  Case "LayerVecto" 
+                    
+                  Case "Layer"  
+                    
+                    OptionsIE\LayerTyp = Val(StringField(line$, 17, "|"))
+                    
+                    Layer_Add()
+                    
+                    ; on redéfinit les infos des calques
+                    With Layer(LayerId)
+                      
+                      \Name$     = StringField(line$, 2, "|")
+                      \Alpha     = Val(StringField(line$, 3, "|"))
+                      \BM        = Val(StringField(line$, 4, "|"))
+                      \LockAlpha = Val(StringField(line$, 5, "|"))
+                      \locked    = Val(StringField(line$, 6, "|"))
+                      \LockMove  = Val(StringField(line$, 7, "|"))
+                      \LockPaint = Val(StringField(line$, 8, "|"))
+                      \ordre     = Val(StringField(line$, 9, "|"))
+                      \View      = Val(StringField(line$, 10, "|"))                    
+                      
+                      \X         = Val(StringField(line$, 11, "|"))
+                      \Y         = Val(StringField(line$, 12, "|"))                    
+                      \W         = Val(StringField(line$, 13, "|"))                    
+                      \H         = Val(StringField(line$, 14, "|"))                    
+                      \Group     = Val(StringField(line$, 15, "|"))
+                      \Link      = Val(StringField(line$, 16, "|"))
+                      \Typ       = Val(StringField(line$, 17, "|"))
+                      \Text$     = StringField(line$, 18, "|")
+                      \CenterX   = Val(StringField(line$, 19, "|"))
+                      \CenterY   = Val(StringField(line$, 20, "|"))                    
+                      \MaskAlpha = Val(StringField(line$, 21, "|"))                    
+                      \FontColor = Val(StringField(line$, 22, "|"))
+                      \FontName$ = StringField(line$, 23, "|")
+                      \FontSize  = Val(StringField(line$, 24, "|"))
+                      \FontStyle = Val(StringField(line$, 25, "|"))
+                      
+                      \FontID = LoadFont(#PB_Any,\FontName$,\FontSize,\FontStyle)
+                      
+                      
+                      If VersionDoc < VersionTeo 
+                        imageloaded$ = DocPath$+DocName$+"_"+\name$+".png"         
+                      Else                        
+                        imageloaded$ = DocPath$+dirname$+"/"+DocName$+"_Layer"+Str(ArraySize(layer()))+".png"
+                      EndIf
+                      
+                      temp =  LoadImage(#PB_Any, imageloaded$)
+                      ;                       If pack <> 2 And pack >=1
+                      ;                         Debug "on supprime le fichier : "+imageloaded$
+                      ;                         ;DeleteFile(imageloaded$)
+                      ;                       EndIf
+                      
+                      
+                      
+                      If temp = 0
+                        reponse = MessageRequester("Error", "unable to load the image " + imageloaded$ + ".png. Do you want To open by yourself ?",#PB_MessageRequester_YesNo)     
+                        If reponse = 6
+                          Layer_importImage(0)
+                        EndIf                  
+                      EndIf
+                      
+                      If temp
+                        If StartDrawing(ImageOutput(layer(LayerId)\Image))
+                          DrawingMode(#PB_2DDrawing_AlphaBlend)
+                          DrawAlphaImage(ImageID(temp),0,0)
+                          StopDrawing()
+                        EndIf                  
+                        FreeImage(temp)                 
+                      EndIf
+                      
+                      If \w =0 Or \h =0
+                        \w =ImageWidth(layer(LayerId)\Image)
+                        \h =ImageHeight(layer(LayerId)\Image)
+                      EndIf
+                      
+                    EndWith
+                    NewPainting = 1
+                    ; Layer_Update(LayerId)
+                    ScreenUpdate(1)
+                    
+                EndSelect
+                
+              Wend
+              
+              
+            EndIf
+            
+            ; close // on ferme le fichier
+            CloseFile(0)
+            
+            ; delete temporary folder // supprime le dossier temporaire
+            If pack >= 1 And pack <> 2
+              ;DeleteFile(Filemain$)
+              DeleteDirectory(Directory$,"",#PB_FileSystem_Recursive)
+            EndIf
+            
+            ; update list for layers
+            Layer_UpdateList()
+            
+            ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
+            RecreateLayerUtilities()
 
+            
+            ;  update  screen
+            NewPainting =1
+            ScreenUpdate(0)
+            
+          Else
+            Debug "pas de fichier à lire : " +Filemain$
+            MessageRequester(lang("Error"),lang("No file to open. Please with the old .ani format."))
+            Layer_Add()
+            
+            ; I have to delete the sprite layer tempo (the sprite for temporary operations) and re create it (because it has new size)
+            RecreateLayerUtilities()
+
+          EndIf
+          
+          
+        EndIf
+        
+      Case "jpg","png","bmp"
+        ;{ on ouver une image 
+        
+        tmp = LoadImage(#PB_Any, File$)
+        Doc\w = ImageWidth(tmp)
+        Doc\h = ImageHeight(tmp)
+        
+        
+        Layer_Add()
+        
+        If StartDrawing(ImageOutput(Layer(layerId)\Image))
+          DrawingMode(#PB_2DDrawing_AlphaBlend)
+          DrawAlphaImage(ImageID(tmp),0,0)
+          StopDrawing()
+        EndIf 
+        
+        FreeImage2(tmp)
+        
+        ; I have to delete the sprite layer tempo and other sprite (the sprite for temporary operations) and re create it (because it has new size)
+        RecreateLayerUtilities()
+
+        
+        ; on update la liste des calques
+        Layer_UpdateList()
+        ; on update le screen
+        NewPainting =1
+        ScreenUpdate(0)
+        ;}
+        
+    EndSelect
+    
+    
+  EndIf 
+  
+  IE_StatusBarUpdate()
+  
 EndProcedure
 
 
@@ -1579,7 +1387,7 @@ Procedure Doc_Save()
   If p$<>"" 
     
     If GetFileExist(p$) = #True
-      rep = MessageRequester(Lang("Info"), Lang("The file already exists. Do you want to overwrite it ?"), #PB_MessageRequester_YesNo|#PB_MessageRequester_Warning)
+      rep = MessageRequester(Lang("Info"), Lang("The file already exists. Do you want to overwrite it ?"), #PB_MessageRequester_YesNo)
       If rep = #PB_MessageRequester_Yes
         ok = 1
       EndIf
@@ -1612,17 +1420,14 @@ Procedure Doc_Save()
         h_exp = Doc\H
         
         
-        CreateWindowInfo("Save document")
-        
-        ; no more used
-        ;         temp = CreateImage(#PB_Any, w_exp, h_exp, 32, #PB_Image_Transparent)
+        temp = CreateImage(#PB_Any, w_exp, h_exp, 32, #PB_Image_Transparent)
         
         ; I need to convert layers, to get the blendmode // je dois convertir les calques pour prendre en comte les blendmodes 
         For i =0 To Nb
           Layer_ConvertToBm(i)
         Next i
         
-        ;{
+        
         ; puis, je dessine tout sur une image temporaire, avant de la sauver et de la supprimer en mémoire.
         ;         If StartDrawing(ImageOutput(temp))
         ;           
@@ -1643,7 +1448,7 @@ Procedure Doc_Save()
         ;           StopDrawing()
         ;           
         ;         EndIf 
-        ;}
+        
         
         File$ = RemoveString(p$,".ani")
         ; in old version, I was saving an image with all layers
@@ -1657,34 +1462,31 @@ Procedure Doc_Save()
         ;         FileToDelete$(0) = nom$
         
         ; delete the temprorary layer // puis, on supprime les images temporaire
-        ;         For i =0 To ArraySize(layer())
-        ;           FreeImage2(layer(i)\ImageTemp)
-        ;         Next i
+        For i =0 To ArraySize(layer())
+          FreeImage2(layer(i)\ImageTemp)
+        Next i
         
         ; on sauvegarde tous les layers
         For i = 0 To nb
-          event = WaitWindowEvent(1)
+          
           If IsImage(Layer(i)\Image)
             nom$ = Name$ + "_Layer"+ Str(i)+".png"
-            ; update the window infos
-            UpdateWindowInfo("SAVE : #Save layer Image : #"+nom$)
-            
-            ; save image
             SaveImage(Layer(i)\Image, nom$, #PB_ImagePlugin_PNG)
             AddPackFile(0, nom$, nom$)
-            ; DeleteFile(nom$,#PB_FileSystem_Force)
-            ; DeleteFile(GetCurrentDirectory()+nom$)
-            ; MessageRequester("",GetCurrentDirectory()+nom$)
+            ;DeleteFile(nom$,#PB_FileSystem_Force)
+            ;DeleteFile(GetCurrentDirectory()+nom$)
+            ;MessageRequester("",GetCurrentDirectory()+nom$)
             n = ArraySize(FileToDelete$())+1
             ReDim FileToDelete$(n)
             FileToDelete$(n) = nom$
           EndIf
+          
         Next
         
-        ; Then, we save the text document // enfin, On sauvegarde le fichier texte
+        ; enfin, On sauvegarde le fichier texte
         nom$ = Name$ + ".txt"
         If OpenFile(0, Nom$)
-          UpdateWindowInfo("SAVE : #Save text info")
+          
           WriteStringN(0, "; Made By Animatoon ")
           WriteStringN(0, "Version|"+ OptionsIE\Version$+ "|")
           WriteStringN(0, "Background|"+ OptionsIE\Paper$+ "|"+Str(paper\alpha)+ "|"+Str(paper\scale)+ "|"+Str(paper\intensity)+ "|"+Str(paper\Color))
@@ -1730,26 +1532,17 @@ Procedure Doc_Save()
         AddPackFile(0, nom$, nom$)
         ClosePack(0)
         
-        UpdateWindowInfo("SAVE : #Finish and clean up")
-        
-        DeleteFile(nom$, #PB_FileSystem_Force)
+        DeleteFile(nom$,#PB_FileSystem_Force)
         For i =0 To n
           DeleteFile(FileToDelete$(i))
         Next 
-        
         FreeArray(FileToDelete$())
         
-        If IsWindow(#win_autosave)
-          CloseWindow(#win_autosave)
-        EndIf
-    
-        ProcedureReturn 1
       EndIf 
       
     EndIf 
     
-  Else
-     ProcedureReturn 0
+    
     
   EndIf 
   
@@ -1765,11 +1558,9 @@ Procedure ExportImage(auto=0)
   EndIf
   
   If filename$ <>"" Or auto = 1
-    
     If auto = 1
       filename$ = "save\autosav"+Str(Random(1000000))
-    EndIf  
-    
+    EndIf    
     For i=0 To ArraySize(layer())
       name$=filename$+"_Layer"+Str(i)+ ".png"
       If OptionsIE\SaveImageRT
@@ -1785,13 +1576,11 @@ Procedure ExportImage(auto=0)
       EndIf
       
     Next i  
-    
   EndIf
   
 EndProcedure
 Procedure.s ExportOnImage()
   
-  ; export the image with all layers visible and background.
   filename$ = SaveFileRequester("Save Image","","jpg|*.jpg|png|*.png|bmp|*.bmp",0)
   
   If filename$ <>""      
@@ -1808,96 +1597,53 @@ Procedure.s ExportOnImage()
     Next i
     
     If IsImage(#ImageExport)=0
-      CreateImage(#ImageExport, doc\w, doc\h, 32, #PB_Image_Transparent)
+      CreateImage(#ImageExport,doc\w,doc\h,32,#PB_Image_Transparent)
     EndIf
     
-    If StartDrawing(ImageOutput(#ImageExport))  
-      ; erase the image (not usefull ?)
+    If StartDrawing(ImageOutput(#ImageExport))                
       DrawingMode(#PB_2DDrawing_AlphaChannel)
-      Box(0,0,canvasW,canvasH,RGBA(0,0,0,0)) 
-      
-      ; draw the background ground
-      DrawingMode(#PB_2DDrawing_AlphaBlend) 
-      
-      
-      ; draw the paper
-      If paper\alpha > 0 And OptionsIE\UsePaperForRendering
-        ; the color
-        Box(0, 0,  doc\w, doc\h, paper\color) 
-      
-        ; the background paper
-        DrawAlphaImage(ImageID(#Img_PaperForMainCanvas), 0, 0, paper\alpha)
-        
-      EndIf
-      
+      Box(0,0,canvasW,canvasH,RGBA(0,0,0,0))                
+      DrawingMode(#PB_2DDrawing_AlphaBlend)                
       For i=0 To ArraySize(layer())
         If layer(i)\view = 1
           Layer_bm2(i)
-          ;DrawAlphaImage(ImageID(layer(i)\ImageTemp),0,0,layer(i)\alpha)
-          If layer(i)\Bm = #bm_normal
-            DrawAlphaImage(ImageID(layer(i)\Image),  layer(i)\x, layer(i)\y , layer(i)\Alpha)
-          Else
-            DrawAlphaImage(ImageID(layer(i)\ImageTemp), layer(i)\x, layer(i)\y , layer(i)\Alpha)
-          EndIf
+          DrawAlphaImage(ImageID(layer(i)\ImageTemp),0,0,layer(i)\alpha)
         EndIf
       Next i
-      
       StopDrawing()
-      
     EndIf
     
-    ; we will save the image (all layers visibles) // on sauve ensuite l'image obtenue    
+    ; on sauve ensuite l'image obtenue    
     Filtre = SelectedFilePattern() ; 0 = jpg, 1 = png, 2 = bmp
     
-    ; set extension if needed
     Ext$ = GetExtensionPart(filename$)
-    If (Ext$ <> "jpg" And filtre = 0)
+    If Ext$ <> "jpg" And filtre = 0
       filename$ + ".jpg"
       Ext$ = ".jpg"
+      format = #PB_ImagePlugin_JPEG
     EndIf  
-    If (Ext$ <> "png" And filtre = 1) 
+    If Ext$ <> "png" And filtre = 1
       filename$ + ".png"
       Ext$ = ".png"
+      format = #PB_ImagePlugin_PNG
     EndIf     
-    If (Ext$ <> "bmp" And filtre = 2)
+    If Ext$ <> "bmp" And filtre = 2
       filename$ + ".bmp"
-      Ext$ = ".bmp"
+      format = #PB_ImagePlugin_BMP
     EndIf   
     
-    ; set the format for image saving.
-    Select filtre
-      Case 0
-        ; jpg
-        format = #PB_ImagePlugin_JPEG
-      Case 1
-        ; png
-        format = #PB_ImagePlugin_PNG
-      Case 2 
-        ; bmp
-        format = #PB_ImagePlugin_BMP
-    EndSelect
+    result$ = RemoveString(filename$,ext$)
+    SaveImage(#ImageExport, filename$,format)
     
-    ; result$ = RemoveString(filename$, ext$)
+    ; puis, on supprime les images temporaire
+    For i =0 To ArraySize(layer())
+      FreeImage2(layer(i)\ImageTemp)
+    Next i
     
-    ; save the image
-    If ext$ = ".jpg" Or ext$ = "jpg"
-      If SaveImage(#ImageExport, filename$, format, 8) = 0
-         MessageRequester(LAng("Error"), Lang("Unable to save the canvas image")+" (jpg)")
-      EndIf
-    Else
-      If SaveImage(#ImageExport, filename$, format) =0
-        MessageRequester(LAng("Error"), Lang("Unable to save the canvas image")+" ("+ext$+")")
-      EndIf
-    EndIf
-    
-    
-    ; free image
-    FreeImage(#ImageExport)
-        
     
   EndIf
   
-  ProcedureReturn filename$
+  ProcedureReturn filename$ ; result$
 EndProcedure
 
 Procedure.i CaptureScreenToImage(x.i, y.i, width.i, height.i)
@@ -1946,24 +1692,6 @@ Procedure MakeScreenshot(x,y,Width,Height,File.s)
   EndIf
 EndProcedure
 
-
-Procedure testlayer(n)
-   ;<-- need to be comment
-  Debug "on update un ou des layers. Layerid : "+Str(n)
-  For i = 0 To ArraySize(layer())
-;     Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / image : "+Str(layer(i)\image)+" / imagetemp : "+Str(layer(i)\imagetemp)
-;       Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / bm : "+Str(layer(i)\Bm)
-    info$ = "layer "+Str(i)+" nom : "+layer(i)\name$+
-            " / image : "+Str(layer(i)\image)+
-            " / imagetemp : "+ Str(layer(i)\imagetemp)+
-            " / sprite : "+Str(layer(i)\sprite)
-    
-    Debug info$  
-
-  Next
-  ;--> 
-EndProcedure
-
 Procedure File_SaveImage()
   
   ; d'abord, on sauvegarde l'image normal, avec les blendemode
@@ -1971,211 +1699,140 @@ Procedure File_SaveImage()
   ; on va ensuite sauvegarder toutes les parties de l'image, en décalant les calques pour capturer 
   ; ce qu'on voit à l'écran, puis tout coller ensuite en une seule grosse image 
   ; si c'est plus gros que la taille de l'écran ^^
+  name$ = ExportOnImage()
   
-  If OptionsIE\UseCanvas
-    
-    ;{ export the canvas As image
-    
-    ;   ; update all if needed
-    ;   UseCanvas = OptionsIE\usecanvas
-    ;   OptionsIE\usecanvas = 1
-    ;   
-    ;   ; change the element
-    ;   Layer_UpdateElementsForRenderingSystem()
-    ; 
-    ;   
-    ;   ; save the image from the canvas
-    ;   name$ = ExportOnImage()
-    ;   
-    ; ;   If UseCanvas = 0
-    ; ;     FreeImage2(#Img_PaperForMainCanvas)
-    ; ;   EndIf
-    
-    ExportOnImage()
-    
-    ;}
-    
+  If name$ = ""
+    name$ = "Img_"+Str(Random(1000000))+"_"
   Else
-    
-    ;{ then export the screen as image
-    
-    ;     OptionsIE\usecanvas = 0
-    ;     Layer_UpdateElementsForRenderingSystem()
-    ;     
-    ;     If name$ = ""
-    ;       name$ = "Img_"+Str(Random(1000000))+"_"
-    ;     Else
-    ;       ext$ = GetExtensionPart(name$)
-    ;       name$ = RemoveString(name$,ext$)
-    ;       name$ = RemoveString(name$,".")
-    ;     EndIf
-    
-    name$ = SaveFileRequester("Save Image","","jpg|*.jpg|png|*.png|bmp|*.bmp",0)
-    
-    If name$ <>""  
+    ext$ = GetExtensionPart(name$)
+    name$ = RemoveString(name$,ext$)
+    name$ = RemoveString(name$,".")
+  EndIf
+  
+  If doc\w>CanvasW
+    NbPartX = Round(doc\w/CanvasW,#PB_Round_Up)-1 
+  Else
+    NbPartX = 0
+  EndIf
+  If doc\h > CanvasH
+    NbPartY = Round(doc\h/CanvasH,#PB_Round_Up)-1 
+  Else
+    NbPartY = 0
+  EndIf
+  
+  OldCanvasX = CanvasX
+  OldCanvasY = CanvasY
+  
+  OldZoom = OptionsIE\Zoom
+  OptionsIE\Zoom = 100
+  
+  ;Debug "on va sauver l'image issue du screen"
+  
+  ; on crée des sprites temporaires de la taille des écrans
+  NbPart = (NbPartX+1) * (NbPartY+1)
+  Dim TempoImg.i(NbPart)
+  
+  
+  ;Debug "nbre de partie : "+Str(NbPartX)+"*"+Str(NbPartY)+"="+Str(NbPart)
+  
+  u=0
+  For i = 0 To NbPartX
+    For j = 0 To NbPartY
       
-      If GetFileExist(name$) = #True
-        rep = MessageRequester(Lang("Info"), Lang("The file already exists. Do you want to overwrite it ?"), #PB_MessageRequester_YesNo|#PB_MessageRequester_Warning)
-        If rep = #PB_MessageRequester_Yes
-          ok = 1
-        EndIf
-      Else
-        ok = 1
-      EndIf 
+      W = ScreenWidth()
+      H = ScreenHeight()
+      CheckIfInf2(doc\w,w)
+      CheckIfInf2(doc\h,h)
       
-      If ok = 0
-        
-        File_SaveImage()
-        
-      Else
-        
-        ;{ save the image
-        
-        ; get extension and name
-        ext$ = GetExtensionPart(name$)
-        name$ = RemoveString(name$, ext$)
-        name$ = RemoveString(name$,".")
-        
-        ; calcul the number of parts for the image from screen.
-        If doc\w > CanvasW
-          NbPartX = Round(doc\w/CanvasW, #PB_Round_Up) -1 
-        Else
-          NbPartX = 0
-        EndIf
-        If doc\h > CanvasH
-          NbPartY = Round(doc\h/CanvasH, #PB_Round_Up) -1 
-        Else
-          NbPartY = 0
-        EndIf
-        
-        OldCanvasX = CanvasX
-        OldCanvasY = CanvasY
-        
-        OldZoom = OptionsIE\Zoom
-        OptionsIE\Zoom = 100
-        
-        ;Debug "on va sauver l'image issue du screen"
-        
-        ; create the sprite temporary of the size of the portions of the screen // on crée des sprites temporaires de la taille des écrans
-        NbPart = (NbPartX+1) * (NbPartY+1)
-        Dim TempoImg.i(NbPart)
-        
-        
-        ;Debug "nbre de partie : "+Str(NbPartX)+"*"+Str(NbPartY)+"="+Str(NbPart)
-        
-        uu=0
-        For i = 0 To NbPartX
-          For j = 0 To NbPartY
-            
-            W = ScreenWidth()
-            H = ScreenHeight()
-            CheckIfInf2(doc\w, w)
-            CheckIfInf2(doc\h, h)
-            
-            ; on va déplacer tous les calques en même temps, pour avoir toutes les parties de l'écran au complet :)
-            CanvasX = - i*W
-            CanvasY = - j*H
-            
-            ;Debug "position du canvas : "+Str(CanvasX)+"/"+Str(CanvasY)
-            ; puis, j'update le screen
-            If OptionsIE\UsePaperForRendering 
-              ; on efface tout  
-              ClearScreen(RGB(120,120,120))
-              ; the paper
-              PaperDraw()  
-            Else
-              ClearScreen(RGB(0,0,0))
-            EndIf
-            
-            ; draw the layers and flipbuffers
-            Layer_DrawAll(); tous les calques
-            FlipBuffers(): ; affiche l'ecran
-            
-            
-            ; grab the sprite, and save it as image.
-            If GrabSprite(#Sp_ToSaveImage, 0, 0, w, h, #PB_Sprite_AlphaBlending)
-              If SaveSprite(#Sp_ToSaveImage, "sprite__0__0.png", #PB_ImagePlugin_PNG)
-                If LoadImage(#Img_saveImage, "sprite__0__0.png") 
-                  ; CatchImage(#Img_saveImage, @tmpSprite) 
-                  ;Debug "U : "+Str(u) + " sprite : "+Str(#Sp_ToSaveImage)+ "- Image : "+Str(#Img_saveImage)
-                  ; TempoImg(u) = CatchImage(#PB_Any, @tmpSprite) 
-                  TempoImg(uu) = CopyImage(#Img_saveImage, #PB_Any)
-                  FreeImage(#Img_saveImage)
-                EndIf
-                FreeSprite(#Sp_ToSaveImage)
-                uu+1
-              EndIf
-            EndIf
-            
-          Next j
-        Next i  
-        
-        ; create finale image and draw on it with the parts of images // on créé l'image finale et on dessine dessus les bouts d'image)  
-        If CreateImage(#Img_saveImage, doc\w, doc\h, 32, #PB_Image_Transparent)
-          u=0
-          If StartDrawing(ImageOutput(#Img_saveImage))
-            DrawingMode(#PB_2DDrawing_AllChannels)
-            Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
-            DrawingMode(#PB_2DDrawing_AlphaBlend)
-            For i = 0 To NbPartX
-              For j = 0 To NbPartY
-                If IsImage(TempoImg(u))
-                  DrawAlphaImage(ImageID(TempoImg(u)),i*w,j*h)
-                Else
-                  ;Debug "pas d'image en :"+Str(u)
-                EndIf
-                u+1
-              Next j
-            Next i
-            StopDrawing()
+      ; on va déplacer tous les calques en même temps, pour avoir toutes les parties de l'écran au complet :)
+      CanvasX = - i*W
+      CanvasY = - j*H
+      
+      ;Debug "position du canvas : "+Str(CanvasX)+"/"+Str(CanvasY)
+      ; puis, j'update le screen
+      ClearScreen(RGB(120,120,120)) ; on efface tout
+                                    ; the paper
+      PaperDraw()                   ; je met le paper ?
+      
+      Layer_DrawAll(); tous les calques
+      FlipBuffers(): ; affiche l'ecran
+      
+      ;       If IsImage(#Img_saveImage) = 0
+      ;         CreateImage(#Img_saveImage, W,H,32,#PB_Image_Transparent)
+      ;       EndIf
+      
+      
+      GrabSprite(#Sp_ToSaveImage,0,0,w,h)
+      SaveSprite(#Sp_ToSaveImage,"sprite__0__0.png",#PB_ImagePlugin_PNG)
+      LoadImage(#Img_saveImage, "sprite__0__0.png") 
+      ; CatchImage(#Img_saveImage, @tmpSprite) 
+      ;Debug "U : "+Str(u) + " sprite : "+Str(#Sp_ToSaveImage)+ "- Image : "+Str(#Img_saveImage)
+      ; TempoImg(u) = CatchImage(#PB_Any, @tmpSprite) 
+      TempoImg(u) = CopyImage(#Img_saveImage,#PB_Any)
+      FreeImage(#Img_saveImage)
+      FreeSprite(#Sp_ToSaveImage)
+      u+1
+      
+    Next j
+  Next i
+  
+  
+  ; on créé l'image finale et on dessine dessus les bout d'image)  
+  If CreateImage(#Img_saveImage,doc\w,doc\h,32,#PB_Image_Transparent)
+    u=0
+    If StartDrawing(ImageOutput(#Img_saveImage))
+      DrawingMode(#PB_2DDrawing_AllChannels)
+      Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
+      For i = 0 To NbPartX
+        For j = 0 To NbPartY
+          If IsImage(TempoImg(u))
+            DrawAlphaImage(ImageID(TempoImg(u)),i*w,j*h)
+          Else
+            ;Debug "pas d'image en :"+Str(u)
           EndIf
-          
-          ; on sauve l'image
-          ;Debug "on sauve l'image"
-          savefile$ = name$+"_Screen."+ext$
-          format = SelectFormat(savefile$)
-          
-          If SaveImage(#Img_saveImage,savefile$,format)=0
-            MessageRequester("error","unable to save the part of the image screen !"+savefile$)
-          EndIf
-          
-          ; puis on libère la mémoire
-          FreeImage(#Img_saveImage)
-          
-        Else
-          MessageRequester("Error", "unable to create the final image")
-          
-        EndIf
-        
-        For i = 0 To NbPart
-          FreeImage2(TempoImg(i))
-        Next i
-        
-        FreeArray(TempoImg())
-        
-        ; on supprime l'image temporaire
-        DeleteFile("sprite__0__0.png")
-        
-        ; Then, set the variable for canvas position and zoom // et on rétablit le screen tel qu'il était
-        CanvasX = OldCanvasX
-        CanvasY = OldCanvasY
-        OptionsIE\Zoom = OldZoom
-        
-        ;}
-       
-      EndIf
-        
+          u+1
+        Next j
+      Next i
+      StopDrawing()
     EndIf
     
-    ;}
+    ; on sauve l'image
+    ;Debug "on sauve l'image"
+    savefile$ = name$+"_Screen."+ext$
+    format = SelectFormat(savefile$)
+    
+    If SaveImage(#Img_saveImage,savefile$,format)=0
+      MessageRequester("error","unable to save the part of the image screen !"+savefile$)
+    EndIf
+    
+    ; puis on libère la mémoire
+    FreeImage(#Img_saveImage)
+    
+    
+  Else
+    MessageRequester("Error", "unable to create the final image")
     
   EndIf
   
-  ;   ; update the rendering systeme if needed
-  ;   If UseCanvas = 1
-  ;     OptionsIE\usecanvas = usecanvas
-  ;     Layer_UpdateElementsForRenderingSystem()
-  ;   EndIf
+  For i = 0 To NbPart
+    FreeImage2(TempoImg(i))
+  Next i
+  
+  FreeArray(TempoImg())
+  
+  ; on supprime l'image temporaire
+  DeleteFile("sprite__0__0.png")
+  
+  
+  ; et on rétablit le screen tel qu'il était
+  CanvasX = OldCanvasX
+  CanvasY = OldCanvasY
+  
+  
+  OptionsIE\Zoom = OldZoom
+  ScreenUpdate()
+  
   
 EndProcedure
 
@@ -2216,29 +1873,14 @@ Procedure AutoSave()
   ; autosave, not in a thread, there is an autosave function with thread if needed (in procedures.pb)
   If  OptionsIE\Autosave = 1
     
-    autosavetime_ = ElapsedMilliseconds() - AutosaveTimeStart
+    autosavetime = ElapsedMilliseconds() - AutosaveTimeStart
     
-    ; StatusBarText(0, 3, Str(autosavetime_)+"/"+Str(AutosaveTimeStart)+"/"+Str(ElapsedMilliseconds())+"/"+Str(OptionsIE\AutosaveTime)+"/")
-    
-    If autosavetime_ >= OptionsIE\AutosaveTime * 60000
+    If autosavetime >= AutosaveTimeStart + OptionsIE\AutosaveTime * 60000
       AutosaveTimeStart = ElapsedMilliseconds()
       
-     CreateWindowInfo("AUTOSAVE")
-      
-      ; verify if a layer has changed
-      For i = 0 To ArraySize(layer())
-        If layer(i)\Haschanged <> 0
-          LayerHasChanged = 1
-          Break
-        EndIf
-      Next
-          
-      
-      If OptionsIE\ImageHasChanged <> 0 Or LayerHasChanged = 1
+      If OptionsIE\ImageHasChanged
         
         OptionsIE\ImageHasChanged = 0
-        
-        ;MessageRequester("infos", Str(autosavetime_)+"/"+Str(AutosaveTimeStart)+"/"+Str(ElapsedMilliseconds())+"/"+Str(OptionsIE\AutosaveTime)+"/")
         
         ; First, examine if directories exists // d'abord on vérifie que le dossier "save existe
         saveDir$ = GetCurrentDirectory()+"save\"
@@ -2314,9 +1956,6 @@ Procedure AutoSave()
               OptionsIE\AutosaveFileName$ = theAutosavedir$+"AutoSave_"+Doc\name$+"_"+Str(OptionsIE\NbNewFile)+"_"+Str(Random(100000))+Date$
             EndIf
             
-            UpdateWindowInfo("AUTOSAVE : #Save layer Image : #"+layer(i)\Name$)
-            
-            
             If SaveImage(layer(i)\Image,  optionsIE\AutosaveFileName$ +"_"+layer(i)\Name$+"_"+Str(i)+".png", #PB_ImagePlugin_PNG)
               ; Debug LAng("ok save image layer "+layer(i)\Name$)
             Else
@@ -2335,32 +1974,17 @@ Procedure AutoSave()
         
       EndIf
       
-      If IsWindow(#win_autosave)
-        CloseWindow(#win_autosave)
-      EndIf
-      
-      
-      ; reset the clic/paint variable
-      Paint = 0
-      clic = 0
-      MouseClic = 0
-      
     EndIf
     
   EndIf
   
 EndProcedure
 
-
 ;}
 
 ;{ editions
 Procedure Edit_Copy()
   
-  ; first free the selection image
-  FreeImage2(#img_selection)
-  
-  ; define parameters for the iumage copy
   x = OptionsIE\SelectionX
   y = OptionsIE\SelectionY
   w = OptionsIE\SelectionW
@@ -2370,60 +1994,24 @@ Procedure Edit_Copy()
     h= ImageHeight(layer(layerid)\Image)
   EndIf
   
-  ; grab the image
-  tmp = GrabImage(layer(layerid)\Image, #PB_Any, X, Y, W, H)
-  Layer(layerId)\Haschanged = 1
+  tmp = GrabImage(layer(layerid)\Image, #PB_Any,X,Y,W,H)
   
-  Select OptionsIE\SelectionType
-      
-    Case #selectionRectangle
-      SetClipboardImage(tmp)
-      
-    Case #selectionCircle
-        
-      ; because we can cut a portion of an image with selection
-      ; we have to create an "selection image"
-      If OptionsIE\Selection > 0
-       
-        If CreateImage(#img_selection, w, h, 32, #PB_Image_Transparent)
-          If StartDrawing(ImageOutput(#img_selection))
-            
-            ; draw the selection on alpha
-            DrawingMode(#PB_2DDrawing_AllChannels)
-            Layer_DrawSelection(0, 0, RGBA(0,0,0,255))
-            
-            ; draw the image tmp
-            DrawingMode(#PB_2DDrawing_CustomFilter)
-            CustomFilterCallback(@Filtre_AlphaSel()) 
-            DrawAlphaImage(ImageID(tmp), 0, 0)
-            
-            StopDrawing()
-          EndIf
-        EndIf
-      EndIf
-
-  EndSelect
+  SetClipboardImage(tmp)
   
-  If OptionsIE\Selection = 0 And Not IsImage(#img_selection)
-    SetClipboardImage(tmp)
-    FreeImage2(tmp)
-  EndIf
+  FreeImage2(tmp)
   
 EndProcedure
 Procedure Edit_Paste()
   
-  If OptionsIE\Selection = 0 And Not IsImage(#img_selection)
-    tmp = GetClipboardImage(#PB_Any, 32)
-  Else
-    tmp = #img_selection
-  EndIf
-
+  tmp = GetClipboardImage(#PB_Any, 32)
+  
   If tmp
     
     ; variable needed
     x = 0
     y = 0
     Z.d = OptionsIE\Zoom * 0.01
+    
     
     ; check if we have selected first something or not
     If OptionsIE\Selection = 2
@@ -2438,19 +2026,16 @@ Procedure Edit_Paste()
     ; then draw on this layer
     If StartDrawing(ImageOutput(layer(LayerId)\Image))
       DrawingMode(#PB_2DDrawing_AlphaBlend)
+      
       DrawAlphaImage(ImageID(tmp),x,y)
+      
       StopDrawing()
     EndIf
     
-    ; update
     Newpainting = 1
     ScreenUpdate()
     
-    ; free image if needed
-    If OptionsIE\Selection = 0 And Not IsImage(#img_selection)
-      FreeImage(tmp)
-    EndIf
-    
+    FreeImage(tmp)
     
   EndIf
   
@@ -2458,9 +2043,7 @@ EndProcedure
 
 Procedure Edit_Select(selectAll=1)
   
-  ; reset some selection parameters
-  OptionsIE\Selection = 1-selectAll
-  OptionsIE\SelectionType = 0
+  OptionsIE\Selection = selectAll
   
   OptionsIE\SelectAlpha = 0
   
@@ -2548,7 +2131,7 @@ Procedure ResizeDoc(canvas=0)
           Layer(i)\h = doc\h
           Layer(i)\NewW = doc\w
           Layer(i)\NewH = doc\h
-          Layer_UpdateSprite(i)
+          Layer_Update(i)
         Next i 
         
       Else 
@@ -2591,6 +2174,9 @@ Procedure ResizeDoc(canvas=0)
             
             ; puis, on redimensionne nos calques (images et bm)
             ResizeImage(layer(i)\Image,doc\w,doc\h)
+            ResizeImage(layer(i)\ImageBM,doc\w,doc\h)
+            
+            ; puis, on les efface et on redessine dessus
             If StartDrawing(ImageOutput(layer(i)\Image))
               DrawingMode(#PB_2DDrawing_AllChannels)
               Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
@@ -2598,28 +2184,21 @@ Procedure ResizeDoc(canvas=0)
               DrawAlphaImage(ImageID(Tmp),0,0)
               StopDrawing()          
             EndIf
-          
-            ; puis, on les efface et on redessine dessus
-            If IsImage(layer(i)\ImageBM)
-              ResizeImage(layer(i)\ImageBM,doc\w,doc\h)
-              
-              If StartDrawing(ImageOutput(layer(i)\ImageBM))
-                DrawingMode(#PB_2DDrawing_AllChannels)
-                Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-                DrawingMode(#PB_2DDrawing_AlphaBlend)
-                DrawAlphaImage(ImageID(TmpBm),0,0)
-                StopDrawing()          
-              EndIf
+            If StartDrawing(ImageOutput(layer(i)\ImageBM))
+              DrawingMode(#PB_2DDrawing_AllChannels)
+              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+              DrawingMode(#PB_2DDrawing_AlphaBlend)
+              DrawAlphaImage(ImageID(TmpBm),0,0)
+              StopDrawing()          
             EndIf
             
-            ; change sprite
             FreeSprite2(layer(i)\Sprite)
             layer(i)\Sprite = CreateSprite(#PB_Any,doc\w,doc\h,#PB_Sprite_AlphaBlending)
             
             Layer(i)\w = doc\w
             Layer(i)\h = doc\h
             
-            Layer_UpdateSprite(i)
+            Layer_Update(i)
             ;Debug "size : " +Str(ImageWidth(layer(layerid)\Image))+"/"+Str(layer(layerId)\Image)
           Next i 
           
@@ -2685,16 +2264,14 @@ Procedure CropDoc()
       StatusBarProgress(#Statusbar, 3, (i+1)*10,0,0,n1)
       
       tmp = GrabImage(layer(i)\Image,#PB_Any,x,y,w1,h1)
-;       If IsImage(layer(i)\ImageBM)
-;         ;tmpBM = GrabImage(layer(i)\ImageBM,#PB_Any,x,y,w1,h1)
-;       EndIf
+      tmpBM = GrabImage(layer(i)\ImageBM,#PB_Any,x,y,w1,h1)
       
-      If Tmp > 0 ;And TmpBm > 0
+      If Tmp > 0 And TmpBm > 0
         FreeImage2(layer(i)\Image)
         FreeImage2(layer(i)\ImageBM)
         
         layer(i)\Image = GrabImage(tmp,#PB_Any,0,0,w1,h1)
-        ; layer(i)\ImageBM = GrabImage(tmpBM,#PB_Any,0,0,w1,h1)
+        layer(i)\ImageBM = GrabImage(tmpBM,#PB_Any,0,0,w1,h1)
         
         ;{ old
         ;             ; d'abord, on sauve les images et imageBm
@@ -2742,7 +2319,7 @@ Procedure CropDoc()
         Layer(i)\w = doc\w
         Layer(i)\h = doc\h
         
-        Layer_UpdateSprite(i)
+        Layer_Update(i)
         ;Debug "size : " +Str(ImageWidth(layer(layerid)\Image))+"/"+Str(ImageHeight(layer(layerId)\Image))
         ; on supprime les images temporaires
         FreeImage2(Tmp)
@@ -2872,12 +2449,11 @@ EndProcedure
 
 ;}
 
-; Layers : see layer.pbi
-
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 341
-; Folding = AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAg
+; CursorPosition = 223
+; FirstLine = 168
+; Folding = HACAfAAAEAAAAAAAAAAAAAIAAAAAAAAAAAAA5
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

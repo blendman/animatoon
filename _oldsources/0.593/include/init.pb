@@ -79,13 +79,9 @@ LoadImage2(#ico_LayerUp,       OptionsIE\Theme$ +"\icones\up.png")
 LoadImage2(#ico_LayerDown,     OptionsIE\Theme$ +"\icones\down.png")
 LoadImage2(#ico_LayerMask,     OptionsIE\Theme$ +"\layerbtn3.jpg")
 
-; Load FOnt
-If LoadFont(#FontArial20Bold, "arial", 20,  #PB_Font_Bold) : EndIf
-
-
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 82
-; FirstLine = 54
-; Folding = --
+; CursorPosition = 79
+; FirstLine = 50
+; Folding = -
 ; EnableXP
 ; EnableUnicode

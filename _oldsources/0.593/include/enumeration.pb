@@ -1,6 +1,6 @@
 ﻿
 ; CompilerIf #PB_Compiler_IsMainFile 
-
+  
 
 #Statusbar = 0
 
@@ -26,45 +26,37 @@ Enumeration
   #fnt_Arial10BoldItalic
   #fnt_Arial12Italic
   #fnt_Arial11
-  #FontArial20Bold
-
+  
   #Font_last
 EndEnumeration
 
-If LoadFont(#fnt_Arial8, "Arial.ttf", 8) : EndIf
-If LoadFont(#fnt_Arial8Bold, "Arial.ttf", 8, #PB_Font_Bold) : EndIf
-If LoadFont(#fnt_Arial10, "Arial.ttf", 10) : EndIf
-If LoadFont(#fnt_Arial12, "Arial.ttf", 12) : EndIf
-If LoadFont(#fnt_Arial10BoldItalic, "Arial.ttf", 10, #PB_Font_Bold|#PB_Font_Italic) : EndIf
-If LoadFont(#fnt_Arial12Italic, "Arial.ttf", 12, #PB_Font_Italic)  : EndIf
-If LoadFont(#fnt_Arial11, "Arial.ttf", 11)  : EndIf
+LoadFont(#fnt_Arial8, "Arial.ttf", 8)
+LoadFont(#fnt_Arial8Bold, "Arial.ttf", 8,#PB_Font_Bold)
+LoadFont(#fnt_Arial10, "Arial.ttf", 10)
+LoadFont(#fnt_Arial12, "Arial.ttf", 12)
+LoadFont(#fnt_Arial10BoldItalic, "Arial.ttf", 10,#PB_Font_Bold|#PB_Font_Italic)
+LoadFont(#fnt_Arial12Italic, "Arial.ttf", 12,#PB_Font_Italic)
+LoadFont(#fnt_Arial11, "Arial.ttf", 11)
 
 
 
 #MaxTxt=500
 ;}
 
-
-; some events
-#eventquit = 1
-
-;-- WINDOW
 Enumeration ; windows
   
   #WinMain
   #Win_Intro
   
-  ; File/menu
+  ; autre
   #Win_New
   #winNewTileset
   #Win_Pref
-  #Win_Autosave
+  
   
   #Win_Layer
   #Win_BGeditor
   #Win_Swatch
-  #Win_BrushEditor
-  
   
   ; Images settings / reglages images
   #Win_Contrast
@@ -76,12 +68,9 @@ Enumeration ; windows
   ; other windows
   #Win_Exit
   #Win_About
- 
   
 EndEnumeration
 
-
-;-- IMAGES, SPRITES 
 Enumeration ; images
   
   ; on garde 100 images pour les 100 calques ?
@@ -98,9 +87,6 @@ Enumeration ; images
   #Img_Intro
   
   #Img_Paper
-  #Img_PaperForMainCanvas
-  #ImagecanvasMini
-  
   #ImageTablet
   #ImageExport
   #Img_Checker
@@ -133,7 +119,7 @@ Enumeration ; images
   ; panel
   #image_RB
   #image_patternscanvas ; image for canvas pattern (in panel pattern)
-  #image_patternForstamp; image of pattern that we use with stamp tool
+  #image_patternForstamp ; image of pattern that we use with stamp tool
   
   ;{ icone
   #ico_New
@@ -196,7 +182,7 @@ Enumeration ; images
   ;   #ImgAboutCredit
   #Img_About
   
-  #img_selection
+  
   #Img_AlphaSel
   
   #Img_Max
@@ -205,7 +191,6 @@ EndEnumeration
 
 Enumeration ; sprite
   
-  #SpriteZero = 0
   #Layeractif = 50
   
   ; les sprites pour les brushs
@@ -236,17 +221,15 @@ Enumeration ; sprite
   
 EndEnumeration
 
-
-;-- MENUS
-Enumeration ; Menu, menuitems
+Enumeration ; Menu
   
- ;{ the menu for windows
   #Menu_Main
   #Menu_Layer
   #Menu_LayerBM
-  ;}
   
- ;{ menuItem
+EndEnumeration
+
+Enumeration ; menuItem
   
   ;{ Window Main
   
@@ -297,6 +280,22 @@ Enumeration ; Menu, menuitems
   #menu_ScreenRedraw
   #menu_ScreenQuality
   
+  #menu_ShowStatus
+  #Menu_SHowHideAllUI
+  
+  #menu_ShowToolParameters
+  #menu_ShowColor
+  #menu_Showgradient
+  #menu_ShowLayers
+  #menu_ShowPresets
+  #menu_Showoptions
+  #menu_ShowSwatchs
+  #menu_ShowRoughBoard
+  #menu_ShowPatterns
+  
+  #menu_UIEditor
+  #menu_UISimple
+  #menu_UIAdvanced
   
   
   ; Selection
@@ -305,8 +304,6 @@ Enumeration ; Menu, menuitems
   #Menu_SelExtend
   #Menu_SelContract
   #Menu_SelInverse
-  #Menu_SelectAlphaLayer
-  #Menu_SelectionsEditor
   
   ; image
   #Menu_ResizeDoc
@@ -342,7 +339,6 @@ Enumeration ; Menu, menuitems
   #Menu_LayerTransformToLine
   #Menu_BackgroundEditor
   #Menu_LayerAddBackgroundOnAlpha
-  #Menu_LayerEraseAlpha
   
   
   ; Actions
@@ -359,26 +355,6 @@ Enumeration ; Menu, menuitems
   #Menu_IE_SharpenAlpha
   #menu_IE_Offset
   
-  ; window
-  #menu_ShowStatus
-  #Menu_SHowHideAllUI
-  
-  #menu_ShowToolParameters
-  #menu_ShowColor
-  #menu_Showgradient
-  #menu_ShowLayers
-  #menu_ShowPresets
-  #menu_Showoptions
-  #menu_ShowSwatchs
-  #menu_ShowRoughBoard
-  #menu_ShowPatterns
-  
-  #menu_UIEditor
-  #menu_UISimple
-  #menu_UIAdvanced
-  
-  #menu_BrushEditor
- 
   ; Help
   #Menu_about
   #Menu_Infos
@@ -393,14 +369,10 @@ Enumeration ; Menu, menuitems
   #Menu_Layer_Group
   ;}
   
-  ;}
   
   #Menu_Last ; the last meni id !
-  
 EndEnumeration
 
-
-;-- GAGDETS 
 Enumeration ; gadgets
   
   #G_0
@@ -448,11 +420,11 @@ Enumeration ; gadgets
   
   ;}
   
-  ; canvas, if version cusecanvas = 1 // si version canvas
+  ; canvas, si version canvas
   #G_SA_forcanvas
   #G_CanvasMain
   
-  ; container for the screen // pour le screen
+  ; container pour le screen
   #G_ContScreen
   
   ; splitters
@@ -470,7 +442,7 @@ Enumeration ; gadgets
   
   #G_BrushTool
   
-  ; By TOOL
+  ;--- By TOOL
   
   #G_ConfirmAction ; for all action, if needed
   
@@ -607,7 +579,6 @@ Enumeration ; gadgets
   #G_PanelLayer
   #G_Layer
   #G_LayerList
-  #G_LayerListCanvas
   #G_LayerDuplicate
   #G_LayerAlpha
   #G_LayerAlphaSpin
@@ -684,7 +655,7 @@ Enumeration ; gadgets
   #G_SA_Pattern ; scrollarea
   #G_PatternCanvas ; canvas To draw the patterns
   #G_PatternAdd    ; button to add a pattern 
-  #G_PatternLoad   ; button to add a pattern 
+  #G_PatternLoad    ; button to add a pattern 
   
   
   ; gradient
@@ -714,7 +685,7 @@ Enumeration ; gadgets
   ;}
   
   
-  ;{**** window by menu
+  ;{**** window par menu
   
   
   ;{-- MENU FILE
@@ -730,20 +701,10 @@ Enumeration ; gadgets
   #G_PrefPanel
   
   #G_Frame_Lang
-  #G_Pref_Lang
-  #G_Pref_Theme
-  
-  #G_Pref_Autosave
-  #G_Pref_AutosaveTime
-  #G_Pref_ExportWithPaper
-  
-  #G_Pref_autosaveAtexit
-  #G_Pref_ConfirmExit
-  
+  #G_Cob_Lang
   #G_pref_UseRightbutonTopaint
-  #G_pref_UseCanvas
-  
-  
+  #G_Pref_AutoSave
+  #G_Pref_AskWhenExit
   
   ; grille
   #G_GridW
@@ -758,15 +719,6 @@ Enumeration ; gadgets
   #G_WAnim_CBTimelineBar
   #G_WPref_SizeFrame
   
-  ;}
-  
-  ;{ window brush editor
-  #G_brushAddRdNoiseToImage
-  #G_brushNoiseToImgMin
-  #G_brushNoiseToImgMax
-  #G_brushNoiseToImgGrey
-  #G_brushAlphaVsTime
-  #G_brushAlphaVsTimeFactor
   ;}
   
   ;}  
@@ -836,17 +788,15 @@ Enumeration ; gadgets
   #G_LastGadget
   
 EndEnumeration
+
 ;{ taille gadgets ; some gadget size
 #GetColor_ArcEnCiel_L = 20
 #GetColor_ArcEnCiel_W = 128
 #GetColor_ArcEnCiel_H = 128
 ;}
 
-
-;-- LAYERS
-Enumeration ; BlendMode, LAyer set BM, layer type
+Enumeration ; BlendMode
   
-  ;{ BLENDMODE
   ; must be in the same order as the gadget of blendmode layer
   #Bm_Normal 
   
@@ -887,46 +837,12 @@ Enumeration ; BlendMode, LAyer set BM, layer type
   
   #Bm_Custom ; pour tester les blendmode
   
+EndEnumeration
+
+Enumeration ; Layer Set BM
   
-  ;   #Normal
-  ;   #Add
-  ;   #Multiply
-  ;   #Screen
-  ;   #Overlay
-  ;   #SoftLight
-  ;   #HardLight
-  ;   #ColorBurn
-  ;   #LinearBurn
-  ;   #ColorDodge
-  ;   #LinearDodge
-  ;   #Darken
-  ;   #Lighten
-  ;   #Difference
-  ;   #Exclusion
-  ;   #LinearLight
-  ;   #PinLight
-  ;   #VividLight
-  ;   #HardMix
-  ;   #Hue
-  ;   #Saturation
-  ;   #Color
-  ;   #Luminosity
-  ;  
-  ;   #Average
-  ;   #Negation
-  ;   #Subtract
-  ;   #Reflect
-  ;   #Glow
-  ;   #Phoenix
-  ;   #Stamp
-  ;   #Freeze
-  
-  ;}
-  
-  ;{ FOR LAYER SET BM
-  
-  ; Add the others blendmode when we ill have it // ajouter les autres bm qd on les aura
-  #SetBm_normal = 0
+  ; ajouter les autres bm qd on les aura
+  #SetBm_normal
   
   #SetBm_Darken
   #SetBm_multiply
@@ -945,38 +861,13 @@ Enumeration ; BlendMode, LAyer set BM, layer type
   #SetBm_Overlay2
   
   #SetBm_Custom
-  ;}
-  
-  ;{ layer type
-  #Layer_TypBitmap = 0 ; always first , =0 // toujours en premier = 0
-  #Layer_TypText
-  #Layer_TypBG  
-  #Layer_TypShape
-  #Layer_TypGroup
-  #Layer_TypVecto
-  ;}
   
 EndEnumeration
 
-
-;-- SELECTION
-Enumeration 
+Enumeration ; action qu'on effectue sur le calque
   
-  #selectionRectangle
-  #selectionCircle
-  #selectionLasso
-  #selectionPolygon
-  #selectionPaint
-  
-EndEnumeration
-
-;-- TOOLS
-Enumeration ; action on the layer, ToolType, stroke style
-  
-  ;{ Actions on the layers // // action qu'on effectur sur le calque
   ; doivent être identique à l'organisation des gadgets outils (dans IE_GadgetAdd() (gadgets.pbi)
   ; ainsi que Enumeration gadget/bouton toolbar
-  
   ; be carefull ! THose constant order need to be the same than the organisation of the gadgets tool (in IE_GadgetAdd() gadgets.pbi), 
   ; and the same as enumeration gadget/bouton toolbar.
   
@@ -1010,14 +901,14 @@ Enumeration ; action on the layer, ToolType, stroke style
   #Action_Hand ; 19
   #Action_Zoom
   
-  ;}
-  
-  ;{ ToolType
+EndEnumeration
+
+Enumeration ; ToolType
   
   ; pour les outils, le type d'outil
   ; attention, ça doit être dans le même ordre que sur le combobox "caractéristique de l'outil" 
   ; ou type de l'outil, dans AddtoolbarIE()
-  #ToolType_Brush = 0
+  #ToolType_Brush
   #ToolType_Pen
   #ToolType_Eraser
   #ToolType_Light
@@ -1032,27 +923,40 @@ Enumeration ; action on the layer, ToolType, stroke style
   #ToolType_Blur
   #ToolType_Sol
   #ToolType_Line
-  ;}
-  
-  ;{ stroke style
-  
-  #Stroke_Rough =0 ; blendman line,  not great
-  #Stroke_Knife    ; LSI thickline
-  #Stroke_Dash     ; HB Dashdraw
-  #Stroke_LineAA   ; by lsi
-  
-  
-  ; Gersam (G-rom & Falsam line)
-  #Stroke_Gersam 
-  ;}
   
 EndEnumeration
+
+Enumeration ; stroke style
+  
+  #Stroke_Rough ; blendman line,  not great
+  #Stroke_Knife ; LSI thickline
+  #Stroke_Dash  ; HB Dashdraw
+  #Stroke_LineAA; by lsi
+  
+  
+  
+  #Stroke_Gersam ; Gersam (G-rom & Falsam line)
+  
+  
+EndEnumeration
+
+Enumeration ; layer type
+  
+  #Layer_TypBitmap ; toujours en premier = 0
+  #Layer_TypText
+  #Layer_TypBG  
+  #Layer_TypShape
+  #Layer_TypGroup
+  #Layer_TypVecto
+  
+EndEnumeration
+
 
 ; CompilerEndIf
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 766
-; FirstLine = 33
-; Folding = 5fgFgwEAA-
+; CursorPosition = 704
+; FirstLine = 26
+; Folding = AABAsAA-
 ; EnableXP
 ; EnableUnicode

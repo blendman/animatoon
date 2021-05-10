@@ -64,18 +64,26 @@ Procedure SetMaximum(a,max)
   EndIf
   ProcedureReturn a
 EndProcedure
-Procedure.l max(a, b)
+Procedure Max(a, b)
+  
+  ; get the max of 2 numbers
+  
   If a > b
     ProcedureReturn a
+  Else
+    ProcedureReturn b
   EndIf
-  ProcedureReturn b
+  
 EndProcedure
 
-Procedure.l min(a,b)
-  If a > b
+Procedure Min(a,b)
+  
+  ; get the min of 2 variable
+  If a>b
     ProcedureReturn b
   EndIf
   ProcedureReturn a
+  
 EndProcedure
 Procedure SetMin(a, min)
   
@@ -104,19 +112,17 @@ Procedure.f Min3(Value1.f=255, Value2.f=255, Value3.f=255)
   ProcedureReturn MinValue
 EndProcedure
 
-Procedure.f MinF(a.f, b.f) 
-  ; get the min
-  If a < b 
-    ProcedureReturn a 
+Procedure.f MinF(n1.f, n2.f) 
+  If n1<n2 
+    ProcedureReturn n1 
   EndIf 
-  ProcedureReturn b 
+  ProcedureReturn n2 
 EndProcedure 
-Procedure.f MaxF(a.f, b.f) 
-  ; get the max
-  If a > b 
-    ProcedureReturn a 
+Procedure.f MaxF(n1.f, n2.f) 
+  If n1>n2 
+    ProcedureReturn n1 
   EndIf 
-  ProcedureReturn b 
+  ProcedureReturn n2 
 EndProcedure 
 
 
@@ -177,8 +183,8 @@ EndMacro
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 79
+; CursorPosition = 98
 ; FirstLine = 15
-; Folding = 5B44dHA-
+; Folding = 5BR1dAA-
 ; EnableXP
 ; EnableUnicode

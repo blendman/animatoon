@@ -119,246 +119,186 @@ Macro WinDocNewCont(typ)
 EndMacro
 Procedure WindowDocNew()
   
-  If DocHasChanged() = 0
+  If OpenWindow(#winNewTileset,0,0, 650,500,Lang("NewDoc"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
     
-    If OpenWindow(#winNewTileset,0,0, 650, 500, Lang("New Document"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
+    w1 = WindowWidth(#winNewTileset)
+    h1 = WindowHeight(#winNewTileset)
+    Col = RGB(80,80,80)
+    col2 = RGB(120,120,120)
+    SetWindowColor(#winNewTileset,col)
+    
+    xx = 165
+    canvas = CanvasGadget(#PB_Any,10,10,150,WindowHeight(#winNewTileset)-50) 
+    If StartDrawing(CanvasOutput(canvas))
+      Box(0,0,200,1000,col2)
+      StopDrawing()
+    EndIf
+    yy=10
+    
+    WinDocNewCont(1)
+    
+    ButtonGadget(#GADGET_WNewBtnOk,w1-70,h1 -25,60,20,Lang("Ok"))
+    BtnCancel = ButtonGadget(#PB_Any,10,h1-25,GadgetWidth(canvas),20,Lang("Cancel"))
+    SetGadgetColor(BtnCancel,#PB_Gadget_BackColor,col2)
+    SetGadgetColor(#GADGET_WNewBtnOk,#PB_Gadget_BackColor,col2)
+    
+    Repeat
       
-      w1 = WindowWidth(#winNewTileset)
-      h1 = WindowHeight(#winNewTileset)
-      Col = RGB(80,80,80)
-      col2 = RGB(120,120,120)
-      SetWindowColor(#winNewTileset,col)
+      Event       = WaitWindowEvent(10)
+      EventGadget = EventGadget()
+      EventType   = EventType()
       
-      xx = 165
-      canvas = CanvasGadget(#PB_Any,10,10,150,WindowHeight(#winNewTileset)-50) 
-      If StartDrawing(CanvasOutput(canvas))
-        Box(0,0,200,1000,col2)
-        StopDrawing()
-      EndIf
-      yy=10
-      
-      WinDocNewCont(1)
-      
-      ButtonGadget(#GADGET_WNewBtnOk,w1-70,h1 -25,60,20,Lang("Ok"))
-      BtnCancel = ButtonGadget(#PB_Any,10,h1-25,GadgetWidth(canvas),20,Lang("Cancel"))
-      SetGadgetColor(BtnCancel,#PB_Gadget_BackColor,col2)
-      SetGadgetColor(#GADGET_WNewBtnOk,#PB_Gadget_BackColor,col2)
-      
-      Repeat
-        
-        Event       = WaitWindowEvent(10)
-        EventGadget = EventGadget()
-        EventType   = EventType()
-        
-        Select event
-            
-            
-          Case #PB_Event_Gadget
-            
-            Select EventGadget
-                
-              Case CbTemplate
-                templat = GetGadgetState(CbTemplate)
-                SetGadgetText(#GADGET_WNewW,Str(template(templat)\w))
-                SetGadgetText(#GADGET_WNewH,Str(template(templat)\h))
-                
-              Case canvas
-                
-              Case SGnom
-                name$ =GetGadgetText(SGNom)
-                
-                
-                
-              Case #GADGET_WNewW,#GADGET_WNewH
-                W = Val(GetGadgetText(#GADGET_WNewW))
-                If W <1
-                  SetGadgetText(#GADGET_WNewW,Str(1))
-                ElseIf W > 10000
-                  SetGadgetText(#GADGET_WNewW,Str(10000))
-                EndIf
-                H = Val(GetGadgetText(#GADGET_WNewH))
-                If H <1 
-                  SetGadgetText(#GADGET_WNewH,Str(1))
-                ElseIf H > 10000
-                  SetGadgetText(#GADGET_WNewH,Str(10000))
-                EndIf
-                
-              Case #GADGET_WNewBtnOk
-                quit = 1
-                ok = 1
-                
-              Case BtnCancel              
-                quit = 1
-                
-            EndSelect
-            
-            
-          Case #PB_Event_CloseWindow
-            quit = 1
-            
-        EndSelect
-        
-        
-        
-        
-      Until quit = 1
+      Select event
+          
+          
+        Case #PB_Event_Gadget
+          
+          Select EventGadget
+              
+            Case CbTemplate
+              templat = GetGadgetState(CbTemplate)
+              SetGadgetText(#GADGET_WNewW,Str(template(templat)\w))
+              SetGadgetText(#GADGET_WNewH,Str(template(templat)\h))
+              
+            Case canvas
+              
+            Case SGnom
+              name$ =GetGadgetText(SGNom)
+              
+              
+              
+            Case #GADGET_WNewW,#GADGET_WNewH
+              W = Val(GetGadgetText(#GADGET_WNewW))
+              If W <1
+                SetGadgetText(#GADGET_WNewW,Str(1))
+              ElseIf W > 10000
+                SetGadgetText(#GADGET_WNewW,Str(10000))
+              EndIf
+              H = Val(GetGadgetText(#GADGET_WNewH))
+              If H <1 
+                SetGadgetText(#GADGET_WNewH,Str(1))
+              ElseIf H > 10000
+                SetGadgetText(#GADGET_WNewH,Str(10000))
+              EndIf
+              
+            Case #GADGET_WNewBtnOk
+              quit = 1
+              ok = 1
+              
+            Case BtnCancel              
+              quit = 1
+              
+          EndSelect
+          
+          
+        Case #PB_Event_CloseWindow
+          quit = 1
+          
+      EndSelect
       
       
-      If ok =1
-        
-       
-        
-        
-        ; then, set the new document parameters
-        Doc\name$ = name$
-        Doc\w = Val(GetGadgetText(#GADGET_WNewW))
-        Doc\h = Val(GetGadgetText(#GADGET_WNewH))
-        
-        ; we have clicked on ok  button, we can create a new document
-        Layer_FreeAll()
-        
-         ; add a new layer.
-        Layer_Add()
-        Layer_UpdateForRenderingSystem()
-        
-        ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
-        RecreateLayerUtilities()
-        
-        
-       
-        
-        ; reset the options parameters
-        OptionsIE\AutosaveFileName$ = ""
-        OptionsIE\NbNewFile +1
-        OptionsIE\zoom = 100
-        canvasX = 0
-        canvasY = 0
-                 
-        
-        ;ClearGadgetItems(#G_LayerList)
-        ;n = ArraySize(layer())
-        ;AddGadgetItem(#G_LayerList,-1,Layer(layerId)\Name$)
-        
-        ; update the GUI
-        IE_StatusBarUpdate()
-        ScreenUpdate()
-        
-      EndIf
       
       
-      FreeArray(template())
-      FreeArray(Format$())
+    Until quit = 1
+    
+    
+    If ok =1
       
-      CloseWindow(#winNewTileset)
+      ; we have clicked on ok  button, we can create a new document
+      Layer_FreeAll()
       
       
-    EndIf  
-  EndIf
+      
+      ; then, set the new document parameters
+      Doc\name$ = name$
+      Doc\w = Val(GetGadgetText(#GADGET_WNewW))
+      Doc\h = Val(GetGadgetText(#GADGET_WNewH))
+      
+      ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
+      RecreateLayerUtilities()
 
+      
+      ; add a new layer.
+      Layer_Add()
+      
+      ; reset the options parameters
+      OptionsIE\AutosaveFileName$ = ""
+      OptionsIE\NbNewFile +1
+      
+      
+      ;ClearGadgetItems(#G_LayerList)
+      ;n = ArraySize(layer())
+      ;AddGadgetItem(#G_LayerList,-1,Layer(layerId)\Name$)
+      
+      ; update the GUI
+      IE_StatusBarUpdate()
+      ScreenUpdate()
+      
+    EndIf
+    
+    
+    FreeArray(template())
+    FreeArray(Format$())
+    
+    CloseWindow(#winNewTileset)
+    
+    
+  EndIf  
+  
 EndProcedure
 
 Procedure WindowPref()
   
   Shared animBarre.a
   
-  winW = 750
-  winH = 500
-  If OpenWindow(#Win_Pref, 0, 0, winw, winH, Lang("Preferences"), #PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
+  winW = 700
+  winH = 400
+  If OpenWindow(#Win_Pref, 0, 0, winw, winH, Lang("Preferences"), #PB_Window_ScreenCentered|#PB_Window_SystemMenu)
     
-    ; generality : 
-    ; theme, langage, shortcuts
-    ; saving : 
-    ; brush (painting) : brush color saving
-    ; rendering : use image reduced, see only zone visible, don't update the canvas in RT, use canvas or screen...
-    
-    
-    
-    
-    ;{ add gagdets
-    h1 = 20
-    
-    
-    If PanelGadget(#G_PrefPanel, 5, 5, winW-10, winH-40)
+    If PanelGadget(#G_PrefPanel, 5, 5, winW-10, winH-10)
       
       ;{ General
-      AddGadgetItem(#G_PrefPanel, -1, lang("General"))
-      y1 = 5 :  x1 = 5
-      FrameGadget(#G_Frame_Lang, x1, y1, 100, 40, lang("Langage")) : y1 +15
+      AddGadgetItem(#G_PrefPanel, 0, lang("General"))
       
-      ComboBoxGadget(#G_pref_Lang, 15, y1, 80, 20) : y1+35
+      FrameGadget(#G_Frame_Lang, 5, 5, 100, 40, lang("Langage")) : y1 = 20
+      
+      ComboBoxGadget(#G_Cob_Lang, 15, y1, 80, 20) : y1+35
+      
       Directory$ = "data\Lang\"   
       If ExamineDirectory(0, Directory$, "*.ini")  
         While NextDirectoryEntry(0)
           If DirectoryEntryType(0) = #PB_DirectoryEntry_File
             nom$ = RemoveString(DirectoryEntryName(0),".ini")            
             If nom$ = OptionsIE\Lang$
-              pos = CountGadgetItems(#G_pref_Lang)
+              pos = CountGadgetItems(#G_Cob_Lang)
             EndIf
-            AddGadgetItem(#G_pref_Lang,-1,nom$)  
+            AddGadgetItem(#G_Cob_Lang,-1,nom$)  
           EndIf
         Wend
         FinishDirectory(0)
       EndIf
-      SetGadgetState(#G_pref_Lang, pos)
-      ;}
+      SetGadgetState(#G_Cob_Lang, pos)
       
-      ;{ interface
-      AddGadgetItem(#G_PrefPanel, -1, lang("Interface"))
-      y1 = 5 :  x1 = 5
-      AddStringGadget(#G_pref_Theme, x1, y1, 250, 20, OptionsIE\Theme$, lang("Theme :"), lang("Set the directory for the icone and images theme")) : y1+35
-      ;} 
+      text$ = Lang("Use right button to paint")
+      CheckBoxGadget(#G_pref_UseRightbutonTopaint, 10, y1, Len(text$)*8, 20, text$) : y1+20
+      SetGadgetState(#G_pref_UseRightbutonTopaint, OptionsIE\UseRighmouseToPaint)
       
-      ;{ saving
-      AddGadgetItem(#G_PrefPanel, -1, lang("Saving"))
-      y1 = 5 :  x1 = 5
-      AddCheckBox(#G_Pref_Autosave, x1, y1, 120, h1, LAng("Autosave"), OptionsIE\Autosave, lang("active the autosave or not")) : y1+h1+10
-      AddStringGadget(#G_Pref_AutosaveTime, x1, y1, 120, h1, Str(OptionsIE\AutosaveTime), 
-                      lang("Autosave time"), lang("Define the time between two autosave")): y1+h1+10
-      
-      AddCheckBox(#G_Pref_ExportWithPaper, x1, y1, 120, h1, LAng("Export with paper"), OptionsIE\UsePaperForRendering, lang("Use the paper when export image.")) : y1+h1+10
-
-      ;}
-      
-      ;{ shorctuts
-      AddGadgetItem(#G_PrefPanel, -1, lang("Shorcuts"))
-      y1 = 5 :  x1 = 5
-      ;}
-      
-      ;{ rendering
-      AddGadgetItem(#G_PrefPanel,-1,lang("Rendering"))
-      y1 = 5 :  x1 = 5
-      ; choose the preview rendering gadget (canvas) or screen and sprites.
-      ComboBoxGadget(#G_pref_UseCanvas, x1, y1, 120, 20) : y1+35
-      AddGadgetItem(#G_pref_UseCanvas, 0, lang("Screen & Sprite"))  
-      AddGadgetItem(#G_pref_UseCanvas, 1, lang("Canvas (& Images)"))
-      GadgetToolTip(#G_pref_UseCanvas, lang("Choose the surface for preview and drawings"))
-      SetGadgetState(#G_pref_UseCanvas, OptionsIE\UseCanvas)
-
       ;}
       
       ;{ Grille
-     
-      AddGadgetItem(#G_PrefPanel,-1,lang("Grid"))
-      y1 = 5
-      x1 = 5
-      SpinGadget(#G_GridW, x1, y1, 50, 20, 1, 500, #PB_Spin_Numeric)
-      SpinGadget(#G_GridH, 60, Y1, 50, 20, 1, 500, #PB_Spin_Numeric)
-      ButtonGadget(#G_GridColor, 120, y1, 60, 20, lang("Grid Color"))
-      SetGadgetState(#G_GridW, OptionsIE\GridW)
-      SetGadgetState(#G_GridH, OptionsIE\gridH)     
+      
+      AddGadgetItem(#G_PrefPanel,1,lang("Grid"))
+      SpinGadget(#G_GridW,5,10,50,20,1,500,#PB_Spin_Numeric)
+      SpinGadget(#G_GridH,60,10,50,20,1,500,#PB_Spin_Numeric)
+      ButtonGadget(#G_GridColor,120,10,60,20,lang("Grid Color"))
+      SetGadgetState(#G_GridW,OptionsIE\GridW)
+      SetGadgetState(#G_GridH,OptionsIE\gridH)     
       ;}
       
-      ;{ paint
-      AddGadgetItem(#G_PrefPanel,-1,lang("Paint"))
-      y1 = 5
-      x1 = 5
-      text$ = Lang("Use right button to paint")
-      CheckBoxGadget(#G_pref_UseRightbutonTopaint, x1, y1, Len(text$)*8, 20, text$) : y1+30
-      SetGadgetState(#G_pref_UseRightbutonTopaint, OptionsIE\UseRighmouseToPaint)
-      
-;       text$ = Lang("Save Color Brush")
-;       CheckBoxGadget(#G_BrushPreset_Save_color, x1, y1, Len(text$)*8, 20, text$)
-      
+      ;{ Preset
+      AddGadgetItem(#G_PrefPanel,-1,lang("Brush Preset"))
+      text$ = Lang("Save Color Brush")
+      CheckBoxGadget(#G_BrushPreset_Save_color, 10, 10, Len(text$)*8, 20, text$)
       ;}
       
       ;{ Animation
@@ -387,36 +327,6 @@ Procedure WindowPref()
       
     EndIf
     
-    
-    ; Add 2 buttons
-    w1 = WindowWidth(#Win_Pref)
-    h1 = WindowHeight(#Win_Pref)
-
-    ButtonGadget(#GADGET_WinBGED_BtnOk, w1-70, h1 -25, 60, 20, Lang("Ok"))
-    ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-140, h1-25, 60, 20, Lang("Cancel"))
-
-    ;}
-    
-    ;{ define variables by default
-    Lang$ = OptionsIE\Lang$ 
-    Theme$ = OptionsIE\Theme$
-    
-    UseCanvas = OptionsIE\UseCanvas
-    UseRighmouseToPaint = OptionsIE\UseRighmouseToPaint
-    
-    Autosave = OptionsIE\Autosave
-    AutosaveTime = OptionsIE\AutosaveTime
-    UsePaperForRendering = OptionsIE\UsePaperForRendering
-    
-    gridW = OptionsIE\GridW
-    GridH = OptionsIE\GridH
-    GridColor = OptionsIE\GridColor
-    
-    AnimBarre = OptionsIE\AnimBarre
-    SizeFrameW = OptionsIE\SizeFrameW
-    ;}
-    
-    
     Repeat
       
       Event = WindowEvent()
@@ -430,64 +340,47 @@ Procedure WindowPref()
           
           Select EventGadget
               
-            Case #GADGET_WinBGED_BtnOk
-              quit = 1
-              
-            Case #GADGET_WinBGED_BtnCancel
-              quit = 2
-              
-            Case #G_Pref_Autosave
-              Autosave = GetGadgetState(EventGadget)
-              
-            Case #G_Pref_AutosaveTime
-              Autosavetime = Val(GetGadgetText(EventGadget))
-              If Autosavetime< 1
-                Autosavetime = 1
-              EndIf
-              
-            Case #G_Pref_ExportWithPaper
-              UsePaperForRendering = GetGadgetState(EventGadget)
-              
-            Case #G_pref_UseCanvas
-              UseCanvas = GetGadgetState(EventGadget)
-              
-            Case #G_pref_Lang
-              lang$ = GetGadgetText(#G_pref_Lang)
+            Case #G_Cob_Lang
+              lang$ = GetGadgetText(#G_Cob_Lang)
               If lang$ <>  OptionsIE\lang$
-                ; in Menu.pbi
+                SaveOptions()
                 UpdateLanguageUI() 
                 
                 ; temporary message
                 ; I have to update all the gadgets with the new langage
                 MessageRequester(lang("Infos"), Lang("you need to restart Animatoon to see the changes of langage for gadgets"))
               EndIf
+              ; in Menu.pbi
+              ; OpenLang()
+              ; AddMenuMain()
               
             Case #G_GridW              
-              gridW = GetGadgetState(#G_GridW)
+              OptionsIE\gridW = GetGadgetState(#G_GridW)
               ScreenUpdate()
               
             Case #G_GridH
-              gridH = GetGadgetState(#G_GridH)
+              OptionsIE\gridH = GetGadgetState(#G_GridH)
               ScreenUpdate()
               
             Case #G_GridColor
-              GridColor = ColorRequester(OptionsIE\gridColor)
+              OptionsIE\GridColor = ColorRequester(OptionsIE\gridColor)
               ScreenUpdate()
               
             Case #G_pref_UseRightbutonTopaint
-              UseRighmouseToPaint = GetGadgetState(eventgadget)
+              OptionsIE\UseRighmouseToPaint = GetGadgetState(eventgadget)
+              SaveOptions()
               
             Case #G_BrushPreset_Save_color                  
-              brushPresetsavecolor = GetGadgetState(#G_BrushPreset_Save_color)
+              ;OptionsIE\brushPresetsavecolor = GetGadgetState(#G_BrushPreset_Save_color)
               
               ; animation
             Case #G_WAnim_CBTimelineBar
-              AnimBarre = GetGadgetState(#G_WAnim_CBTimelineBar)
+              OptionsIE\AnimBarre = GetGadgetState(#G_WAnim_CBTimelineBar)
               ;UpdateTimeLine()
               
               
             Case #G_WPref_SizeFrame
-              SizeFrameW = GetGadgetState(#G_WPref_SizeFrame)
+              OptionsIE\SizeFrameW = GetGadgetState(#G_WPref_SizeFrame)
               ;AddTimeLine(WindowWidth(#WinMain))                
               ;UpdateTimeLine()
               
@@ -495,60 +388,12 @@ Procedure WindowPref()
           
              
         Case #PB_Event_CloseWindow
-          quit = 2
+          quit = 1
           
       EndSelect
       
       
-    Until quit >= 1
-    
-    If quit = 1
-      
-      ; generality
-      If lang$ <>  OptionsIE\lang$
-        changelangage = 1
-      EndIf
-      
-      OptionsIE\Lang$ = Lang$
-      OptionsIE\Theme$ = Theme$
-      
-      If usecanvas <> OptionsIE\UseCanvas
-        updatecanvas = 1
-      EndIf
-      
-      OptionsIE\UseCanvas = usecanvas
-      OptionsIE\UseRighmouseToPaint = UseRighmouseToPaint
-      
-      ; saving
-      OptionsIE\Autosave = Autosave
-      OptionsIE\AutosaveTime = AutosaveTime
-      OptionsIE\UsePaperForRendering = UsePaperForRendering
-      
-      ; painting
-      ;OptionsIE\brushPresetsavecolor = brushPresetsavecolor
-      
-      ; anim
-      OptionsIE\SizeFrameW = SizeFrameW
-      OptionsIE\AnimBarre = AnimBarre
-      
-      ; utiles
-      OptionsIE\GridH = GridH
-      OptionsIE\GridW = GridW
-      OptionsIE\GridColor= GridColor
-      
-      SaveOptions()
-    Else
-     
-    EndIf
-    
-    If updatecanvas
-      IE_UpdateGadget()
-      Layer_UpdateElementsForRenderingSystem()
-    EndIf
-    
-    If changelangage = 1
-      UpdateLanguageUI() 
-    EndIf
+    Until quit = 1
     
     CloseWindow(#Win_Pref)
     
@@ -557,107 +402,6 @@ Procedure WindowPref()
 EndProcedure
 
 
-;--- TOOLS
-Procedure EventBrushEditor(EventGadget)
-  
-  ; event for gagdeget for window brush editor
-   Select EventGadget
-              
-     Case #G_brushAddRdNoiseToImage
-       brush(action)\AddNoiseRandomOnImagebrush = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgMin
-       brush(action)\AddNoiseOnImgMin = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgMax
-       brush(action)\AddNoiseOnImgMax = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgGrey
-       brush(action)\AddNoiseOnImgGrey = GetGadgetState(EventGadget)
-       
-     Case #G_brushAlphaVsTime
-       brush(action)\AlphaVsTime = GetGadgetState(EventGadget)
-   EndSelect
-   
-   BrushUpdateImage()
-   
-EndProcedure
-Procedure WindowBrushEditor()
-  
-  
-  
-  winW = 750
-  winH = 500
-  If OpenWindow(#Win_BrushEditor, 0, 0, winw, winH, Lang("Brush Editor"), #PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
-    
-    x = 10
-    y = 10
-    wsg = 60
-    h = 25
-    oldaction = action
-    action = #Action_Brush
-    
-    wp = 170
-    panel = PanelGadget(#PB_Any, wp+5, 5, winw-10-wp, WinH-50)
-    AddGadgetItem(panel, -1, lang("Image"))
-    AddGadgetItem(panel, -1, lang("Size"))
-    
-    AddGadgetItem(panel, -1, lang("Alpha"))
-    
-    addSpinGadget(#G_brushAddRdNoiseToImage, brush(action)\AddNoiseRandomOnImagebrush, lang("Add Noise to Image Brush"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    addSpinGadget(#G_brushNoiseToImgMin, brush(action)\AddNoiseOnImgMin, lang("Add Noise to Image Min"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    addSpinGadget(#G_brushNoiseToImgMax, brush(action)\AddNoiseOnImgMax, lang("Add Noise to Image Max"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    ; addSpinGadget(#G_brushNoiseToImggrey, brush(action)\AddNoiseOnImgGrey, lang("Add Noise to Image Alpha"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    y+h+5
-    
-    x = 10
-    addSpinGadget(#G_brushAlphaVsTime, brush(action)\AlphaVsTime, lang("Add fade off alpha"), x, y, wsg ,h, 0,5000, #PB_Spin_Numeric )
-    
-    AddGadgetItem(panel, -1, lang("Dynamics"))
-    AddGadgetItem(panel, -1, lang("Color"))
-
-    If useeditorloop = 1
-    Repeat
-      
-      Event = WindowEvent()
-      EventGadget = EventGadget()
-      
-      Select event
-        Case #PB_Event_Gadget
-          Select EventGadget
-              
-            Case #G_brushAddRdNoiseToImage
-              brush(action)\AddNoiseRandomOnImagebrush = GetGadgetState(EventGadget)
-              
-            Case #G_brushNoiseToImgMin
-              brush(action)\AddNoiseOnImgMin = GetGadgetState(EventGadget)
-              
-            Case #G_brushNoiseToImgMax
-              brush(action)\AddNoiseOnImgMax = GetGadgetState(EventGadget)
-              
-            Case #G_brushNoiseToImgGrey
-              brush(action)\AddNoiseOnImgGrey = GetGadgetState(EventGadget)
-              
-            Case #G_brushAlphaVsTime
-              brush(action)\AlphaVsTime = GetGadgetState(EventGadget)
-          EndSelect
-        Case #PB_Event_CloseWindow
-          quit = 2
-          
-      EndSelect
-      
-    Until quit >= 1
-    
-    BrushUpdateImage()
-    
-    CloseWindow(#Win_BrushEditor)
-  EndIf
-  
-    action = oldaction
-    
-  EndIf
-  
-EndProcedure
 ;--- EDITIONS
 
 
@@ -989,11 +733,10 @@ Procedure WindowBackgroundEditor()
   winW = 800
   WinH = 500
   
-  If OpenWindow(#Win_BGeditor, 0, 0, winw, WinH, Lang("Background editor"),
-                #PB_Window_ScreenCentered|#PB_Window_SystemMenu|#PB_Window_Invisible, WindowID(#WinMain))
+  If OpenWindow(#Win_BGeditor, 0, 0, winw, WinH, Lang("Background editor"),#PB_Window_ScreenCentered|#PB_Window_SystemMenu|#PB_Window_Invisible)
     
-    ;  HideWindow(#Win_BGeditor,1)
-    
+   ;  HideWindow(#Win_BGeditor,1)
+
     w1 = WindowWidth(#Win_BGeditor)
     h1 = WindowHeight(#Win_BGeditor)
     Col = RGB(80,80,80)
@@ -1040,8 +783,8 @@ Procedure WindowBackgroundEditor()
     
     ; the buton to save a background in data\presets\backgrounds
     wb = 22
-    ; AddButonImage3(#GADGET_WinBGED_BtnSaveBG, 5, 5, wb, wb, #ico_Save, #PB_Button_Default, 
-    ;lang("Save the background preset (with paper parameters and colors"))
+   ; AddButonImage3(#GADGET_WinBGED_BtnSaveBG, 5, 5, wb, wb, #ico_Save, #PB_Button_Default, 
+                   ;lang("Save the background preset (with paper parameters and colors"))
     
     ; the buton to update the list of presets bg, colors, and papers
     ;AddButonImage3(#GADGET_WinBGED_BtnUpdateBG, 5+wb+5, 5, wb, wb, #ico_loop, #PB_Button_Default, lang("Update presets, papers and colors lists"))
@@ -1103,7 +846,7 @@ Procedure WindowBackgroundEditor()
     xb = 15+winW - 220
     AddButonImage3(#GADGET_WinBGED_BtnsaveBGColors, xb, 5, wb, wb, #ico_New, #PB_Button_Default, 
                    lang("Create a new color (and save it in the color presets"))
-    
+
     ; a scrollarea +canvas to see the colors
     If ScrollAreaGadget(#GADGET_WinBGED_SA_colors, xb, y0, 200, hh, 150,  WinH*2)
       
@@ -1133,7 +876,7 @@ Procedure WindowBackgroundEditor()
       Else
         hcanvas = hh
       EndIf
-      
+            
       
       ; then create the canvas for color
       If CanvasGadget(#GADGET_WinBGED_Canvas_colors, 0, 0, 150, hcanvas) 
@@ -1164,8 +907,8 @@ Procedure WindowBackgroundEditor()
     ; the alpha gadgets (trackbar, name, spin)
     y = y0 + hh+10
     wTB = 150 ; trackbar width
-    wSG = 40  ; stringgadget width
-    wtg = 55  ; textgadget width
+    wSG = 40 ; stringgadget width
+    wtg = 55 ; textgadget width
     AddSTringTBGadget(#GADGET_WinBGED_TB_ALphaName,#GADGET_WinBGED_TB_ALpha,#GADGET_WinBGED_TB_ALphaSG, paper\alpha, 
                       lang("Alpha"), lang("Alpha of the background"), 5, y, wTB, wSG, 0, 255, wtg)
     
@@ -1177,18 +920,13 @@ Procedure WindowBackgroundEditor()
     ; the intensity gadgets (trackbar, name, spin)
     AddSTringTBGadget(#GADGET_WinBGED_TB_intensityName, #GADGET_WinBGED_TB_intensity, #GADGET_WinBGED_TB_intensitySG, paper\intensity, 
                       lang("Intensity"), lang("Intensity of the background"), 5, y+30, wTB, wSG, 1, 10, wtg)  
-    ;}
     
-    ;{ add two buttons in the bottom
-    w1 = WindowWidth(#Win_BGeditor)
-    h1 = WindowHeight(#Win_BGeditor)
     
-    ButtonGadget(#GADGET_WinBGED_BtnOk, w1-70, h1 -25, 60, 20,Lang("Ok"))
-    ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-140, h1-25, 60, 20, Lang("Cancel"))
+    ; add two buttons in the bottom
+    ButtonGadget(#GADGET_WinBGED_BtnOk,w1-70,h1 -25,60,20,Lang("Ok"))
+    ButtonGadget(#GADGET_WinBGED_BtnCancel,w1-140,h1-25,60,20,Lang("Cancel"))
     SetGadgetColor(#GADGET_WinBGED_BtnCancel,#PB_Gadget_BackColor,col2)
     SetGadgetColor(#GADGET_WinBGED_BtnOk, #PB_Gadget_BackColor,col2)
-    
-    
     
     ;}
     
@@ -1196,7 +934,7 @@ Procedure WindowBackgroundEditor()
     
     HideWindow(#Win_BGeditor,0)
     
-    Repeat
+     Repeat
       
       Event       = WaitWindowEvent(10)
       EventGadget = EventGadget()
@@ -1205,7 +943,7 @@ Procedure WindowBackgroundEditor()
       Select event
           
         Case #PB_Event_CloseWindow
-          quit = 2
+          quit = 1
           
         Case #PB_Event_Gadget
           
@@ -1254,46 +992,33 @@ Procedure WindowBackgroundEditor()
                   
                   PaperUpdate(1)
                   ScreenUpdate(0)
-                  
+                
                 EndIf
               EndIf
               
             Case #GADGET_WinBGED_TB_ALpha, #GADGET_WinBGED_TB_ALphaSG
               ;{
-              If EventGadget = #GADGET_WinBGED_TB_ALpha
-                paper\alpha = setmin(GetGadgetState(EventGadget), 1)
-                SetGadgetText(#GADGET_WinBGED_TB_ALphaSG, Str(paper\alpha))
-              Else
-                paper\alpha = setmin(Val(GetGadgetText(EventGadget)), 1)
-                SetGadgetState(#GADGET_WinBGED_TB_ALpha, paper\alpha)
-              EndIf
+              paper\alpha = setmin(GetGadgetState(EventGadget), 0)
+              SetGadgetState(#GADGET_WinBGED_TB_ALpha, paper\alpha)
+              SetGadgetText(#GADGET_WinBGED_TB_ALphaSG, Str(paper\alpha))
               PaperUpdate(1)
               ScreenUpdate(0)
               ;}
               
             Case #GADGET_WinBGED_TB_scale, #GADGET_WinBGED_TB_scaleSG
               ;{
-              If EventGadget = #GADGET_WinBGED_TB_scale
-                paper\scale = setmin(GetGadgetState(EventGadget), 1)
-                SetGadgetText(#GADGET_WinBGED_TB_scaleSG, Str(paper\scale))
-              Else
-                paper\scale = setmin(Val(GetGadgetText(EventGadget)), 1)
-                SetGadgetState(#GADGET_WinBGED_TB_scale, paper\scale)
-
-              EndIf
+              paper\scale = setmin(GetGadgetState(EventGadget), 1)
+              SetGadgetState(#GADGET_WinBGED_TB_ALpha, paper\scale)
+              SetGadgetText(#GADGET_WinBGED_TB_ALphaSG, Str(paper\scale))
               PaperUpdate(1)
               ScreenUpdate(0)
               ;}
               
             Case #GADGET_WinBGED_TB_intensity, #GADGET_WinBGED_TB_intensitySG
               ;{
-              If EventGadget = #GADGET_WinBGED_TB_intensity
-                paper\intensity = setmin(GetGadgetState(EventGadget), 1)
-                SetGadgetText(#GADGET_WinBGED_TB_intensitySG, Str(paper\intensity))
-              Else
-                paper\intensity = setmin(Val(GetGadgetText(EventGadget)), 1)
-                SetGadgetState(#GADGET_WinBGED_TB_intensity, paper\intensity)
-              EndIf
+              paper\intensity = setmin(GetGadgetState(EventGadget), 1)
+              SetGadgetState(#GADGET_WinBGED_TB_intensity, paper\intensity)
+              SetGadgetText(#GADGET_WinBGED_TB_intensitySG, Str(paper\intensity))
               PaperUpdate(1)
               ScreenUpdate(0)
               ;}
@@ -1335,7 +1060,6 @@ Procedure WindowBackgroundEditor()
       EndSelect
       
     Until quit >=1
-    
     
     ; free images
     FreeImage(tempImgBGcolor)
@@ -1392,12 +1116,12 @@ Procedure WindowAbout()
   
   ;txt_1$ + Chr(13)+ Chr(13)+"Distributed under the LGPL Licence"
   
-  If OpenWindow(#Win_About,0,0,400,500,optionsIE\name$,#PB_Window_ScreenCentered|#PB_Window_SystemMenu , WindowID(#WinMain))
+  If OpenWindow(#Win_About,0,0,400,500,optionsIE\name$,#PB_Window_ScreenCentered|#PB_Window_SystemMenu)
     imgH = 150
-    ImgAbout = CreateImage(#PB_Any, 380, imgH) ;,32, #PB_Image_Transparent)
-    ImgAboutCredit = CreateImage(#PB_Any, 380, WindowHeight(#win_About)-80) ;,32, #PB_Image_Transparent)
+    ImgAbout = CreateImage(#PB_Any, 380,imgH);,32, #PB_Image_Transparent)
+    ImgAboutCredit = CreateImage(#PB_Any, 380,WindowHeight(#win_About)-80);,32, #PB_Image_Transparent)
     
-    LoadImage2(#Img_About, optionsIE\Theme$+"\paint.png" )
+    LoadImage2(#Img_About,optionsIE\Theme$+"\paint.png" )
     
     ImageGadget(#GADGET_WAboutImage,10,10,380,imgH,ImageID(ImgAbout))
     
@@ -1473,8 +1197,6 @@ Procedure WindowAbout()
     EndSelect
     
   Until QuitAbout = 1 
-  
-  
   CloseWindow(#Win_About)
   FreeImage2(ImgAbout)
   FreeImage2(ImgAboutCredit)
@@ -1486,8 +1208,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 442
-; FirstLine = 84
-; Folding = AgHA5lAAAAAAAAAAAA9
+; CursorPosition = 282
+; FirstLine = 32
+; Folding = AwftAAAAAAAAAA+
 ; EnableXP
 ; EnableUnicode

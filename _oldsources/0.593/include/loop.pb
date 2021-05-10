@@ -43,7 +43,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
     
     Repeat 
       
-      Event       = WaitWindowEvent(1)
+      Event       = WindowEvent()
       EventMenu   = EventMenu()
       EventGadget = EventGadget()
       EventType   = EventType()
@@ -84,7 +84,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_Save
                   Doc_Save()
                   
-                Case #Menu_SaveImage ; image with all layer visible and background
+                Case #Menu_SaveImage
                   File_SaveImage()
                   
                 Case #Menu_Import
@@ -144,7 +144,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                         SaveImage(Layer(LayerId)\image, filename$,#PB_ImagePlugin_PNG)
                       Else
                         CopySprite(Layer(LayerId)\Sprite,#Sp_CopyForsave, #PB_Sprite_AlphaBlending)
-                        SaveSprite(#Sp_CopyForsave, filename$, #PB_ImagePlugin_PNG)
+                        SaveSprite(#Sp_CopyForsave, filename$,#PB_ImagePlugin_PNG)
                         FreeSprite2(#Sp_CopyForsave)
                       EndIf                  
                     EndIf
@@ -173,6 +173,10 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_Copy
                   Edit_Copy()
                   
+                Case #Menu_SelectAll,#Menu_DeSelect
+                  sel = (EventMenu-#Menu_DeSelect)
+                  Edit_Select(1+sel)
+                  
                 Case #Menu_FillAll
                   Layer_Fill(1)
                   
@@ -191,15 +195,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_RealTime
                   Clear = 1-clear
                   SetMenuItemState(0,#Menu_RealTime,Clear)
-                  ;}
-                  
-                  ;{ select
-                Case #Menu_SelectAll, #Menu_DeSelect
-                  sel = (EventMenu-#Menu_DeSelect)
-                  Edit_Select(1+sel)
-                  
-                Case #Menu_SelectAlphaLayer
-                  Layer_SelectAlpha()
                   ;}
                   
                   ;{ image
@@ -324,7 +319,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #menu_ScreenRedraw
                   W = WindowWidth(#WinMain) - ScreenX*2 ; -10
                   H = WindowHeight(#WinMain) - 150
-                  ScreenResize(w,h)  
+                  ResizeScreen(w,h)  
                   
                   ;}
                   
@@ -394,9 +389,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_LayerAddBackgroundOnAlpha  
                   Layer_AddBGToalpha()
                   
-                Case #Menu_LayerEraseAlpha  
-                  Layer_EraseAlpha()
-                  
                   ;}
                   
                   ;{ Filters
@@ -457,9 +449,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #menu_ShowSwatchs
                   OptionsIE\ShowPanelswatchs = 1- OptionsIE\ShowPanelswatchs 
                   UpdateUIShowHide()
-                  
-                Case #menu_brusheditor
-                  WindowBrushEditor()
                   ;}
                   
                   ;{ Help
@@ -520,16 +509,14 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
             ;}
             
           Case #PB_Event_Gadget
+            
             Select EventWindow
                 
               Case #WinMain              
                 ;{ win main
                 
-                If EventGadget <> #G_CanvasMain And EventGadget <> #G_SA_forcanvas
-                  Gad = 1
-                EndIf
-                
-                ; Debug EventType
+                Gad = 1
+                ;Debug EventType
                 
                 If EventType = #PB_EventType_LeftButtonUp
                   MoveCanvas = 0
@@ -550,82 +537,82 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   EndIf
                   
                 ElseIf EventGadget > #G_LastGadget
-                  ;{                  
-                  ;                   ; Click on the layer gadget // on clique sur le layer gadget
-                  ;                   For i =0 To ArraySize(layer())
-                  ;                     
-                  ;                     If EventGadget = layer(i)\IG_LayerMenu
-                  ;                       
-                  ;                       lx = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseX)
-                  ;                       ly = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseY)
-                  ;                       
-                  ;                       If EventType = #PB_EventType_LeftButtonDown
-                  ;                         
-                  ;                         
-                  ;                         
-                  ;                         If Lx < 20; view
-                  ;                           Layer(i)\View = 1 - Layer(i)\View
-                  ;                           Layer_updateUi(i)
-                  ;                           ScreenUpdate() 
-                  ;                         Else
-                  ;                           Id = i ; GetGadgetState(#G_LayerList) 
-                  ;                           If layerID <> id
-                  ;                             If OldAction <> Action
-                  ;                               Layer_ValidChange(Action)  
-                  ;                               OldAction = Action
-                  ;                             EndIf                
-                  ;                             UpdateGadgetLayer(id)
-                  ;                             ScreenUpdate()            
-                  ;                             LayerId= id
-                  ;                             IE_UpdateLayerUi() 
-                  ;                             
-                  ;                           EndIf
-                  ;                           
-                  ;                           If Lx >= 20 And lx < 45; drawing on the layer
-                  ;                             If Layer(layerId)\MaskAlpha =2
-                  ;                               Layer(layerId)\MaskAlpha = 1
-                  ;                               Layer_updateUi(layerId)
-                  ;                             EndIf
-                  ;                             If Control
-                  ;                               Layer_SelectAlpha()
-                  ;                             EndIf
-                  ;                           ElseIf Lx > 45 And lx < 64; drawing on the alpha mask
-                  ;                             If Control = 0
-                  ;                               If Layer(layerId)\MaskAlpha >=1
-                  ;                                 Layer(layerId)\MaskAlpha = 2
-                  ;                                 Layer_updateUi(layerId)                          
-                  ;                               EndIf  
-                  ;                             Else
-                  ;                               Layer(layerId)\MaskAlpha = 3 ; on ne l'affiche pas
-                  ;                               Layer_updateUi(layerId)  
-                  ;                             EndIf
-                  ;                             NewPainting = 1
-                  ;                             ScreenUpdate() 
-                  ;                           Else
-                  ;                             ; WindowLayerProp()
-                  ;                           EndIf
-                  ;                         EndIf
-                  ;                         
-                  ;                         
-                  ;                       ElseIf EventType = #PB_EventType_LeftDoubleClick
-                  ;                         If Lx > 45 And Lx <= 80
-                  ;                           ; 
-                  ;                           nom$ = InputRequester("Name","New Name","")
-                  ;                           If nom$ <> ""
-                  ;                             layer(layerid)\name$ = nom$
-                  ;                             SetGadgetItemText(#G_LayerList,id,nom$)
-                  ;                             Layer_updateUi(layerId)
-                  ;                           EndIf
-                  ;                         ElseIf Lx > 80 ; layer properties
-                  ;                           WindowLayerProp()
-                  ;                         EndIf
-                  ;                         
-                  ;                       EndIf
-                  ;                       Break
-                  ;                     EndIf
-                  ;                     
-                  ;                   Next i
-                  ;}                  
+                  
+                  ; Click on the layer gadget // on clique sur le layer gadget
+                  For i =0 To ArraySize(layer())
+                    
+                    If EventGadget = layer(i)\IG_LayerMenu
+                      
+                      lx = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseX)
+                      ly = GetGadgetAttribute(EventGadget, #PB_Canvas_MouseY)
+                      
+                      If EventType = #PB_EventType_LeftButtonDown
+                        
+                        
+                        
+                        If Lx < 20; view
+                          Layer(i)\View = 1 - Layer(i)\View
+                          Layer_updateUi(i)
+                          ScreenUpdate() 
+                        Else
+                          Id = i ; GetGadgetState(#G_LayerList) 
+                          If layerID <> id
+                            If OldAction <> Action
+                              Layer_ValidChange(Action)  
+                              OldAction = Action
+                            EndIf                
+                            UpdateGadgetLayer(id)
+                            ScreenUpdate()            
+                            LayerId= id
+                            IE_UpdateLayerUi() 
+                            
+                          EndIf
+                          
+                          If Lx >= 20 And lx < 45; drawing on the layer
+                            If Layer(layerId)\MaskAlpha =2
+                              Layer(layerId)\MaskAlpha = 1
+                              Layer_updateUi(layerId)
+                            EndIf
+                            If Control
+                              Layer_SelectAlpha()
+                            EndIf
+                          ElseIf Lx > 45 And lx < 64; drawing on the alpha mask
+                            If Control = 0
+                              If Layer(layerId)\MaskAlpha >=1
+                                Layer(layerId)\MaskAlpha = 2
+                                Layer_updateUi(layerId)                          
+                              EndIf  
+                            Else
+                              Layer(layerId)\MaskAlpha = 3 ; on ne l'affiche pas
+                              Layer_updateUi(layerId)  
+                            EndIf
+                            NewPainting = 1
+                            ScreenUpdate() 
+                          Else
+                            ; WindowLayerProp()
+                          EndIf
+                        EndIf
+                        
+                        
+                      ElseIf EventType = #PB_EventType_LeftDoubleClick
+                        If Lx > 45 And Lx <= 80
+                          ; 
+                          nom$ = InputRequester("Name","New Name","")
+                          If nom$ <> ""
+                            layer(layerid)\name$ = nom$
+                            SetGadgetItemText(#G_LayerList,id,nom$)
+                            Layer_updateUi(layerId)
+                          EndIf
+                        ElseIf Lx > 80 ; layer properties
+                          WindowLayerProp()
+                        EndIf
+                        
+                      EndIf
+                      Break
+                    EndIf
+                    
+                  Next i
+                  
                 Else ; the others gadgets
                   
                   Select eventgadget
@@ -634,16 +621,15 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                       ;{-- Layer
                       
-                      ;{ select, Bm & alpha
-;                     Case #G_layerbm1, #G_layerbm2
-;                       blend1 = GetGadgetState(#G_layerbm1)
-;                       blend2 = GetGadgetState(#G_layerbm2)
-;                       Layer_SetBm(GetGadgetState(#G_LayerBM))
-;                       newpainting = 1
-;                       ScreenUpdate(1) 
+                      ;{ Bm & alpha
+                    Case #G_layerbm1,#G_layerbm2
+                      blend1 = GetGadgetState(#G_layerbm1)
+                      blend2 = GetGadgetState(#G_layerbm2)
+                      Layer_SetBm(GetGadgetState(#G_LayerBM))
+                      newpainting = 1
+                      ScreenUpdate(1) 
                       
-                    Case #G_LayerListcanvas
-                      Layer_GetLayerId()
+                      ;Case #G_LayerList
                       ;{
                       ;                     If OldAction <> Action
                       ;                       Layer_ValidChange(Action)  
@@ -664,22 +650,25 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                     Case #G_LayerBM ; blendmode of the layer
                       oldbm = layer(layerid)\bm
-                      Layer_SetBm(layerId, GetGadgetState(#G_LayerBM))
+                      Layer_SetBm(GetGadgetState(#G_LayerBM))
                       newpainting = 1
-                      CanvasHasChanged = 1
-                      ScreenUpdate(1)
-                      testlayer(LayerId)
+                      ScreenUpdate(1) 
                       
-                    Case #G_LayerAlpha, #G_LayerAlphaSpin
-                      Layer(LayerId)\alpha = GetGadgetState(eventgadget)
+                    Case #G_LayerAlpha
+                      Layer(LayerId)\alpha = GetGadgetState(#G_LayerAlpha)
                       SetGadgetState(#G_LayerAlphaSpin,Layer(LayerId)\alpha)
+                      If layer(layerId)\bm <> #Bm_Normal
+                        NewPainting = 1
+                      EndIf                
+                      ScreenUpdate()
+                      
+                    Case #G_LayerAlphaSpin                
+                      Layer(LayerId)\alpha = GetGadgetState(#G_LayerAlphaSpin)
                       SetGadgetState(#G_LayerAlpha,Layer(LayerId)\alpha)
                       If layer(layerId)\bm <> #Bm_Normal
                         NewPainting = 1
                       EndIf                
-                      CanvasHasChanged = 1
                       ScreenUpdate()
-                  
                       ;}
                       
                       ;{ lock  & view
@@ -687,11 +676,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       Layer(LayerId)\view = GetGadgetState(#G_LayerView)
                       ScreenUpdate()
                       Layer_updateUi(layerId)
-                      
                     Case #G_LayerLocked
                       Layer(LayerId)\locked = GetGadgetState(#G_LayerLocked)
                       Layer_updateUi(layerId)
-                      
                     Case #G_LayerLockAlpha 
                       Layer(LayerId)\LockAlpha = GetGadgetState(#G_LayerLockAlpha)
                       
@@ -913,11 +900,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                         EndIf
                       ElseIf action = #Action_Fill
                         brush(action)\Alpha = GetGadgetState(#G_ActionY)
-                        If IsGadget(#G_ActionX)
-                          ; tolerance, not used for the moment
-                          brush(action)\Size  = GetGadgetState(#G_ActionX)
-                        EndIf
-                        
+                        brush(action)\Size  = GetGadgetState(#G_ActionX)
                       ElseIf action = #Action_Transform
                         If layer(layerId)\Locked = 0 And layer(layerid)\View = 1
                           Layer(LayerId)\w = GetGadgetState(#G_ActionX)                      
@@ -933,8 +916,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       ElseIf action = #Action_Line Or action = #Action_Box
                         brush(action)\Alpha = GetGadgetState(#G_ActionY)
                         brush(action)\Size  = GetGadgetState(#G_ActionX)
-                      ElseIf action = #Action_Select
-                        
                       ElseIf action = #Action_Gradient
                         brush(action)\Alpha   = GetGadgetState(#G_ActionX)
                         brush(action)\AlphaFG = GetGadgetState(#G_ActionY)
@@ -942,7 +923,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                     Case #G_ActionFullLayer
                       OptionsIE\ActionForAllLayers = GetGadgetState(#G_ActionFullLayer)
-                      OptionsIE\ShapeFullLayer = GetGadgetState(#G_ActionFullLayer)
                       
                     Case #G_ConfirmAction
                       OptionsIE\ConfirmAction = GetGadgetState(#G_ConfirmAction)
@@ -954,13 +934,13 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                     Case #G_ActionTyp
                       If action  = #Action_Pipette Or action =#Action_Zoom
                         brush(action)\type = GetGadgetState(#G_ActionTyp)
-                      ElseIf action = #Action_Select
-                        OptionsIE\SelectionType = GetGadgetState(#G_ActionTyp)
-                        brush(action)\type = GetGadgetState(#G_ActionTyp)
                       Else
                         OptionsIE\ShapeTyp = GetGadgetState(#G_ActionTyp)
                       EndIf
-                   
+                      
+                    Case #G_ActionFullLayer
+                      OptionsIE\ShapeFullLayer = GetGadgetState(#G_ActionFullLayer)
+                      
                     Case #G_ActionW, #G_ActionH
                       If action = #Action_Circle Or action = #Action_Box ; outlined
                         Brush(action)\ShapeOutSize = GetGadgetState(#G_ActionH)
@@ -1232,6 +1212,10 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 
                 ;}
                 
+                ; Case  #Win_Pref
+                ; see window.pbi
+              
+                
               Case #Win_Level
                 ;{ Win level
                 gad=1              
@@ -1267,17 +1251,14 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 EndSelect              
                 ;}
                 
-              Case #Win_BrushEditor  
-                EventBrushEditor(EventGadget)
-                
-                ; For the other window gagdets on other windows (pref, newdoc..), see include\procedures\window.pbi
+                ; For the other window gagdets, see include\procedures\window.pbi
                 
             EndSelect
             
           Case #PB_Event_CloseWindow
             
             If EventWindow = #WinMain
-              quit = #eventquit
+              quit = 1
             Else            
               CloseWindow(EventWindow)
               MouseClic = 0               
@@ -1307,7 +1288,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   
                   ePar = EventwParam()
                   wheelDelta.w = ((ePar>>16)&$FFFF) 
-                  OptionsIE\zoom + (wheelDelta / 12)     
+                  
+                  OptionsIE\zoom + (wheelDelta / 20)     
                   If OptionsIE\zoom > 5000
                     OptionsIE\zoom = 5000
                   EndIf    
@@ -1317,11 +1299,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   ScreenZoom() ; update screen   
                 EndIf
               EndIf
-              
             EndIf
             
           Case #WM_LBUTTONDOWN 
-             ; Debug "left down"
             ; we are on the drawing surface, to do action (painting, select...)
             If Mx>0 And My>0 And Mx<GadgetWidth(#G_ContScreen)-1 And My<GadgetHeight(#G_ContScreen)-1
               If GetActiveWindow() = #WinMain
@@ -1344,7 +1324,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
               EndIf
             EndIf
             
-          Case #PB_Event_LeftClick, #WM_LBUTTONUP
+          Case #PB_Event_LeftClick 
             ;{ mouseleft up
             ; clic = 0
             If Gad =0
@@ -1368,7 +1348,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
               
               If paint = 1
                 paint = 0 
-                ; Debug "left click-paint"
+                
                 ; Layer_updateUi(layerId) ; update the gadget-layer current
                 
                 If (layer(layerid)\MaskAlpha >= 1 And layer(layerid)\MaskAlpha < 3) Or layer(layerid)\typ =#Layer_TypBG Or OptionsIE\SelectAlpha = 1
@@ -1394,7 +1374,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 
                 ; wash the brush (set the initial color ) // on lave le pinceau si besoin
                 If Brush(Action)\Wash
-                  Brush(Action)\Color = RGB(Brush(Action)\ColorBG\R, Brush(Action)\ColorBG\G, Brush(Action)\ColorBG\B)
+                  Brush(Action)\Color = RGB(Brush(Action)\ColorBG\R,Brush(Action)\ColorBG\G,Brush(Action)\ColorBG\B)
                   BrushResetColor()
                   BrushUpdateImage(0,1)
                 EndIf
@@ -1403,13 +1383,17 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 ; clear the layer_tempo
                 Select action 
                   Case #Action_Box, #Action_Circle, #Action_Line, #Action_Gradient
-                    ; I have to delete the sprite layer tempo (the sprite for temporary operations)
-                    freesprite2(#Sp_LayerTempo)
+                    ; I have to clear the sprite layer tempo (the sprite for temporary operations)
+                    If StartDrawing(SpriteOutput(#Sp_LayerTempo))
+                      DrawingMode(#PB_2DDrawing_AlphaChannel)
+                      Box(0, 0, OutputWidth(), OutputHeight(), RGBA(0,0,0,255))
+                      Box(0, 0, OutputWidth(), OutputHeight(), RGBA(0,0,0,0))
+                      StopDrawing()
+                    EndIf
                   Case #Action_Select
                     If OptionsIE\SelectionW = 0 Or OptionsIE\SelectionH = 0
                       DisableMenuItem(#Menu_Main, #menu_Crop, 1)
                       OptionsIE\Selection = 0
-                      freesprite2(#Sp_LayerTempo)
                     Else
                       DisableMenuItem(#Menu_Main, #menu_Crop, 0)
                     EndIf
@@ -1420,11 +1404,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 
               EndIf
               
-              NewPainting = 0
-              
             EndIf
             MoveCanvas = 0
-            
             ;}
             
           Case #PB_Event_SizeWindow
@@ -1438,14 +1419,12 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
         
       EndIf
       
-      FPS()
-      
-    Until event = 0 Or event = #WM_LBUTTONDOWN Or event = #WM_LBUTTONUP Or quit = #eventquit
+    Until event = 0 Or event = #WM_LBUTTONDOWN Or event = #WM_LBUTTONUP
     
     IncludeFile "loop_mousekeyb.pb" ; event paint, erase...
     
     ; confirm exit
-    If quit = #eventquit
+    If quit = 1
       If OptionsIE\ConfirmExit = 1
         If OptionsIE\ImageHasChanged
           If MessageRequester(Lang("Exit"), Lang("Do you confirm you want to exit this beautiful program ? You have some work which aren't saved."), 
@@ -1456,7 +1435,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
       EndIf
     EndIf
     
-  Until quit = #eventquit
+  Until quit = 1
   
 CompilerEndIf
 
@@ -1479,8 +1458,8 @@ End
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1270
-; FirstLine = 29
-; Folding = hnCAAAAARcBDQBACAAAQgRAAA9
+; CursorPosition = 1215
+; FirstLine = 28
+; Folding = hHAAAAAgGAgBAAAAgACAAwf88PA+
 ; EnableXP
 ; EnableUnicode
