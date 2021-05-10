@@ -1,6 +1,204 @@
 ﻿
 ************************* CHANGELOG ********************************
 
+05/05/2021  0.5.9.6.2
+// Fixes
+- When add more than 8 layers, the canvas-layer height should be changed.
+- preference : the autosavetime can't be > 1.
+
+
+28/04/2021  0.5.9.6
+// New
+- brush editor window : add panel (images, size, alpha, dynamics, colors), add some gadgets (add random noise (+min, max))
+// Changes
+- change fillarea : can fill area With Or without alpha channel (rest a bug With black color As shape).
+// Fixes
+- some little bugfixes
+
+
+27/04/2021  0.5.9.5.6
+// Changes
+- delete the paper image To gain memory.
+// Fixes
+- Doc_Open() : fix some bugs hhen open an image (instead of a document .ani)
+
+
+25/04/2021  0.5.9.5.5
+// Changes
+- sprite paper color is now 10x10 instead of document size (because only a colored box).
+
+
+24/04/2021  0.5.9.5.4
+// Fixes
+- when change rendering system : bug With some image layers
+- checker isn't drawn on layer image
+
+
+23/04/2021  0.5.9.5.3
+// New
+- add Canvas_CreateImageMiniForMove(), canvasdraw()
+// changes
+- Movecanvas : now, If optionsie\usecavans =1 : use a "mini" image (all visible layers merged on this mini image)
+- replace CanvasMain_Update() by canvasupdate() (With new addition (chef If usecanvas, update the canvasmini image)
+- paper : only create paper sprite If we use the screen As preview system
+- layer : when clear, layer()\haschanged = 0 now, To Not save an empty layer (With autosave)
+- add PaperCreate(), PaperUpdate(1) And setbm To sprite when change rendering system from canvas To screen
+// fixes
+- when export image, the sprites With multiply bm get a black background instead of a white bg
+- when change rendering system in preference window,  sprites (bm multiply) get a black background instead of a white bg
+
+
+22/04/2021  0.5.9.5.2
+// changes
+- when export image, Layer_UpdateForRenderingSystem()
+- Layer_UpdateForRenderingSystem() : add free sprite/image of paper
+- new document : free all the sprite (event the paper sprite ) Or image, depending of the rendering system used
+- new document : add reset zoom, canvas position
+// Fixes
+- export image : when usecanvas= 1, crash because no sprite To make the rendering on the screen. -> change export : If usecanvas, no screen export.
+- fix a bug in Layer_ConvertToBm() (use layerId As id, instead of i)
+
+
+21/04/2021  0.5.9.5.1
+// New
+- Window preference : add gadgets For : autosave, autosavetime, theme
+// Changes
+- when change rendering system : If use canvas : delete the sprite, If use screen : recreate the sprite, And delete some images For canvas (paper repeted)
+- add window infos when : opendoc, savedoc.
+- opendoc optimisation (no more copy image loaded, directly use it)
+
+
+
+20/04/2021  0.5.9.5
+// Changes
+- Big optimisations : delete unused images. On big document (3500x2500pixels, With 6 layers, I get from 1,5Go ram To 500mo ram)
+- change And improve a lot the gadget layerListcanvas (layerList)
+- now, when layer_add(), I dont' create all the image, only layer()\image (not imagetemp, imageBm, etc..) to gain memory and ram.
+- autosave : add text on autosavewindow when save a layer (layer()\name$)
+- autosave : after opendoc() save only If layer has changed
+- change ScreenUpdate() : by Default updateCanvas = 0 And no more layer(layerID)\haschanged = 1
+- shape : only create layertempo_ If use toolwhich use this sprite.
+- delete layertempo_ when Not used
+- create #Img_PaperForMainCanvas only If optionsIE\usecanvas =1
+// fixes
+- autosave : only save the changed image.
+
+
+14 -> 20.4.2021 : work on animatoon test brush editor And optimisations.
+
+
+14/04/2021  0.5.9.4.1
+// New
+// Changes
+- OptionsIE : add OpenDocPatternPos To keep the pattern position when open a doc.
+- when autosave, now open a little window To say "autosave" (close after autosave)
+// Fixes
+- autosaveTime double each time it autosave !
+- opendoc : should verify If document has changed And propose To save it
+- newdoc  : should verify If document has changed And propose To save it
+
+
+09/04/2021  0.5.9.4
+// Fixes
+- tool selection type isn't updated when open the program
+- bug With selection ellipse And Cut/copy/paste
+- autosave : when save one time, it doesnt save no more
+
+
+
+08/04/2021  0.5.9.3.9
+// Fixes
+- tool parameter (For selection) isn't updated with the correct parameter when change the tool to selection
+
+
+
+07/04/2021  0.5.9.3.8
+// New
+- add selection circle
+- add gadgets options For selection (type : rectangle, ellipse)
+- edit/cut : now cut the image With the selection (rectangle Or ellipse) (Not paste For the moment) 
+// Changes
+- add selection Enumeration
+- Add 2 buttons on window preference (ok, cancel)
+- Add WindowID(#WinMain) To windows : preference, bgeditor
+- main menu : set layers transformations (mirror H, V, Rotation) on a submenu "transformations"
+// Fixes
+- when open a document (created With canvas) With layers With alpha And blendmode <> normal, sometimes, the alpha isn't correct with screen (need to be updated).
+- Select/deselect all : the preview rectangle was inverted
+- Select rectangle + cut : the uncutted part became white
+- background windows : trackbar scale change the gadgets For alpha.
+- background windows : fixe bugs With string gadget -> change value To 1 instead of the current value of gadget.
+- background windows : when clic on red cross To close window, the parameters of the paper are Not restored
+- when open, the paper doesn't use the scale saved.
+
+
+
+06/04/2021  0.5.9.3.7
+// Changes
+- Add optionsIE\UsePaperForRendering To know If we use the paper in the rendering of final image (saved in pref.ini)
+- Add some verification when create the saved image (from screen : If grabsprite, If savepsrite, If load...)
+- code cleaning And some comments added (in english)
+// Fixes
+- With eraser, we can't move the screen no more
+- when save the document As image (ful With layers), it's saved only if extension = "".
+- bug With pick color (alt+clic) don't use the layer with normal blendmode
+
+
+
+05/04/2021  0.5.9.3.6
+// Fixes
+- picker doesn't work on canvas
+- pick color With brush (alt+clic) doesn't work on canvas.
+- bug With selection And cut, With zoom Or very small document (64*64)
+
+
+
+04/04/2021  0.5.9.3.5
+// Fixes
+- when we change in pref the preview-rendering system (from screen To canvas) : the alpha of the layers (images) are erased
+- when we use canvas, the color (tool brush) isn't washed
+- when open a document, we need To update the layer()\ImageTemp now (With the new canvas For drawing)
+- fixe a bug when delete a layer, sometimes, the layerID is > ArraySize (layer()).
+- export image (all layers+bg) -> the image saved from canvas is empty (alpha = 0)
+- export image (all layers+BG) -> the paper isn't drawn
+- export image (all layers+BG) -> layer With a blendmode <> normal become invisible
+- when export image (all layers+background) -> the image saved from screen is only background If we have Not change first from canvas To screen
+
+
+
+03/04/2021  0.5.9.3.4
+// Changes
+- some optimisations (gain +5fps (Screen : 50-60fps, canvas 25-30 (before was 20-25)))
+// Fixes
+- fixe bugs With blendmode For canvas (darken, ColorLight, colorburn)
+// Tests (branch)
+- Blendmodes, optimisation (blendmode, drawing on canvas), brush editor, circle brush
+
+
+02/04/2021  0.5.9.3.3
+// Fixes
+- when we change in pref the preview-rendering system, the sprite aren't updated
+- Canvas blendmode : fixe the bugs With darken blendmode
+- fixe bugs in Procedure blendmode For canvas (darken, ColorLight, colorburn)
+- fixe the alpha bug With cnavas And blendmode <> normal (alpha didn't work)
+
+
+02/04/2021  0.5.9.3.2
+// Fixes
+- Canvas Blendmode : fixes the bugs With multiply, add, screen, overlay... (the other blendmode are still bugged : darken...)
+- canvas : when change blendmode, update the layer-image With a colored box If needed 
+(black For the "lighten" blendmode (add, screen...), white For the "darken" (multiply..), grey For some (overlay))
+- canvas : a lot of optimisation To get a better FPS (more like With Screen+sprite) in loop_mousekey.pb.
+
+
+01/04/2021  0.5.9.3.1
+// Fixes
+- Canvas : tests To fixe the Blendmode With canvas...
+- the image on the canvas is'nt updated when change in pref the rendering system (screen+Sprite or canvas+images)
+some bugs With canvas are fixed
+
+
+
 31/03/2021  0.5.9.3
 // Changes 
 - I have cut/paste the code For "preference window" from loop.pb to window.pbi
