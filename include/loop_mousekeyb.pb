@@ -560,6 +560,8 @@ If GetActiveWindow() = #WinMain
                     
                     
                     ;*****************  puis on dessine sur l'image active
+                   
+                      
                     If FinalSize >0 And (OptionsIE\SaveImageRT Or OptionsIE\UseCanvas)
                       
                       
@@ -639,8 +641,6 @@ If GetActiveWindow() = #WinMain
                       StartY1 = yy
                       
                     EndIf  
-                    
-                    
                     
                   EndIf
                   
@@ -804,6 +804,7 @@ If GetActiveWindow() = #WinMain
           
           ;}
           
+          ;}
           
         Else ; Other actions (move, transform, hand, zoom, color picker..) // action autre que dessiner : bouger, transform, pipette
           
@@ -874,12 +875,12 @@ If GetActiveWindow() = #WinMain
                 Layer(LayerId)\selected = 1
                 Layer(layerId)\Haschanged = 1
                 CanvasHasChanged = 1
-                Layer(layerId)\W = Mx/z -StartX ; - CanvasX
+                Layer(layerId)\W = Mx/z -StartX 
                 If shift = 1
                   ratio.d = Layer(LayerID)\NewH/Layer(LayerID)\NewW
                   Layer(layerId)\H = Layer(layerId)\W*ratio
                 Else                  
-                  Layer(layerId)\H = My/z -startY ; - CanvasY 
+                  Layer(layerId)\H = My/z -startY 
                 EndIf                
                 If OptionsIE\ActionForAllLayers
                   For i =0 To ArraySize(layer())
@@ -944,7 +945,7 @@ If GetActiveWindow() = #WinMain
         
         ;}
         
-        ; then display the screen
+        ;{ then display the screen
         If OptionsIE\UseCanvas = 0
           
           ;{ display the top layer , over the current layer //on affiche les calques du dessus
@@ -990,6 +991,7 @@ If GetActiveWindow() = #WinMain
           ;}
           
         EndIf
+        ;}
         
       EndIf
       
@@ -1336,8 +1338,8 @@ EndIf
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 675
-; FirstLine = 156
-; Folding = 855A-AEAAEAAAAwDACAAAQAawCEgAAAAAAAw
+; CursorPosition = 881
+; FirstLine = 56
+; Folding = 85YA3AEAAE5QGEQDACA2AgAwgFIABAAAAAAg
 ; EnableXP
 ; EnableUnicode

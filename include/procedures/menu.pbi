@@ -2374,17 +2374,15 @@ Procedure Edit_Copy()
   tmp = GrabImage(layer(layerid)\Image, #PB_Any, X, Y, W, H)
   Layer(layerId)\Haschanged = 1
   
-  Select OptionsIE\SelectionType
+  ;Select OptionsIE\SelectionType
       
-    Case #selectionRectangle
-      SetClipboardImage(tmp)
+    ;Case #selectionRectangle
+      ;SetClipboardImage(tmp)
       
-    Case #selectionCircle
-        
+    ;Case #selectionCircle, #selectionRectangle
       ; because we can cut a portion of an image with selection
       ; we have to create an "selection image"
       If OptionsIE\Selection > 0
-       
         If CreateImage(#img_selection, w, h, 32, #PB_Image_Transparent)
           If StartDrawing(ImageOutput(#img_selection))
             
@@ -2402,7 +2400,7 @@ Procedure Edit_Copy()
         EndIf
       EndIf
 
-  EndSelect
+  ;EndSelect
   
   If OptionsIE\Selection = 0 And Not IsImage(#img_selection)
     SetClipboardImage(tmp)
@@ -2876,8 +2874,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 341
-; Folding = AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAg
+; CursorPosition = 2402
+; FirstLine = 21
+; Folding = AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA--BAAAAAAw
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

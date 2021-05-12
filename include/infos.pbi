@@ -22,13 +22,13 @@
 
 
 ; OPTIMISATIONS
-; - I need to modify how to work the painting and rendering system, which use too much stardrawing/stopdrawing (with screen/sprite).
+; WIP - I need to modify how to work the painting and rendering system, which use too much stardrawing/stopdrawing (with screen/sprite).
 ; - add the system from drawing_optimised (for canvas : paint on small image for preview or in image at the size of the rendering surface when zoomed)
 ; - add the system from "paintoon.pb" (brush with space)
 
 
 ; PRIORITY (new & changes)
-; - brush "blending point" alpha et size // brush : fondu entre les points 'size, alpha)
+; - brush "blending point" alpha et size // brush : fondu entre les points (size, alpha)
 ; - Roughboard : should work like the "main canvas" ? (painting with mouse, and pick with alt+mouse).
 
 
@@ -43,7 +43,7 @@
 ; et on affiche le 1er aussi)
 ; - ajouter vectordrawing line
 ; - ajouter bezier sur les strokes
-; - ajouter brush éditor et ne laisser que quelques gadgets sur le panneau outils (taille, alpha, dureté..)
+; WIP - ajouter brush éditor et ne laisser que quelques gadgets sur le panneau outils (taille, alpha, dureté..)
 
 
 ; TOOLS
@@ -51,10 +51,10 @@
 ; - add pattern tool (stamp/tampon)
 ; - add a kind ot pattern stamp-brush paint ( grey level + color, to add a kind of texture during the painting) // 
 ; (ajouter sorte de tampon (niveau de gris) + couleur, pour peindre de l'aquarelle (texture) avec une couleur.)
-; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY  and IE_Options\confirmaction....
+; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY and IE_Options\confirmaction....
 
 ; PAPER
-; WIp - paper scale : ok when change trackbar paperScale
+; Wip - paper scale : ok when change trackbar paperScale
 
 ; IMAGES
 ; - Level is'nt good // niveau ne fonctionne pas très bien, voir en temps réel et mettre plus d'info sur les trackbar (on ne sait pas ce que c'est)
@@ -114,6 +114,15 @@
 ; ok, mais non - clipsprite (screen) : tests ok, mais ça n'apporte rien niveau optimisation 
 
 
+
+
+; 12/05/2021  0.5.9.6.3
+; // Changes
+; - improvements of do_paint() (use only 1 time rotation, delete some conditions not needed, redraw on the brush_preview color only 1 time). Gain when drawing : x2 ?
+; // Fixes
+; - sometimes, brush has black border when we resize the brush (with wacom pression for ex or when use "trim brush").
+; - black border when use tool transform or rotate
+; - paste layer didn't work when selection = rectangle
 
 
 ; 05/05/2021  0.5.9.6.2
@@ -1849,8 +1858,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 118
-; FirstLine = 71
+; CursorPosition = 122
+; FirstLine = 96
 ; Folding = 7+
 ; EnableXP
 ; DisableDebugger

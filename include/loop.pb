@@ -529,8 +529,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   Gad = 1
                 EndIf
                 
-                ; Debug EventType
-                
                 If EventType = #PB_EventType_LeftButtonUp
                   MoveCanvas = 0
                   paint = 0
@@ -1313,8 +1311,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   EndIf    
                   If OptionsIE\zoom < 10
                     OptionsIE\zoom = 10
-                  EndIf    
+                  EndIf 
                   ScreenZoom() ; update screen   
+                  
                 EndIf
               EndIf
               
@@ -1479,8 +1478,8 @@ End
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1270
-; FirstLine = 29
-; Folding = hnCAAAAARcBDQBACAAAQgRAAA9
+; CursorPosition = 163
+; FirstLine = 35
+; Folding = hvDAgAAADcBDQBACAAAQbhBAA9
 ; EnableXP
 ; EnableUnicode

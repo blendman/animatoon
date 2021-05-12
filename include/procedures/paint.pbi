@@ -1016,17 +1016,18 @@ Procedure DrawSymetry(RotImg,x,y,alpha)
   
 EndProcedure
 
+;Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
 Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
   
   ; pour peindre sur le sprite et sur l'image
   ; il faut la même procédure pour un rendu identique
   ; outputID permet de savoir sur quoi on va peindre
   
-  ;Debug "dessin sur "+Str(OutputID)
+  ; Debug "dessin sur "+Str(OutputID)
   
   CheckAlpha() ; alpha avec pression, random, etc...
   
-  water = brush(#Action_Brush)\Water* 0.3; * size
+  water = brush(#Action_Brush)\Water* 0.3 ; * size
   
   alpha = alpha *(1-brush(#Action_Brush)\Water/255)
   
@@ -1035,7 +1036,12 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
     
     dist  = point_distance(xx,yy,StartX1,StartY1) ; to find the distance between two brush dots
     d.d   = point_direction(xx,yy,StartX1,StartY1); to find the direction between the two brush dots
-    angle = GetAngle(xx,yy,StartX1,StartY1)
+    If Brush(Action)\RotateByAngle
+      angle = GetAngle(xx,yy,StartX1,StartY1) * Brush(Action)\RotateByAngle + Rnd(Brush(Action)\randRot)
+    Else
+      angle = Rnd(Brush(Action)\randRot) + Brush(Action)\randRot
+    EndIf
+    
     ;d = (angle  * 180 / #PI) + 180
     sinD.d = Sin(d)               
     cosD.d = Cos(d)
@@ -1063,83 +1069,82 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       
       
       
+      checkok = 0
       
-      If Brush(Action)\randRot > 0 Or Brush(Action)\RotateByAngle = 1
+      If angle >0 ; Or Brush(Action)\randRot > 0 ; Or Brush(Action)\RotateByAngle = 1
         
         ; rotation by the angle
-        If Brush(Action)\RotatebyAngle = 1 
-          RotImg = RotateImageEx2(ImageID(#BrushCopy),angle+Rnd(Brush(Action)\randRot)) ; test pour voir si je peux rotationné en fonction de l'angle
-                                                                                        ;RotImg2 = RotateImageEx2(ImageID(RotImg),) 
-                                                                                        ;FreeImage(RotImg)
-                                                                                        ;RotImg = RotImg2
+        ;If Brush(Action)\RotatebyAngle = 1 
+        RotImg = RotateImageEx2(ImageID(#BrushCopy),angle+Rnd(Brush(Action)\randRot)) 
+        ; test pour voir si je peux rotationné en fonction de l'angle
+                                                                                       
           www = ImageWidth(RotImg) 
           hhh = ImageHeight(RotImg)
-          ;If www < 20 Or hhh < 20
-          
-          StopDrawing()
-          
-          
-          If StartDrawing(ImageOutput(RotImg))
-            DrawingMode(#PB_2DDrawing_AlphaClip)
-            Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),0))
-            StopDrawing()
-          EndIf
-          
-          If OutputID = 0
-            StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-          Else
-            StartDrawing(ImageOutput(Layer(LayerId)\Image))
-          EndIf
-          
-          checkok = 1
-          ;EndIf
+;           
+;           StopDrawing()
+;           
+;           
+;           If StartDrawing(ImageOutput(RotImg))
+;             DrawingMode(#PB_2DDrawing_AlphaClip)
+;             Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),255))
+;             StopDrawing()
+;           EndIf
+;           
+;           If OutputID = 0
+;             StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+;           Else
+;             StartDrawing(ImageOutput(Layer(LayerId)\Image))
+;           EndIf
+;           
+           checkok = 1
           
           
-        Else
-          RotImg = RotateImageEx2(ImageID(#BrushCopy),Rnd(Brush(Action)\randRot))  
+        ;Else
+          ;RotImg = RotateImageEx2(ImageID(#BrushCopy),Rnd(Brush(Action)\randRot))  
           ; RotImg = UnPreMultiplyAlpha(RotImg)
           
-        EndIf
+        ;EndIf
         
         If Brush(Action)\Sizepressure And FinalSize >0 And Action <> #Action_Eraser
           www = ImageWidth(RotImg) * FinalSize
           hhh = ImageHeight(RotImg) * FinalSize
           ResizeImage(RotImg,www,hhh,1-Brush(Action)\Smooth)
-          ; RotImg = UnPreMultiplyAlpha(RotImg)
           
-          If  checkok =0
-            If (www < 20 Or hhh < 20)
-              StopDrawing()
-              If StartDrawing(ImageOutput(RotImg))
-                DrawingMode(#PB_2DDrawing_AlphaClip)
-                Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),0))
-                StopDrawing()
-              EndIf
-              
-              If OutputID = 0
-                StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-              Else
-                StartDrawing(ImageOutput(Layer(LayerId)\Image))
-              EndIf
-              
-            EndIf
-          EndIf
+          checkOk =1
+          
         EndIf
         
         
-        IE_TypeDrawing() ; le drawingmode (alphablend, clip si alphalock, etc..
+        If  checkok =1
+          ;If (www < 20 Or hhh < 20)
+            StopDrawing()
+            If StartDrawing(ImageOutput(RotImg))
+              DrawingMode(#PB_2DDrawing_AlphaClip)
+              Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),255))
+              StopDrawing()
+            EndIf
+            
+            If OutputID = 0
+              StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+            Else
+              StartDrawing(ImageOutput(Layer(LayerId)\Image))
+            EndIf
+            
+          ;EndIf
+        EndIf
+        
+        
+        
+        IE_TypeDrawing() ;  drawingmode (alphablend, clip si alphalock, etc..)
         
         x_result + Brush(Action)\centerX -ImageWidth(RotImg)/2 
         y_result + Brush(Action)\centerY -ImageHeight(RotImg)/2
         
         
-        ; on draw
+        ; draw the image
         alpha * (100-brush(#Action_Brush)\Water)*0.01
         DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha) 
         DrawSymetry(RotImg,x_result,y_result,alpha)
-        
-        ; AntialiasedCircle(x_result,y_result, Brush(Action)\size, Color,Brush(Action)\Softness)
-        ; MyCircle(x_result,y_result, Brush(Action)\size, Color,Brush(Action)\Softness)
         
         If brush(action)\Water > 0 And action <> #Action_Eraser
           DrawingMode(#PB_2DDrawing_CustomFilter)
@@ -1153,19 +1158,30 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       Else
         
         If Brush(Action)\Sizepressure And FinalSize > 0
-          If Brush(Action)\RotateByAngle = 1
-            RotImg = RotateImageEx2(ImageID(#BrushCopy),angle) ; test pour voir si je peux rotationné en fonction de l'angle
-                                                               ; RotImg = UnPreMultiplyAlpha(RotImg)
-            
-          Else
+;           If Brush(Action)\RotateByAngle = 1
+;             RotImg = RotateImageEx2(ImageID(#BrushCopy),angle) ; test pour voir si je peux rotationné en fonction de l'angle
+;                                                                ; RotImg = UnPreMultiplyAlpha(RotImg)
+;             
+;           Else
             RotImg= CopyImage(#BrushCopy,#PB_Any)
-          EndIf  
+;           EndIf  
           
           ResizeImage(RotImg,ImageWidth(RotImg)*FinalSize, ImageHeight(RotImg)*FinalSize,1 - Brush(Action)\Smooth)
           x_result + Brush(Action)\centerX -ImageWidth(RotImg)/2 
           y_result + Brush(Action)\centerY -ImageHeight(RotImg)/2
           
+          StopDrawing()
+          If StartDrawing(ImageOutput(RotImg))
+            DrawingMode(#PB_2DDrawing_AlphaClip)
+            Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),255))
+            StopDrawing()
+          EndIf
           
+          If OutputID = 0
+            StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+          Else
+            StartDrawing(ImageOutput(Layer(LayerId)\Image))
+          EndIf
           
           
           
@@ -1201,8 +1217,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       v+1
       u + b
       
-      
-;        FinalSize - FinalSize*ratio
+;       ratio.d = 0.1
+;        FinalSize - FinalSize * ratio.d
 ;       If FinalSize <0
 ;         FinalSize = 0
 ;         Break
@@ -1227,6 +1243,21 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       RotImg = RotateImageEx2(ImageID(#BrushCopy),Random(Brush(Action)\rotate))  
       
       ; RotImg = UnPreMultiplyAlpha(RotImg)
+      
+      ; manque le resize en fonction de la taille, etc...
+      StopDrawing()
+      If StartDrawing(ImageOutput(RotImg))
+        DrawingMode(#PB_2DDrawing_AlphaClip)
+        Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),255))
+        StopDrawing()
+      EndIf
+      
+      If OutputID = 0
+        StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+      Else
+        StartDrawing(ImageOutput(Layer(LayerId)\Image))
+      EndIf
+      
       
       
       IE_TypeDrawing() ; drawingmode (alphablend, clip si alphalock, etc..
@@ -2135,8 +2166,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1966
-; FirstLine = 99
-; Folding = Q5AAAAAAAAAAAQDOAAAAAAA9AAwPAA9AA9
+; CursorPosition = 1132
+; FirstLine = 135
+; Folding = A5AAAAAAAAAAAQDOAAEAAAA9AAwPAA5AA9
 ; EnableXP
 ; EnableUnicode

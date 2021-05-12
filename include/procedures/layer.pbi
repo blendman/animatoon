@@ -2223,6 +2223,7 @@ Procedure Layer_ValidChange(Action,i=-1)
           If Action = #Action_Transform          
             
             ResizeImage(tmp,Layer(i)\w,Layer(i)\h)  
+            tmp = UnPreMultiplyAlpha(tmp)
             Layer(i)\w = doc\w
             Layer(i)\h = doc\h
             Layer(i)\NewW = doc\w
@@ -2232,7 +2233,7 @@ Procedure Layer_ValidChange(Action,i=-1)
             
             rotimg = RotateImageEx2(ImageID(tmp),layer(i)\Angle)
             FreeImage2(tmp)
-            
+            rotimg = UnPreMultiplyAlpha(rotimg)
             w = ImageWidth(rotimg)
             h = ImageHeight(rotimg)
             
@@ -2467,8 +2468,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 399
-; FirstLine = 31
-; Folding = AAAAAAAAAgPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5
+; CursorPosition = 1898
+; FirstLine = 225
+; Folding = AAAAAAAAAAPAAAAAAAAAAAAAAAhDAIAAAAAAAo-BA5
 ; EnableXP
 ; EnableUnicode

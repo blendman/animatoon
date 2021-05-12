@@ -13,8 +13,9 @@ ScreenX = 175
 ScreenY = 40
 
 
-Global MouseX_Old.d, MouseY_Old.d, x, y, mx, my, LayerId.a 
+Global MouseX_Old.d, MouseY_Old.d, x, y, mx, my
 ; mx, my : position of mouse in the canvas-screen
+Global LayerId.w
 
 Global blend1,blend2 ; temporary // temporaire
 ; Global xx,yy,StartX1,StartY1
@@ -30,7 +31,7 @@ Global NewList Pakets.PACKET()
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 7
+; CursorPosition = 15
 ; Folding = -
 ; EnableXP
 ; EnableUnicode

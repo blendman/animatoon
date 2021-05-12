@@ -1,5 +1,13 @@
 ﻿
 ************************* CHANGELOG ********************************
+12/05/2021  0.5.9.6.3
+// Changes
+- improvements of do_paint() (use only 1 time rotation, delete some conditions Not needed, redraw on the brush_preview color only 1 time). Gain when drawing : x2 ?
+// Fixes
+- sometimes, brush has black border when we resize the brush (With wacom pression For ex Or when use "trim brush").
+- black border when use tool transform Or rotate
+- paste layer didn't work when selection = rectangle
+
 
 05/05/2021  0.5.9.6.2
 // Fixes
