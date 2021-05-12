@@ -73,6 +73,12 @@ EndIf
 
 If OpenWindow(#Win_Intro,0,0,w,h,#ProgramName, #PB_Window_BorderLess|#PB_Window_ScreenCentered)
   
+  If StartDrawing(ImageOutput(#img_intro))
+    DrawingMode(#PB_2DDrawing_Transparent)
+    DrawText(10, h-25, "v "+#ProgramVersion+r$,RGBA(255,255,255,255))
+    StopDrawing()
+  EndIf
+  
   tmp=ImageGadget(#PB_Any,0,0,w,h,ImageID(#img_intro))
   
   Repeat
@@ -285,8 +291,9 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 58
-; Folding = DAAw
+; CursorPosition = 77
+; FirstLine = 61
+; Folding = 4BAk
 ; EnableXP
 ; EnableOnError
 ; UseIcon = teo.ico

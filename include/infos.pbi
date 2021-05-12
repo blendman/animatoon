@@ -117,6 +117,8 @@
 
 
 ; 12/05/2021  0.5.9.6.3
+; // New
+; - window intro : add version of program
 ; // Changes
 ; - improvements of do_paint() (use only 1 time rotation, delete some conditions not needed, redraw on the brush_preview color only 1 time). Gain when drawing : x2 ?
 ; // Fixes
@@ -1858,7 +1860,7 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 122
+; CursorPosition = 120
 ; FirstLine = 96
 ; Folding = 7+
 ; EnableXP
