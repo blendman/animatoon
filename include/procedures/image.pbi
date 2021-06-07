@@ -68,94 +68,94 @@ Module Premultiply
   CompilerEndIf
   
   Procedure PremultiplyPixels(*PixelBuffer32, NumPixels)
-    lea rax, [premultiply.l_premultiplyTable]
-    mov rdx, *PixelBuffer32
-    mov rcx, NumPixels
-    push rbx
-    push rsi
-    mov rsi, rax
+    LEA rax, [premultiply.l_premultiplyTable]
+    MOV rdx, *PixelBuffer32
+    MOV rcx, NumPixels
+    PUSH rbx
+    PUSH rsi
+    MOV rsi, rax
     !premultiply.l_premul0:
-    movzx eax, word [rdx + 2]
+    MOVZX eax, word [rdx + 2]
     cmp ah, 255
     !je premultiply.l_premul1
-    movzx ebx, byte [rsi + rax]
-    mov [rdx + 2], bl
-    mov al, [rdx + 1]
-    movzx ebx, byte [rsi + rax]
-    mov [rdx + 1], bl
-    mov al, [rdx]
-    movzx ebx, byte [rsi + rax]
-    mov [rdx], bl
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx + 2], bl
+    MOV al, [rdx + 1]
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx + 1], bl
+    MOV al, [rdx]
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx], bl
     !premultiply.l_premul1:
-    add rdx, 4
-    sub rcx, 1
+    ADD rdx, 4
+    SUB rcx, 1
     !jnz premultiply.l_premul0
-    pop rsi
-    pop rbx   
+    POP rsi
+    POP rbx   
   EndProcedure
   
   Procedure UnpremultiplyPixels(*PixelBuffer32, NumPixels)
-    lea rax, [premultiply.l_premultiplyTable + 0x10000]
-    mov rdx, *PixelBuffer32
-    mov rcx, NumPixels
-    push rbx
-    push rsi
-    mov rsi, rax
+    LEA rax, [premultiply.l_premultiplyTable + 0x10000]
+    MOV rdx, *PixelBuffer32
+    MOV rcx, NumPixels
+    PUSH rbx
+    PUSH rsi
+    MOV rsi, rax
     !premultiply.l_unpremul0:
-    movzx eax, word [rdx + 2]
+    MOVZX eax, word [rdx + 2]
     cmp ah, 255
     !je premultiply.l_unpremul1
     cmp ah, 0
     !je premultiply.l_unpremul1
-    movzx ebx, byte [rsi + rax]
-    mov [rdx + 2], bl
-    mov al, [rdx + 1]
-    movzx ebx, byte [rsi + rax]
-    mov [rdx + 1], bl
-    mov al, [rdx]
-    movzx ebx, byte [rsi + rax]
-    mov [rdx], bl
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx + 2], bl
+    MOV al, [rdx + 1]
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx + 1], bl
+    MOV al, [rdx]
+    MOVZX ebx, byte [rsi + rax]
+    MOV [rdx], bl
     !premultiply.l_unpremul1:
-    add rdx, 4
-    sub rcx, 1
+    ADD rdx, 4
+    SUB rcx, 1
     !jnz premultiply.l_unpremul0
-    pop rsi
-    pop rbx
+    POP rsi
+    POP rbx
   EndProcedure
   
   Procedure FillTable()
-    lea rdx, [premultiply.l_premultiplyTable]
-    push rbx
-    mov ebx, 255
-    sub ecx, ecx
+    LEA rdx, [premultiply.l_premultiplyTable]
+    PUSH rbx
+    MOV ebx, 255
+    SUB ecx, ecx
     !premultiply.l_filltable0:
-    movzx eax, ch
-    mul cl
-    add eax, 127
-    div bl
-    mov [rdx + rcx], al
-    add cx, 1
+    MOVZX eax, ch
+    MUL cl
+    ADD eax, 127
+    DIV bl
+    MOV [rdx + rcx], al
+    ADD cx, 1
     !jnz premultiply.l_filltable0
-    add rdx, 0x10000
-    mov ecx, 0x100
-    sub bx, bx
+    ADD rdx, 0x10000
+    MOV ecx, 0x100
+    SUB bx, bx
     !premultiply.l_filltable1:
-    mov eax, 255
+    MOV eax, 255
     cmp cl, ch
     !jae premultiply.l_filltable2
-    mul cl
-    add ax, bx
-    div ch
+    MUL cl
+    ADD ax, bx
+    DIV ch
     !premultiply.l_filltable2:
-    mov [rdx + rcx], al
-    add cl, 1
+    MOV [rdx + rcx], al
+    ADD cl, 1
     !jnz premultiply.l_filltable1
-    movzx bx, ch
-    add bx, 1
-    shr bx, 1
-    add ch, 1
+    MOVZX bx, ch
+    ADD bx, 1
+    SHR bx, 1
+    ADD ch, 1
     !jnz premultiply.l_filltable1
-    pop rbx
+    POP rbx
   EndProcedure
   
   FillTable()
@@ -207,23 +207,17 @@ Macro IE_SetImageOutput(Image,a1=0)
   DrawOk = 0
   
   If OptionsIE\Selection = 0
-    
     W = ImageWidth(Image)
     H = ImageHeight(Image)
-    
     If StartDrawing(ImageOutput(Image))
       DrawOk = 1                     
     EndIf
-    
   Else
-    
     W = OptionsIE\SelectionW
     H = OptionsIE\SelectionH
-    
     If StartDrawing(ImageOutput(ImageSel))
       DrawOk = 1
     EndIf
-    
   EndIf
   
   If DrawOk
@@ -232,17 +226,12 @@ Macro IE_SetImageOutput(Image,a1=0)
     Buffer = DrawingBuffer()
     
     If Buffer <> 0
-      
       ;Organisation du buffer :
       pixelFormat = DrawingBufferPixelFormat()
       ; pixelFormat va te donner une constante car sa peut varier ; Voir la documentation
-      
       lineLength = DrawingBufferPitch();Longueur d'une ligne
-      
       If pixelFormat = #PB_PixelFormat_32Bits_BGR | #PB_PixelFormat_ReversedY
-        
         For i = a1 To W-(1+a1) ;Pour chaque ligne
-          
           For j = a1 To H-(1+a1) ; Pour chaque colonne (donc pour chaque pixel) :
             
 EndMacro
@@ -250,14 +239,10 @@ EndMacro
 Macro IE_SetImageOutput1(mode=0)
             
           Next j
-          
         Next i
-        
       EndIf
-      
       StopDrawing()
     EndIf
-    
   EndIf
   
   If mode =0
@@ -591,14 +576,11 @@ ProcedureDLL.i IE_Contrast(img, contrast, brightness, mode=0) ; Constrater la co
   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
   PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
   
-  
   IE_SetImageOutput1(1)
-  
-  If mode = 0
-    
-    ScreenUpdate()
-    
-  EndIf
+;   
+;   If mode = 0
+;     ScreenUpdate()
+;   EndIf
   
   ProcedureReturn img  
 EndProcedure
@@ -607,65 +589,43 @@ Procedure IE_Contrast2(img, contrast, brightness, mode=0)
   
   IE_SetImageOutput(img)
   
-  ; on lit le pixels
+  ; read the pixel // on lit le pixels
   b = PeekA(Buffer + 4 * i + j * lineLength)    ;Bleu
   g = PeekA(Buffer + 4 * i + j * lineLength + 1);Vert
   r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
   
-  ; on trasnforme
-  
+  ; transforme
   If r + contrast > 126
-    
     r = r + contrast
-    
+    Check(r,255)
   Else
-    
     r = r - contrast
-    
+    Check2(r,0)
   EndIf
-  
   If g + contrast > 126
-    
     g = g + contrast
-    
+    Check(g,255)
   Else
-    
     g = g - contrast
-    
+    Check2(g,0)
   EndIf
-  
   If b + contrast > 126
-    
     b = b + contrast
-    
+    Check(b,255)
   Else
-    
     b = b - contrast
-    
+    Check2(b,0)
   EndIf
   
-  
-  Check(r,255)
-  Check2(r,0)
-  
-  Check(b,255)
-  Check2(b,0)
-  
-  Check(g,255)
-  Check2(g,0)
-  
-  ; on poke le pixel
+  ; poke the pixel // on poke le pixel
   PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
   PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
   
-  
   IE_SetImageOutput1(1)
-  If mode = 0
-    
-    ScreenUpdate()
-    
-  EndIf
+;   If mode = 0
+;     ScreenUpdate()
+;   EndIf
   
   ProcedureReturn img  
 EndProcedure
@@ -680,7 +640,6 @@ Procedure IE_Contrast1(img, contrast, brightness, mode=0)
   r = PeekA(Buffer + 4 * i + j * lineLength + 2);Rouge 
   
   ; on trasnforme
-  
   If (r+g+b)/3 > 127
     
     r = r +contrast
@@ -699,20 +658,16 @@ Procedure IE_Contrast1(img, contrast, brightness, mode=0)
     Check2(b,0)
   EndIf
   
-  
   ; on poke le pixel
   PokeA(Buffer + 4 * i + j * lineLength,      b);Bleu
   PokeA(Buffer + 4 * i + j * lineLength + 1,  g);Vert
   PokeA(Buffer + 4 * i + j * lineLength + 2,  r);Rouge  
   
-  
   IE_SetImageOutput1(1)
   
-  If mode = 0
-    
-    ScreenUpdate()
-    
-  EndIf
+;   If mode = 0
+;     ScreenUpdate()
+;   EndIf
   
   ProcedureReturn img  
 EndProcedure
@@ -1192,13 +1147,11 @@ Procedure IE_WinContrast()
     
     H1 = (W1 * layer(layerid)\H)/layer(layerid)\W
     
-    
     ImageTransf = CopyImage(Layer(LayerID)\Image, #PB_Any)
     ResizeImage(ImageTransf, W1, H1)
     
     ImageGadget(#IE_BalColNormal, 10,       yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
     ImageGadget(#IE_BalColNew,    w1 + 20,  yy, W1, H1, ImageID(ImageTransf), #PB_Image_Border)
-    
     
     
     yy + H1 + 10
@@ -1217,7 +1170,6 @@ Procedure IE_WinContrast()
     TrackBarGadget(#IE_ContrastTB,   x, yy, 255, 20,0,200)
     SetGadgetState(#IE_ContrastTB, 100)
     
-    
     ButtonGadget(#IE_ContrastOk,      WindowWidth(#Win_Contrast)/2 - 30, yy+90,  60, 20, lang("Ok"))
     
     YY + 90 +30
@@ -1226,9 +1178,7 @@ Procedure IE_WinContrast()
     
     
     Repeat
-      
       event = WaitWindowEvent(10)
-      
       
       Select event
           
@@ -1253,11 +1203,11 @@ Procedure IE_WinContrast()
               SetGadgetState(#IE_ContrastTB, contrast)
               
               If EventGadget = #IE_BrightnessSG
-                brightness = Val(GetGadgetText(#IE_ContrastSG))
+                brightness = Val(GetGadgetText(#IE_BrightnessSG))
               Else
                 brightness = GetGadgetState(#IE_BrightnessTB) 
               EndIf
-              If brightness> 200
+              If brightness > 200
                 brightness = 200
               EndIf
               If brightness < 0
@@ -1265,8 +1215,6 @@ Procedure IE_WinContrast()
               EndIf 
               SetGadgetText(#IE_BrightnessSG, Str(brightness))
               SetGadgetState(#IE_BrightnessTB, brightness)
-              
-              
               
               temp = CopyImage(ImageTransf, #PB_Any)
               temp = IE_Contrast(temp, contrast, brightness,1)
@@ -1293,19 +1241,11 @@ Procedure IE_WinContrast()
           quit = 1
       EndSelect
       
-      
     Until quit =1
-    
-    
     
     CloseWindow(#Win_Contrast)
     
-    
-    
-    
-    
   EndIf
-  
   
 EndProcedure
 
@@ -2390,8 +2330,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 355
-; FirstLine = 26
-; Folding = AwHQIAAAAAAAOAAAAAAAAAAAAAAQAIAAAAAAAAAAAAAA-
+; CursorPosition = 563
+; FirstLine = 105
+; Folding = AwHQLAAIAAAwBAAA5vNAAAAAAAAAAAAAAAAAAAAAAAA5
+; EnableAsm
 ; EnableXP
 ; EnableUnicode

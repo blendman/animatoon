@@ -286,13 +286,14 @@ Structure sOptions
   AreaBGColor.i
   Paper$ ; the paper of the canvas
   
-  ; Directory  
+  ;}
+  
+  ; Directory and name
   DirPattern$
   DirPreset$
   DirBrush$
-  
-  ;}
-  
+  DirBankBrush$
+  BrushName$
   
   ; delays  
   Delay.w
@@ -334,6 +335,7 @@ Global OptionsIE.sOptions
 ; define option by default
 With OptionsIE
   \Paper$ = "paper0.png"
+  \DirBankBrush$ = "data\Presets\Brush\"
   \DirPattern$ = "data\Presets\Pattern\"
   \DirPreset$ = "data\Presets\Bank\bd\"
   \ConfirmExit = 1
@@ -402,6 +404,7 @@ Structure Brush
   Type.a
   Brush.w
   Id.w ; le numero de l'image
+  BrushName$ ; the name of the brush (filename$)
   Image$
   Group$
   
@@ -517,7 +520,6 @@ Structure Brush
   
   ; les actions et type d'outil
   Tool.a ; the type of tool // si brush = pinceau =>
-         ; Action.a ; on peint, on déplace un calque, etc...
   
   
   ; image used bu brush (paint) // l'image utilisé pour le brush
@@ -535,6 +537,11 @@ Structure Brush
   ; use the proportion (box, ellipse...)
   Proportion.a
   
+  
+  ; clone stamp
+  Source.a
+  SourceImage.i
+  Alignment.a
   
   ; Spray
   Spray.w
@@ -568,6 +575,8 @@ For i=0 To #Action_Zoom
   With Brush(i)
     If i <> #Action_Brush
       \size = 1
+      \SizeW = 100
+      \SizeH = 100
       \alpha = 255
       \AlphaFG = 255
       \Color = RGB(255, 255, 255)
@@ -596,7 +605,14 @@ With Brush(Action) ; define some parameters (no more used ?)
   \version = 6 ; 6th version ,  c'est la sixième version : GM/PB/teo/agk/pb2-optimised/pb_screen
 EndWith
 
-
+; for the images of brush
+Structure sImage
+  filename$
+  x.w
+  y.w
+EndStructure
+Global Dim BrushImage.sImage(0)
+Global NbBrushImage.w = -1
 ;}
 
 ; pattern
@@ -691,6 +707,8 @@ Structure sLayer
   ImageStyle.i ; image pour le style
   
   Sprite.i
+  CopySpritetoImg.a ; to know if we need to copy sprite to image
+  
   Ordre.w ; l'ordre du calque 0 = tout en bas, 100+ = tout en haut
   
   ImgLayer.i
@@ -759,7 +777,8 @@ Structure sPaper
   name$
   alpha.a
   scale.w
-  intensity.w ; intensity
+  intensity.w ; contrast
+  brightness.w ; brightness
   imageId.i
   imageIdTexture.i
   Color.i
@@ -836,9 +855,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 426
-; FirstLine = 51
-; Folding = AAADAgw
-; Markers = 387
+; CursorPosition = 709
+; FirstLine = 56
+; Folding = AAAACUh
+; Markers = 389
 ; EnableXP
 ; EnableUnicode

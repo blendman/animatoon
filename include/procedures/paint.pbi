@@ -119,10 +119,9 @@ EndMacro
 
 Macro CheckAlpha()
   ; pour calculer l'apha, avec l'apha pressure
-  ;If brush(#Action_Brush)\Water > 0 And action <> #Action_Eraser
-  ;EndIf
-  alpha1 = Brush(Action)\AlphaRand*Random(Brush(Action)\alpha,Brush(Action)\AlphaMin) + (1-Brush(Action)\AlphaRand)*Brush(Action)\alpha
-  ; alpha1 = alpha1 
+  ; If brush(#Action_Brush)\Water > 0 And action <> #Action_Eraser
+  ; EndIf
+  alpha1 = Brush(Action)\AlphaRand * Random(Brush(Action)\alpha,Brush(Action)\AlphaMin) + (1-Brush(Action)\AlphaRand)*Brush(Action)\alpha
   alpha = alpha1 * size
   alpha = (Alpha*0.1)*Brush(Action)\alphaPressure + (1-Brush(Action)\alphaPressure)*alpha1
   If alpha > 255
@@ -135,6 +134,69 @@ EndMacro
 Macro StartDrawing2(output)
   StartDrawing(output)
 EndMacro
+
+
+; For painting 
+Procedure.d Paint_GetTabletSizePression()
+  
+  Static Pression
+  
+  size.d = 0
+                  
+   If ListSize(Pakets()) = 0 ; ça c'est juste au cas où on dessine avec la souris, 
+                             ; auquel cas, pas de packet et donc pas de pression non plus. ben voui, c'est comme ça la vie.
+     If pression <> 1
+       Size = 8.6
+       pression = 2
+     EndIf
+     
+     ;Debug "ok souris  - " + Str(pression)
+     ;Else
+     ; Size = 0.01
+     ;Debug "on a des packets, meme avec souris ?"
+   EndIf
+   
+   
+   If StartDrawing(ImageOutput(#ImageTablet))                      
+     DrawingMode(#PB_2DDrawing_AlphaBlend)                      
+     If ListSize(Pakets())
+       ForEach Pakets()
+         Define p.POINT
+         
+         p\x = MulDiv_(Pakets()\pkX,winw,10000)
+         p\y = winh-MulDiv_(Pakets()\pkY,winh,10000)
+         
+         size.d = Pakets()\pkNormalPressure / 120
+         If size > 0
+           Pression = 1
+         EndIf
+         size + 0.2
+         ; ; ScreenToClient_(GadgetID(#canvas),@p)
+         ; ; ScreenToClient_(ScreenOutput(),@p)
+         ;; drawbrush(p\x, p\y, size)
+         
+         ; Mousex_Old = mx
+         ; MouseY_Old = my
+         Mousex_Old = p\x
+         MouseY_Old = p\y
+         ;;StartX = MouseX_Old
+         ;;StartY = MouseY_Old
+       Next
+       ClearList(Pakets())
+     Else
+       ; drawbrush(MouseX, MouseY, size)                          
+       MouseX_Old = Mx
+       MouseY_Old = My
+       StartX = MouseX_Old
+       StartY = MouseY_Old
+       pression = 2
+     EndIf
+     StopDrawing()                      
+   EndIf
+                  
+  ProcedureReturn size
+EndProcedure
+
 
 
 ; picker
@@ -1031,7 +1093,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
   
   alpha = alpha *(1-brush(#Action_Brush)\Water/255)
   
-  
+  If alpha >0
   If Brush(Action)\Trait
     
     dist  = point_distance(xx,yy,StartX1,StartY1) ; to find the distance between two brush dots
@@ -1046,6 +1108,9 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
     sinD.d = Sin(d)               
     cosD.d = Cos(d)
     
+    ; to add dots 
+    v = 0
+    StrokeId = 0
     
     For u = 0 To dist-1
       Scx.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
@@ -1073,50 +1138,34 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
       
       If angle >0 ; Or Brush(Action)\randRot > 0 ; Or Brush(Action)\RotateByAngle = 1
         
-        ; rotation by the angle
+        ; rotation 
+        ; Debug Str( v )+"/"+ Str( ArraySize(stroke(StrokeId)\dot()))
+        If OutputID = 1
+          anglefromsprite = stroke(StrokeId)\dot(v)\Rot
+        EndIf
+
+        Zeangle = (angle+Rnd(Brush(Action)\randRot)) * (1-OutputID) + (anglefromsprite) * OutputID
+        
         ;If Brush(Action)\RotatebyAngle = 1 
-        RotImg = RotateImageEx2(ImageID(#BrushCopy),angle+Rnd(Brush(Action)\randRot)) 
+        RotImg = RotateImageEx2(ImageID(#BrushCopy), zeangle) 
         ; test pour voir si je peux rotationné en fonction de l'angle
-                                                                                       
           www = ImageWidth(RotImg) 
           hhh = ImageHeight(RotImg)
-;           
-;           StopDrawing()
-;           
-;           
-;           If StartDrawing(ImageOutput(RotImg))
-;             DrawingMode(#PB_2DDrawing_AlphaClip)
-;             Box(0,0,www,hhh,RGBA(Red(color),Green(color),Blue(color),255))
-;             StopDrawing()
-;           EndIf
-;           
-;           If OutputID = 0
-;             StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-;           Else
-;             StartDrawing(ImageOutput(Layer(LayerId)\Image))
-;           EndIf
-;           
-           checkok = 1
-          
-          
-        ;Else
-          ;RotImg = RotateImageEx2(ImageID(#BrushCopy),Rnd(Brush(Action)\randRot))  
+          checkok = 1
+        ; Else
+          ; RotImg = RotateImageEx2(ImageID(#BrushCopy),Rnd(Brush(Action)\randRot))  
           ; RotImg = UnPreMultiplyAlpha(RotImg)
-          
-        ;EndIf
+        ; EndIf
         
         If Brush(Action)\Sizepressure And FinalSize >0 And Action <> #Action_Eraser
           www = ImageWidth(RotImg) * FinalSize
           hhh = ImageHeight(RotImg) * FinalSize
           ResizeImage(RotImg,www,hhh,1-Brush(Action)\Smooth)
-          
           checkOk =1
-          
         EndIf
         
         
         If  checkok =1
-          ;If (www < 20 Or hhh < 20)
             StopDrawing()
             If StartDrawing(ImageOutput(RotImg))
               DrawingMode(#PB_2DDrawing_AlphaClip)
@@ -1129,20 +1178,29 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
             Else
               StartDrawing(ImageOutput(Layer(LayerId)\Image))
             EndIf
-            
-          ;EndIf
         EndIf
-        
-        
         
         IE_TypeDrawing() ;  drawingmode (alphablend, clip si alphalock, etc..)
         
         x_result + Brush(Action)\centerX -ImageWidth(RotImg)/2 
         y_result + Brush(Action)\centerY -ImageHeight(RotImg)/2
         
-        
         ; draw the image
         alpha * (100-brush(#Action_Brush)\Water)*0.01
+        
+        If OutputID = 0
+          ReDim Stroke(StrokeId)\dot.sDot(v)
+          Debug Str(v)+"/"+Str(ArraySize(stroke(StrokeId)\dot()))
+          stroke(StrokeId)\dot(v)\X = x_result
+          stroke(StrokeId)\dot(v)\Y = y_result
+          stroke(StrokeId)\dot(v)\Alpha = alpha
+          stroke(StrokeId)\dot(v)\Rot = Zeangle
+        Else
+          x_result =  stroke(StrokeId)\dot(v)\X
+          y_result =  stroke(StrokeId)\dot(v)\y
+          alpha = stroke(StrokeId)\dot(v)\Alpha 
+        EndIf
+      
         DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha) 
         DrawSymetry(RotImg,x_result,y_result,alpha)
         
@@ -1152,7 +1210,6 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
           DrawAlphaImage(ImageID(RotImg),x_result,y_result,Water)
           DrawSymetry(RotImg,x_result,y_result,Water)
         EndIf
-        
         
         FreeImage(RotImg)
       Else
@@ -1184,9 +1241,10 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
           EndIf
           
           
-          
           IE_TypeDrawing() ; le drawingmode (alphablend, clip si alphalock, etc..
           alpha * (100-brush(#Action_Brush)\Water)*0.01
+          
+          
           DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha)          
           DrawSymetry(RotImg,x_result,y_result,alpha)
           
@@ -1291,6 +1349,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
     
   EndIf
   
+EndIf
+
   StopDrawing()                      
   
 EndMacro
@@ -2017,7 +2077,7 @@ EndProcedure
 
 
 ; stroke et dot
-Procedure AddDot(x1,y1,size,col)
+Procedure AddDot(x1, y1, size, col)
   
   i = ArraySize(stroke(StrokeId)\dot())
   
@@ -2166,8 +2226,12 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1132
-; FirstLine = 135
-; Folding = A5AAAAAAAAAAAQDOAAEAAAA9AAwPAA5AA9
+; CursorPosition = 1196
+; FirstLine = 149
+; Folding = A5HAAAAAAAAAAAgGcAAIAAAA5BAAeAAA9O5
+; EnableAsm
 ; EnableXP
+; EnableOnError
+; Warnings = Display
+; EnablePurifier
 ; EnableUnicode

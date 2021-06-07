@@ -51,16 +51,17 @@ Procedure UpdatePatternsImage()
   For i =0 To ArraySize(Pattern())
     freeimage2(Pattern(i)\img)
   Next
+  ReDim Pattern(0)
   
   ; chack the images of patterns
   size = 0
   dir$ = GetCurrentDirectory() + OptionsIE\DirPattern$
+  
   If ExamineDirectory(0, dir$, "*.*")  
     
     While NextDirectoryEntry(0)
       
       If DirectoryEntryType(0) = #PB_DirectoryEntry_File
-        
         ; add the name of the image to the array pattern()
         Name$ = DirectoryEntryName(0)
         
@@ -73,7 +74,8 @@ Procedure UpdatePatternsImage()
       
     Wend
     FinishDirectory(0)
-    
+  Else
+    MessageRequester("Error", "Can't examine patterns directory (does dfolder exists ?) : "+dir$)
   EndIf
   
   
@@ -90,7 +92,6 @@ Procedure UpdatePatternsImage()
   freeimage2(#image_patternscanvas)
   
   If CreateImage(#image_patternscanvas, wcanvas, h2 , 32, #PB_Image_Transparent) = 0            
-    
     MessageRequester(Lang("Error"), Lang("Unable to create the image for the patterns (canvas)"))
     ProcedureReturn 0
   EndIf
@@ -238,7 +239,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 90
-; FirstLine = 59
-; Folding = NK--
+; CursorPosition = 78
+; FirstLine = 17
+; Folding = 9-+-
 ; EnableXP

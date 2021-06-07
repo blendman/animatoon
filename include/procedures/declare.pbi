@@ -15,6 +15,7 @@ Declare PaperCreate(delete=0)
 ; layers
 Declare CreateLayertempo_(create=0)
 Declare RecreateLayerUtilities()
+Declare Layer_SetSpriteToImage_(mode=0)
 Declare Layer_Add(x=0,y=0,text$="") 
 Declare Layer_FreeAll()
 Declare Layer_Clear(i,onlyAlpha=0) 
@@ -92,7 +93,7 @@ Declare BrushResetColor()
 ; window
 Declare WindowLayerProp()
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 64
-; FirstLine = 42
+; CursorPosition = 18
+; FirstLine = 6
 ; EnableXP
 ; EnableUnicode

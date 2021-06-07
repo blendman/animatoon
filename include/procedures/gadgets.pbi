@@ -81,29 +81,28 @@ Procedure AddSTringTBGadget(gadName,gadTB,gadSG,val,name$,tip$,x,y,wtb,wsg,min,m
   
   ; To add a gadget Name+trackbar +stringgadget !! test pour ajouter un gadget "spécial : nom, trackbar et stringgadget
   h = 20
-  If TextGadget(gadName, x+5, y, wtg, h, name$)
-    SetGadgetColor(gadName, #PB_Gadget_BackColor, color)       
+  If gadname <> -1
+    If TextGadget(gadName, x+5, y, wtg, h, name$)
+      SetGadgetColor(gadName, #PB_Gadget_BackColor, color)       
+    EndIf 
+  Else
+    wtg = 0
+  EndIf  
+  
+  If TrackBarGadget(gadTB, x+2+wtg, y, wtb, h, min, max)
+    SetGadgetColor(gadTB, #PB_Gadget_BackColor, color)       
+    SetGadgetState(gadTB, val)
+    GadgetToolTip(gadTB, tip$)
     
-    If TrackBarGadget(gadTB, x+2+wtg, y, wtb, h, min, max)
-      SetGadgetColor(gadTB, #PB_Gadget_BackColor, color)       
-      SetGadgetState(gadTB, val)
-      GadgetToolTip(gadTB, tip$)
-      
-      If StringGadget(GadSG,x+4+wtg+wtb, y, wsg, h, Str(val))  
-        SetGadgetColor(GadSG, #PB_Gadget_BackColor, color)       
-        SetGadgetText(GadSG, Str(val))
-        GadgetToolTip(GadSG, tip$)
-        ProcedureReturn 1
-        
-      EndIf
-      
+    If StringGadget(GadSG,x+4+wtg+wtb, y, wsg, h, Str(val))  
+      SetGadgetColor(GadSG, #PB_Gadget_BackColor, color)       
+      SetGadgetText(GadSG, Str(val))
+      GadgetToolTip(GadSG, tip$)
+      ProcedureReturn 1
     EndIf
-    
   EndIf
   
 EndProcedure
-
-
 Procedure AddCheckBox2(x,y,w,h,nom$,val,tip$)
   gad = CheckBoxGadget(#PB_Any, x,y,w,h,nom$)
   If gad
@@ -142,6 +141,19 @@ Procedure AddButon2(x,y,w,h,txt$,flag,tip$)
   ProcedureReturn gad
   
 EndProcedure
+Procedure AddStringGadget(gad, x, y, w, h, text$, name$, tip$)
+  
+  If name$ <> ""
+    w1 = Len(name$)*6
+    gad2 = TextGadget(#PB_Any, x, y, w1, h, name$)
+    x+w1
+  EndIf
+  
+  If StringGadget(gad, x, y, w, h, text$)
+    GadgetToolTip(gad, tip$)
+  EndIf
+  ProcedureReturn gad2
+EndProcedure
 
 
 Macro HideGad2(gad,state,value)
@@ -157,21 +169,6 @@ Macro FreeGadget2(gad)
   EndIf
   
 EndMacro
-
-Procedure AddStringGadget(gad, x, y, w, h, text$, name$, tip$)
-  
-  If name$ <> ""
-    w1 = Len(name$)*6
-    gad2 = TextGadget(#PB_Any, x, y, w1, h, name$)
-    x+w1
-  EndIf
-  
-  If StringGadget(gad, x, y, w, h, text$)
-    GadgetToolTip(gad, tip$)
-  EndIf
-  ProcedureReturn gad2
-EndProcedure
-
 
 ; Utile (create gadget)
 Procedure TG(x,y,txt$,col=-1) 
@@ -206,7 +203,7 @@ Procedure ResetAllSprites()
   
   FreeSprite2(#Sp_BrushOriginal)
   FreeSprite2(#Sp_BrushCopy)
-  If LoadSprite(#Sp_BrushOriginal,"data\Presets\brush\blendman\brush"+Str(Brush(Action)\id)+".png",#PB_Sprite_AlphaBlending) : EndIf
+  If LoadSprite(#Sp_BrushOriginal, OptionsIE\DirBrush$+Brush(Action)\brushname$,#PB_Sprite_AlphaBlending) : EndIf
   If CopySprite(#Sp_BrushOriginal, #Sp_BrushCopy,#PB_Sprite_AlphaBlending)  : EndIf
   
   FreeSprite2(#Sp_LayerTempo)
@@ -785,52 +782,68 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   ; add at least one panel item
   AddGadgetItem(#G_PanelTool,0, Lang("Gen"))
   
+  
   ToolbarH = 30
   
   w = WindowWidth(#WinMain) - ScreenX
   h = WindowHeight(#WinMain) - 25 - ToolbarH
   
   h1 = 0 ; position in Y by default
-  xx = 5 ; position in y by defaut
-  wb = 50; width of some gadgets
-  ub = 25; the height betwen two line of gagdets
+  xx = 5 ; position in x by defaut
+  wb = 55 ; width of some gadgets
+  ub = 25 ; the height betwen two line of gagdets
   xb = wb+5+30 ; position for some gadgets
   xg = 2
-  cbbh = 25 ; combobogadget height
+  cbbh = 22 ; combobogadget height
+  cbbw = 60 ; combobogadget width
   xa1 = 8
-  
+  wb2 = 40
+  tbw = ScreenX-20-wb2-30
+ 
   
   ; to create the panel depending of the Action selected (brush, eraser, movelayer, transform layer....)
   Select Action
       
-    Case #Action_Brush, #Action_eraser, #Action_Pen
-      ;{ Brush, eraser, pen
+    Case #Action_Brush, #Action_eraser, #Action_Pen, #Action_CloneStamp
+      ;{ Brush, eraser, pen, clone stamp
       
       
       ;AddGadgetItem(#G_PanelTool,0,Lang("Gen"))
       ;{ general parameters
+      i = 0
+      h1 = 10
+      AddSTringTBGadget(#G_BrushSizeNameG, #G_BrushSizeTB, #G_BrushSizeSG, Brush(Action)\size,  lang("Size"), lang("Brush Size"),xx,h1+i,tbw,wb2,1,300) : i+25
+      AddSTringTBGadget(#G_BrushAlphaNameG, #G_BrushAlphaTB, #G_BrushAlphaSG, Brush(Action)\Alpha,  lang("Alpha"), lang("Brush opacity"),xx,h1+i,tbw,wb2,1,255) : i+25
+      AddSTringTBGadget(#G_BrushMixNameG, #G_BrushMixTB, #G_BrushMixSG, Brush(Action)\Mix,  lang("Mix"), lang("Brush Color mixing"),xx,h1+i,tbw,wb2,1,100) : i+25
+      ;}
+      
+      ;{ Base parameters (size, image)
+      AddGadgetItem(#G_PanelTool,-1, Lang("Base"))
+      h1 = 0
       i=0
       If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,75,Lang("Size"))
         i+20
       EndIf    
-      AddSpinGadget(#G_BrushSize,Brush(Action)\size,lang("Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
-      AddCheckBox(#G_BrushSizePressure,xb,h1+i,58,20,LAng("Pressure"),Brush(Action)\sizepressure, lang("Size varie with Pressure"))    
-      AddCheckBox(#G_BrushSizeRand,xb-25,h1+i,25,20,Lang("Rd"),Brush(Action)\SizeRand,lang("Size Random"))
+      AddSpinGadget(#G_BrushSize,Brush(Action)\size,lang("Brush Size"),xx,h1+i,wb,20,1,300,#PB_Spin_Numeric) : xx+wb+2
+      AddSpinGadget(#G_BrushSizeMin,Brush(Action)\SizeMin,lang("Minimum Brush Size"),xx,h1+i,wb,20,1,300,#PB_Spin_Numeric) : xx+wb+2
+      AddCheckBox(#G_BrushSizePressure,xx,h1+i,30,20,Lang("P"),Brush(Action)\sizepressure, lang("Size varie with Pressure"))    
+      xx=5
       i+ub  
-      AddSpinGadget(#G_BrushSizeMin,Brush(Action)\SizeMin,lang("Minimum Brush Size"),5,h1+i,wb,20,1,300,#PB_Spin_Numeric)
-      ; i+ub
-      AddSpinGadget(#G_BrushSizeW,Brush(Action)\SizeW,lang("Brush width"),5+wb+xg,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
-      AddSpinGadget(#G_BrushSizeH,Brush(Action)\SizeH,lang("Brush height"),5+(wb+xg)*2,h1+i,wb,20,1,1000,#PB_Spin_Numeric)
+      AddSpinGadget(#G_BrushSizeW,Brush(Action)\SizeW,lang("Brush width"),xx,h1+i,wb,20,1,1000,#PB_Spin_Numeric) : xx+wb+2
+      AddSpinGadget(#G_BrushSizeH,Brush(Action)\SizeH,lang("Brush height"),xx,h1+i,wb,20,1,1000,#PB_Spin_Numeric) : xx+wb+2
+      AddCheckBox(#G_BrushSizeRand,xx,h1+i,25,20,Lang("R"),Brush(Action)\SizeRand,lang("Size Random"))
       i+ub + 10
       
       ; brush Shape (preview)
       If FrameGadget(#G_FrameBrushImage,0,h1+3+i,ScreenX-15,155,Lang("Shape"))
         i+20
       EndIf 
-      ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
-      UpdateBrushPreview()
-      ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
-      ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
+      If ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
+        GadgetToolTip(#G_BrushPreview, lang("Clic to open the window brush image, to change the image of the tool (brush, eraser, pen...)"))
+        UpdateBrushPreview()
+      EndIf
+      ;ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
+      ;ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
       i+110
       
       ComboBoxGadget(#G_BrushStrokeTyp,5,h1+i,65,cbbh)
@@ -843,7 +856,18 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       
       ;}
       
-      AddGadgetItem(#G_PanelTool,1,Lang("Tra"))
+      If action=#Action_CloneStamp
+        AddGadgetItem(#G_PanelTool,-1,Lang("Stamp"))
+        i=3
+        ; add parameter for source, alignment...
+        ComboBoxGadget(#G_BrushSource,5,h1+i, 120,cbbh)
+        AddGadgetItem(#G_BrushSource, -1, lang("Pattern"))
+        AddGadgetItem(#G_BrushSource, -1, lang("Image"))
+        SetGadgetState(#G_BrushSource, brush(action)\Source)
+      EndIf
+      
+      
+      AddGadgetItem(#G_PanelTool,-1,Lang("Tra"))
       ;{ alpha, aspect & flow
       i = 5
       If FrameGadget(#G_FrameAlpha,0,h1+3,ScreenX-15,80,Lang("Transparency"))
@@ -866,7 +890,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       i+ub+10
       ;}
       
-      AddGadgetItem(#G_PanelTool,2,Lang("Dyn"))
+      AddGadgetItem(#G_PanelTool,-1,Lang("Dyn"))
       ;{ dynamics
       i =5
       If FrameGadget(#G_FrameRot,0,h1+3,ScreenX-15,80,Lang("Rotation"))
@@ -884,17 +908,21 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       EndIf 
       AddSpinGadget(#G_BrushPas, Brush(Action)\pas, lang("Space between dots"), 5,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
       AddSpinGadget(#G_brushIntensity, Brush(Action)\Intensity, lang("Intensity of the brush"), 5+xg+wb,h1+i,wb,20,-255,255,#PB_Spin_Numeric)
-      AddCheckBox(#G_brushTrait, 5+xg*2+wb*2,h1+i,50,20, lang("Line"),Brush(Action)\Trait, lang("Line of the brush")) 
       i+ub
       
-      ComboBoxGadget(#G_BrushStroke,5,h1+i,65,cbbh)
-      AddGadgetItem(#G_BrushStroke,0,lang("Rough"))
-      AddGadgetItem(#G_BrushStroke,1,Lang("Knife"))
-      AddGadgetItem(#G_BrushStroke,2,Lang("Dash"))
-      AddGadgetItem(#G_BrushStroke,3,Lang("Line"))
-      AddGadgetItem(#G_BrushStroke,4,Lang("Gersam"))
-      GadgetToolTip(#G_BrushStroke,Lang("Choose the type of curve for the stroke"))
-      SetGadgetState(#G_BrushStroke,0)
+      If action <> #Action_CloneStamp
+        ComboBoxGadget(#G_BrushStroke,5,h1+i,65,cbbh)
+        AddGadgetItem(#G_BrushStroke,0,lang("Rough"))
+        AddGadgetItem(#G_BrushStroke,1,Lang("Knife"))
+        AddGadgetItem(#G_BrushStroke,2,Lang("Dash"))
+        AddGadgetItem(#G_BrushStroke,3,Lang("Line"))
+        AddGadgetItem(#G_BrushStroke,4,Lang("Gersam"))
+        GadgetToolTip(#G_BrushStroke,Lang("Choose the type of curve for the stroke"))
+        SetGadgetState(#G_BrushStroke,0)
+        w2= GadgetWidth(#G_BrushStroke)
+      EndIf
+      AddCheckBox(#G_brushTrait, 5+xg+w2,h1+i,50,20, lang("Stroke"),Brush(Action)\Trait, lang("Use stroke for the brush")) 
+
       i+ub+10   
       
       ; Scater
@@ -917,11 +945,13 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddGadgetItem(#G_BrushSymetry,3, Lang("Hor & Vert"))
       AddGadgetItem(#G_BrushSymetry,4, Lang("4 views"))
       SetGadgetState(#G_BrushSymetry,0)
-      i+ub
-      AddSpinGadget(#G_BrushFilter,Brush(Action)\filter, lang("Set the filter Type parameter (if used)"),xa1,h1+i,50,20,0,250,#PB_Spin_Numeric)
+     
+      AddSpinGadget(#G_BrushFilter,Brush(Action)\filter, lang("Set the filter Type parameter (if used)"),xa1+2+GadgetWidth(#G_BrushSymetry),
+                    h1+i,50,20,0,250,#PB_Spin_Numeric)
+       i+ub
       ;}
       
-      AddGadgetItem(#G_PanelTool,3,Lang("Col"))
+      AddGadgetItem(#G_PanelTool,-1,Lang("Col"))
       ;{ color
       i =5
       If FrameGadget(#G_FrameColor,0,h1+3,ScreenX-15,110,Lang("Color"))
@@ -1046,7 +1076,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
         AddCheckBox(#G_ActionXLock,xx,h1+i,100,20, lang("Proportion"),OptionsIE\lockX, lang("Keep proportion")) : i + 20   
         ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
         ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+20,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*7+20,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))    
       EndIf    
       
       ;}
@@ -1055,17 +1085,17 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       ;{ 
       If FrameGadget(#G_FrameSize,0,h1+3,ScreenX-15,50,Lang("Size"))
         i+20
-        AddSpinGadget(#G_ActionX,Layer(Layerid)\w,lang("Layer Width"),5,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
-        AddSpinGadget(#G_ActionY,Layer(Layerid)\h,lang("Layer Height"),5+wb+xg,h1+i,wb,20,-100000,100000,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionX,Layer(Layerid)\w,lang("Layer Width"),5,h1+i,wb+10,20,-100000,100000,#PB_Spin_Numeric)
+        AddSpinGadget(#G_ActionY,Layer(Layerid)\h,lang("Layer Height"),5+wb+10+xg,h1+i,wb+10,20,-100000,100000,#PB_Spin_Numeric)
         i + ub+15
       EndIf
       If FrameGadget(#G_FrameAlpha,0,h1+3+i,ScreenX-15,110,Lang("Options"))
         i+20          
-        AddCheckBox(#G_ActionXLock,xx,h1+i,Len(Lang("Proportion"))*6+5,20, lang("Proportion"),OptionsIE\lockX, lang("Keep proportion")) : i + 20   
+        AddCheckBox(#G_ActionXLock,xx,h1+i,Len(Lang("Proportion"))*7+5,20,Lang("Proportion"),OptionsIE\lockX,lang("Keep proportion")) : i + 20   
         ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
         ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))  : i + 20      
-        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Transform all viewed layers"))*6+5,20, lang("Transform all viewed layers"),OptionsIE\ActionForAllLayers,"")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*7+5,20,Lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?"))  : i + 20      
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("All viewed layers"))*7+5,20,Lang("All viewed layers"),OptionsIE\ActionForAllLayers,lang("Transform all viewed layers"))    
       EndIf    
       ;}
       
@@ -1082,8 +1112,8 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
         ;AddCheckBox(#G_ActionXLock,xx,h1+i,58,20,Lang("Proportion"),OptionsIE\lockX,"Keep proportion") : i + 20   
         ;AddCheckBox(#G_ActionYLock,xx,h1+i,58,20,Lang("Lock Y"),OptionsIE\lockY,"Lock Y Direction") : i + 20 
         ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20, lang("Confirm action"),OptionsIE\ConfirmAction, lang("Confirm action ?")) : i + 20      
-        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Rotate all viewed layers"))*6+5,20, lang("Rotate all viewed layers"),OptionsIE\ActionForAllLayers,"")
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*7+5,20,Lang("Confirm action"),OptionsIE\ConfirmAction,lang("Confirm action ?")) : i + 20      
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("All viewed layers"))*7+5,20,Lang("All viewed layers"),OptionsIE\ActionForAllLayers,lang("Rotate all viewed layers"))
       EndIf    
       ;}
       
@@ -1101,8 +1131,8 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
         AddCheckBox(#G_ActionXLock,xx,h1+i,58,20, lang("Lock X"),OptionsIE\lockX, lang("Lock X Direction")) : i + 20   
         AddCheckBox(#G_ActionYLock,xx,h1+i,58,20, lang("Lock Y"),OptionsIE\lockY, lang("Lock Y Direction")) : i + 20 
         ;  AddCheckBox(#G_ActionBorder,xx,h1+i,58,20,Lang("Layer border"),OptionsIE\lockY,"See layer border")    
-        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*6+5,20,lang("Confirm action"),OptionsIE\ConfirmAction,lang("Confirm action ?"))   : i + 20   
-        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("Move all viewed layers"))*6+5,20,lang("Move all viewed layers"),OptionsIE\ActionForAllLayers,"")    
+        AddCheckBox(#G_ConfirmAction,xx,h1+i,Len(Lang("Confirm action"))*7+5,20,Lang("Confirm action"),OptionsIE\ConfirmAction,lang("Confirm action ?"))   : i + 20   
+        AddCheckBox(#G_ActionFullLayer,xx,h1+i,Len(Lang("All viewed layers"))*7+5,20,Lang("All viewed layers"),OptionsIE\ActionForAllLayers,lang("Move all viewed layers"))    
       EndIf    
       
       ;}
@@ -1518,7 +1548,13 @@ Procedure IE_GadgetAdd()
     EndIf
     
     If AddSTringTBGadget(#G_PaperIntensityName,#G_PaperIntensity,#G_PaperIntensitySG, paper\intensity, 
-                         Lang("Intensity"), Lang("Intensity of the background"),0,yy,ScreenX-50-wp,wp,1,1000)
+                         Lang("Contrast"), Lang("Contrast of the background"),0,yy,ScreenX-50-wp,wp,1,1000)
+      YY+GadgetHeight(#G_PaperIntensity)
+    EndIf
+    
+    
+    If AddSTringTBGadget(#G_PaperBrightnessName,#G_PaperBrightness,#G_PaperBrightnessSG, paper\brightness, 
+                         Lang("Brightness"), Lang("Brightness of the background"),0,yy,ScreenX-50-wp,wp,1,100)
       YY+GadgetHeight(#G_PaperIntensity)
     EndIf
     
@@ -1740,9 +1776,112 @@ Procedure UpdateBrushPreview()
       DrawAlphaImage(ImageID(tmp),1,1)
       StopDrawing()
     EndIf    
-    SetGadgetState(#G_BrushPreview,ImageID(#Img_PreviewBrush))
+    SetGadgetState(#G_BrushPreview, ImageID(#Img_PreviewBrush))
     FreeImage2(tmp)
   EndIf
+  
+EndProcedure
+Procedure UpdateBrushImagePreview()
+  
+  ; to update the brush editor preview of the final brush image (with all changes)
+  
+  tmp = CopyImage(#BrushCopy, #PB_Any)
+  If tmp >0
+    ResizeImage(tmp,98,98)
+    If StartDrawing(ImageOutput(tmp))
+      DrawingMode(#PB_2DDrawing_AlphaClip)
+      Box(0,0,98,98,RGBA(0,0,0,255))
+      StopDrawing()
+    EndIf
+    
+    If StartDrawing(ImageOutput(#Img_PreviewBrushFinal))
+      
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
+      DrawImage(ImageID(#Img_checker),0,0,100,100)
+      Box(0, 0, 100, 100, RGBA(240, 240, 240, 100))
+      DrawAlphaImage(ImageID(tmp),1,1)
+      StopDrawing()
+    EndIf    
+    SetGadgetState(#G_brushImageFinal, ImageID(#Img_PreviewBrushFinal))
+    FreeImage2(tmp)
+  EndIf 
+  
+ 
+  tmp = CopyImage(#BrushCopy, #PB_Any)
+  If tmp >0
+    ResizeImage(tmp,32,32)
+    If StartDrawing(ImageOutput(tmp))
+      DrawingMode(#PB_2DDrawing_AlphaClip)
+      Box(0,0,98,98,RGBA(0,0,0,255))
+      StopDrawing()
+    EndIf
+  EndIf
+  
+  
+  
+  If StartDrawing(ImageOutput(#Img_PreviewBrushFinalStroke))
+    
+    DrawingMode(#PB_2DDrawing_AlphaBlend)
+    w1 = Round( OutputWidth()/100, #PB_Round_Up)
+    For i =0 To w1
+      DrawImage(ImageID(#Img_checker),i*100,0,100,100)
+    Next
+    Box(0, 0, OutputWidth(), OutputHeight(), RGBA(240, 240, 240, 100))
+    
+    ; then draw th brushimage 
+    w1 = (OutputWidth()-20)
+    size.d=0
+    Repeat
+      
+      If sizeok = 0
+        If size < 0.98
+          size +0.02+Brush(Action)\Pas*0.01
+        Else
+          sizeok = 1
+        EndIf
+      Else
+        If i > 250
+          If size > 0.02
+            size -0.02
+          EndIf
+        EndIf
+      EndIf
+      
+      brushsiz.d = 32* size 
+      b.d = (brushsiz * Brush(Action)\Pas*0.01) * Brush(Action)\SizeW*0.01
+      b2.d = brushsiz *8 * 0.01
+      If Brush(Action)\RotateByAngle
+        angle = Brush(Action)\RotateByAngle + Rnd(Brush(Action)\randRot)
+      Else
+        angle = Rnd(Brush(Action)\randRot) + Brush(Action)\randRot
+      EndIf
+      
+      
+      ;If angle >0
+        temp1 = RotateImageEx2(ImageID(tmp),angle+Rnd(Brush(Action)\randRot)) 
+      ;Else
+        ;temp1= CopyImage(tmp, #PB_Any)
+      ;EndIf
+      www = ImageWidth(temp1) * b2
+      hhh = ImageHeight(temp1) * b2
+      ResizeImage(temp1,www,hhh,1-Brush(Action)\Smooth)
+      
+      ; then draw the image
+      DrawAlphaImage(ImageID(temp1),10+j,OutputHeight()/2-hhh/2, brush(action)\alpha)
+      ;If angle>0
+        FreeImage2(temp1)
+      ;EndIf
+      j+b
+      i+1
+      
+    Until j > w1
+    
+    StopDrawing()
+  EndIf    
+  SetGadgetState(#G_brushImageFinalStroke, ImageID(#Img_PreviewBrushFinalStroke))
+  
+  FreeImage2(tmp)
+  
 EndProcedure
 Procedure SetToolParamToGad()
   
@@ -1816,14 +1955,10 @@ Procedure SetToolParamToGad()
         
       Case #Action_Text
         
-        
-      Case #Action_Tampon
-        
-        
       Case #Action_Pipette
         
         
-      Case #Action_brush, #Action_eraser, #Action_Pen
+      Case #Action_brush, #Action_eraser, #Action_Pen, #Action_CloneStamp
         
         ; on réaffiche toutes les options des brosses
         ;       For i = #G_FirstParamBrush+1 To #G_LastParamBrush-1
@@ -1985,8 +2120,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1449
-; FirstLine = 110
-; Folding = AAAAAHAgBAAAAAAAAAAAAAAAABa5BAAIAAAAw
+; CursorPosition = 841
+; FirstLine = 103
+; Folding = AAAAAOAADAAAAAAAwlAAAAAAAAABwIGAAAAAAAAA-
 ; DisableDebugger
 ; EnableUnicode

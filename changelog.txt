@@ -1,8 +1,115 @@
 ﻿
 ************************* CHANGELOG ********************************
-12/05/2021  0.5.9.6.3
+07/06/2021  0.5.9.8.1
+// New
+- add menu : window brush image
 // Changes
-- improvements of do_paint() (use only 1 time rotation, delete some conditions Not needed, redraw on the brush_preview color only 1 time). Gain when drawing : x2 ?
+- add tooltip to preview brush gadget
+// Removed
+- Panel Tool\ "gen", remove buttons "<" and ">". Now, to change the image of the tool (brush, eraser..), clic on the brush image open the window brush image.
+// Fixes
+- patterns didn't loaded correctly in github folder
+
+
+06/06/2021  0.5.9.8
+// Changes
+- when paint on sprite : save Stroke(StrokeId)\dot() (x,y,rot,alpha) And use this Array when paint on image.
+- add Layer_SetHasChanged() To know If a layer has changed (To update the image from sprite If needed)
+- add Layer_SetHasChanged() when : paint (brush, shape), erase, move/rotate/transform layer
+// Removed
+- add Layer_SetSpriteToImage() To several function, To have the same image on layer image As layer\sprite.
+Not used because don't work as I want - use Layer_SetSpriteToImage() when : 
+clic on layer UI, change Layer BM, Doc_Save(), autosave, exportimage (all layers visibles), export the current layer, layer_add,
+// Fixes
+- WindowInfo : setactiveiwindow(main) que si pas active, sinon flickering.
+- Stroke on sprite And on image are differents.
+
+
+05/06/2021  0.5.9.7.9
+// Fixes
+- when open brusheditor With a tool <> brush/pen/eraser : crash.
+- SaveBrushPreset() : comment is added 2 times
+- SaveBrushPreset() : add noise parameters (save/load)
+- now when change a brush image, it add the name To brush()\image$
+
+
+04/06/2021  0.5.9.7.8
+// New
+- add paper contraste and brightness (+ trackbar, stringgadget To change it).
+- options : save/load : paper intensity And brightness.
+- layer_applyAlpha() (should be changed) : To apply an alpha selection on the layer selected
+- add new brush folder (brusheditor) With 40 images
+// Fixes
+- the brush image aren't no more loaded when use a brush preset.
+
+
+03/06/2021  0.5.9.7.6
+// tests
+- optimisation (big image, tiles system)
+- brush editor (tool To create a brush image (With circle)
+
+
+02/06/2021  0.5.9.7.6
+// New
+- clic on preview brush image (panel tool (item "base")) : open windowbrushimage()
+- window brushImage (To Select the image For a brush) : StringGadget (directory For brush), canvas To see the images of the selected folder
+- window brushImage : when change combox -> canvas is updated With images from the folder selected
+- Panel "tool" : clic on brush image open the window brushImage
+- add Array sImage (name$, id) For brush image
+- options (load) : add brushname$, dirbankbrush$ (the folder of current images For the brush)
+// Fixes
+- when restorewindow Or activewindow : reset paint variables
+
+
+01/06/2021  0.5.9.7.2
+// New
+- Brush Editor : add brush Image final (updated With changes, To see the changes in real time)
+- Brush Editor : add stroke Image  (updated With changes)
+- Brush Editor : add BrushEditorCloseWindow()
+// Fixes
+- openWindowInfo : reset paint variable (paint=0, clic=0...)
+
+
+31/05/2021  0.5.9.7
+// New
+- panel tool : add itemgadget "Gen" And gadgets (quick gadgets : size, alpha, mix)
+// Changes
+- brush alphafadeout : add more time For the fade
+// Fixes
+- Doc_Save : after save, the mainwindow lost the focus
+
+
+29/05/2021  0.5.9.6.8
+// Changes
+- some changes in ExportOnImage()
+// Fixes
+- ExportOnImage() bug : export image does'nt work if we don't write the extension
+- autosave : after save, the mainwindow lost the focus
+
+
+28/05/2021  0.5.9.6.5
+// Fixes
+- fill : fill the layer0 Not the layerID
+
+
+13/05/2021  0.5.9.6.4
+// New
+- clone stamp : add tool parameter (like brush)
+- clone stamp : panel : add "stamp" item (For source, alignment...)
+WIP - clone stamp : add paint function
+// Changes
+- structures brush : add \sizeW/H=100 by Default. 
+- structures brush : add \source, souceimage, alignment For clonestamp. 
+- change some gadgets size/position For some tools
+- Add missing gadgettooltips For some tools 
+
+
+12/05/2021  0.5.9.6.3
+// New
+- window intro : add version of program
+// Changes
+- improvements of do_paint() (use only 1 time rotation, delete some conditions Not needed, redraw on the brush_preview color only 1 time). 
+Gain when drawing : x2 ?
 // Fixes
 - sometimes, brush has black border when we resize the brush (With wacom pression For ex Or when use "trim brush").
 - black border when use tool transform Or rotate

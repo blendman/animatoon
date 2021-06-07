@@ -48,7 +48,7 @@
 
 ; TOOLS
 ; - bug linear gradient !!
-; - add pattern tool (stamp/tampon)
+; wip - add pattern tool (stamp/tampon)
 ; - add a kind ot pattern stamp-brush paint ( grey level + color, to add a kind of texture during the painting) // 
 ; (ajouter sorte de tampon (niveau de gris) + couleur, pour peindre de l'aquarelle (texture) avec une couleur.)
 ; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY and IE_Options\confirmaction....
@@ -92,8 +92,6 @@
 ; - bug when hide/show panel -> canvas/screen is moved on the left
 ; - gradient linear AR
 ; - bug UI when next opening if we move the splitters // à l'ouverture suivante, quand on déplace les splitters en Y (swatch par exemple)
-; - Bug with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
-; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
 ; - color with water : isn't seen in real time if layer bm <> normal
 ; - Fill : bug PB with border in rgb(0,0,0)              
 ; - bug shape circle with outline > 2 (pixel alpha = 0 in outline)
@@ -102,6 +100,8 @@
 ; - center the view bug when UI panel (right or left) is hiden
 ; - reset the view bug when UI panel (right or left) is hiden
 ; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
+; - after crop, selection should be deselected
+; - fill with pattern could use the pattern selected
 
 ; CANVAS
 ; - add the zoom
@@ -112,8 +112,111 @@
 ; ok - clipoutput (canvas) : tests ok : pas vraiment de différent (gain 1 fps)
 ; - copy zone affichée : gain 6fps -> 14fps (layer multiply)
 ; ok, mais non - clipsprite (screen) : tests ok, mais ça n'apporte rien niveau optimisation 
+; - with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
+; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
 
 
+
+; 07/06/2021  0.5.9.8.1
+; // New
+; - add menu : window brush image
+; // Changes
+; - add tooltip To preview brush gadget
+; // Removed
+; - On panel Tool, item "gen", remove buttons "<" And ">". Now, To change the image, clic on the brush image open the window brush image.
+; // Fixes
+; - patterns didn't loaded correctly in github folder
+
+
+; 06/06/2021  0.5.9.8
+; // Changes
+; - when paint on sprite : save Stroke(StrokeId)\dot() (x,y,rot,alpha) and use this array when paint on image 
+; - add Layer_SetHasChanged() to know if a layer has changed (to update the image from sprite if needed)
+; - add Layer_SetHasChanged() when : paint (brush, shape), erase, move/rotate/transform layer
+; // Removed
+; - add Layer_SetSpriteToImage() to several function, to have the same image on layer image as layer\sprite.
+; not used because don't work as I want - use Layer_SetSpriteToImage() when : clic on layer UI, change Layer BM, Doc_Save(), autosave, exportimage (all layers visibles), export the current layer, layer_add,
+; // Fixes
+; - WindowInfo : setactiveiwindow(main) que si pas active, sinon flickering.
+; - Stroke on sprite and on image are differents.
+
+
+; 05/06/2021  0.5.9.7.9
+; // Fixes
+; - when open brusheditor with a tool <> brush/pen/eraser : crash.
+; - SaveBrushPreset() : comment is added 2 times
+; - SaveBrushPreset() : add noise parameters (save/load)
+; - now when change a brush image, it add the name to brush()\image$
+
+
+; 04/06/2021  0.5.9.7.8
+; // New
+; - add paper contraste and brightness (+ trackbar, stringgadget to change it).
+; - options : save/load : paper intensity and brightness.
+; - layer_applyAlpha() : to apply an alpha selection on the layer selected
+; - add new brush folder (brusheditor) with 40 images
+; // Fixes
+; - the brush image aren't no more loaded when use a brush preset.
+
+
+; 03/06/2021  0.5.9.7.6
+; // tests
+; - optimisation (big image, tile system)
+; - brush editor (tool to create a brush image (with circle)
+
+; 02/06/2021  0.5.9.7.6
+; // New
+; - clic on preview brush image (panel tool (item "base")) : open windowbrushimage()
+; - window brushImage (to select the image for a brush) : stringgadget (directory for brush), canvas to see the images of the selected folder
+; - window brushImage : when change combox -> canvas is updated with images from the folder selected
+; - Panel "tool" : clic on brush image open the window brushImage
+; - add array sImage (name$, id) for brush image
+; - options (load) : add brushname$, dirbankbrush$ (the folder of current images for the brush)
+; // Fixes
+; - when restorewindow or activewindow : reset paint variables
+
+
+; 01/06/2021  0.5.9.7.2
+; // New
+; - Brush Editor : add brush Image final (updated with changes, to see the changes in real time)
+; - Brush Editor : add stroke Image  (updated with changes)
+; - Brush Editor : add BrushEditorCloseWindow()
+; // Fixes
+; - openWindowInfo : reset paint variable (paint=0, clic=0...)
+
+
+; 31/05/2021  0.5.9.7
+; // New
+; - panel tool : add itemgadget "Gen" and gadgets (quick gadgets : size, alpha, mix)
+; // Changes
+; - brush alphafadeout : add more time for the fade
+; // Fixes
+; - Doc_Save : after save, the mainwindow lost the focus
+
+
+; 29/05/2021  0.5.9.6.8
+; // Changes
+; - some changes in ExportOnImage()
+; // Fixes
+; - ExportOnImage() bug : export image does'nt work if we don't write the extension
+; - autosave : after save, the mainwindow lost the focus
+
+
+; 28/05/2021  0.5.9.6.5
+; // Fixes
+; - fill : fill the layer0 not the layerID
+
+
+; 13/05/2021  0.5.9.6.4
+; // New
+; - clone stamp : add tool parameter (like brush)
+; - clone stamp : panel : add "stamp" item (for source, alignment...)
+; WIP - clone stamp : add paint function
+; // Changes
+; - structures brush : add \sizeW/H=100 by default. 
+; - structures brush : add \source, souceimage, alignment for clonestamp. 
+; - change some gadgets size/position for some tools
+; - Add missing gadgettooltips for some tools 
 
 
 ; 12/05/2021  0.5.9.6.3
@@ -1860,8 +1963,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 120
-; FirstLine = 96
+; CursorPosition = 121
+; FirstLine = 110
 ; Folding = 7+
 ; EnableXP
 ; DisableDebugger

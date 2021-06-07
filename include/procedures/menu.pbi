@@ -143,8 +143,9 @@ Procedure AddMenu(clear=0)
     MenuBar()
     OpenSubMenu(lang("Alpha"))
     MenuItem(#Menu_LayerTransformToLine,    Lang("Transform the image of the layer in line"))
-    MenuItem(#Menu_LayerAddBackgroundOnAlpha,   Lang("Add a background on the alpha of the layer"))
-    MenuItem(#Menu_LayerEraseAlpha,         Lang("Erase the alpha of the layer"))
+    MenuItem(#Menu_LayerAddBackgroundOnAlpha,   Lang("Add a background on the alpha"))
+    MenuItem(#Menu_LayerEraseAlpha,         Lang("Erase the alpha"))
+    MenuItem(#Menu_LayerApplyAlpha,         Lang("Apply the selection to alpha"))
     CloseSubMenu()
     
     
@@ -229,6 +230,7 @@ Procedure AddMenu(clear=0)
     MenuBar()
     MenuItem(#Menu_BackgroundEditor,   Lang("Background editor"))
     MenuItem(#Menu_BrushEditor,   Lang("Brush editor"))
+    MenuItem(#menu_BrushImageWindow,   Lang("Brush Image window"))
     
     
     ; HELP
@@ -421,7 +423,9 @@ Procedure CreateWindowInfo(info$, name$="")
   EndIf
   
   If OpenWindow(#win_autosave, (WindowWidth(#WinMain)- w)/2, 170, w, 110, name$, #PB_Window_SystemMenu, WindowID(#WinMain))
-    
+    Paint = 0
+    clic = 0
+    mouseclic = 0
     If StartDrawing(WindowOutput(#win_autosave))
       DrawingMode(#PB_2DDrawing_Default)
       Box(0,0,OutputWidth(),OutputHeight(), RGB(150,150,150))
@@ -472,7 +476,14 @@ Procedure UpdateWindowInfo(info$)
     FreeArray(txt$())
     
 EndProcedure
-
+Procedure CloseWindowInfo()
+  If IsWindow(#win_autosave)
+    CloseWindow(#win_autosave)
+    If GetActiveWindow() <> #winmain
+      SetActiveWindow(#WinMain)
+    EndIf
+  EndIf
+EndProcedure
 
 ; options
 Procedure OpenOptions()
@@ -598,6 +609,7 @@ Procedure OpenOptions()
             paper\alpha   = ReadPreferenceInteger("PaperAlpha", 255)
             paper\scale   = ReadPreferenceInteger("PaperScale", 10)
             paper\intensity   = ReadPreferenceInteger("PaperIntensity", 10)
+            paper\brightness   = ReadPreferenceInteger("PaperBrightness", 100)
             
             ; Document by default ?
             \ImageW       = ReadPreferenceInteger("ImageW", 1024)
@@ -609,6 +621,9 @@ Procedure OpenOptions()
             \DirPattern$  = ReadPreferenceString("DirPattern", "data\Presets\Patterns\")
             \DirPreset$   = ReadPreferenceString("DirPresets", "data\Presets\Bank\Blendman\")
             \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
+            ; \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
+            \BrushName$    = ReadPreferenceString("BrushName", "")
+            
             \RB_Img$      = ReadPreferenceString("RB_img", GetCurrentDirectory() + "data\Presets\RoughBoard\rb.png") 
             \Swatch$      = ReadPreferenceString("Swatch", GetCurrentDirectory() + "data\Presets\Swatch\Tango.gpl") 
             \SwatchColumns = ReadPreferenceInteger("SwatchColumns", 7) 
@@ -689,9 +704,8 @@ Procedure OpenOptions()
                 \BrushNum  = ReadPreferenceInteger("BrushNum", 0)
                 \BrushForm = ReadPreferenceInteger("BrushForm", 0)
                 
-                \BrushDir$ = ReadPreferenceString("BrushDir", "data\Presets\Brush\blendman\")
-                If ExamineDirectory(0, \brushDir$, "*.png")
-                  
+                \BrushDir$ = ReadPreferenceString("BrushDir", "blendman")
+                If ExamineDirectory(0, OptionsIE\DirBankBrush$+ \brushDir$+"\", "*.png")
                   While NextDirectoryEntry(0)
                     If DirectoryEntryType(0) = #PB_DirectoryEntry_File
                       \BrushNumMax +1
@@ -699,7 +713,6 @@ Procedure OpenOptions()
                   Wend        
                   FinishDirectory(0)        
                   \BrushNumMax -1 
-                  
                 EndIf
                 
                 ; size
@@ -832,7 +845,10 @@ Procedure OpenOptions()
     
     ; change some parameters For selection
     OptionsIE\SelectionType = Brush(#Action_Select)\Type
-    
+    If OptionsIE\brushName$ = ""
+      OptionsIE\brushName$ = "brush"+Str(Brush(#action_brush)\id)+".png"
+    EndIf
+  
     ClosePreferences()
     
   Else
@@ -857,6 +873,7 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("PaperAlpha",      paper\alpha)
     WritePreferenceInteger("PaperScale",      paper\scale)
     WritePreferenceInteger("PaperIntensity",  paper\intensity)
+    WritePreferenceInteger("PaperBrightness",  paper\brightness)
     WritePreferenceInteger("Papercolor",      paper\Color)
     
     
@@ -1547,9 +1564,7 @@ Procedure Doc_Open()
     EndIf 
     
     IE_StatusBarUpdate()
-    If IsWindow(#win_autosave)
-      CloseWindow(#win_autosave)
-    EndIf
+    CloseWindowInfo()
     
     
   EndIf
@@ -1567,6 +1582,8 @@ Procedure SelectFormat(file$)
       format = #PB_ImagePlugin_JPEG
     Case "bmp"
       format = #PB_ImagePlugin_BMP 
+    Default
+      format = #PB_ImagePlugin_JPEG
   EndSelect
   
   ProcedureReturn format
@@ -1617,7 +1634,7 @@ Procedure Doc_Save()
         ; no more used
         ;         temp = CreateImage(#PB_Any, w_exp, h_exp, 32, #PB_Image_Transparent)
         
-        ; I need to convert layers, to get the blendmode // je dois convertir les calques pour prendre en comte les blendmodes 
+        ; I need to convert layers, to get the blendmode // je dois convertir les calques pour prendre en compte les blendmodes 
         For i =0 To Nb
           Layer_ConvertToBm(i)
         Next i
@@ -1653,13 +1670,19 @@ Procedure Doc_Save()
         ;         
         ;         ; puis, on supprime les images créées, pour libérer de la mémoire.
         ;         FreeImage2(temp)
-        ;         ; result = DeleteFile(nom$,#PB_FileSystem_Force)
+        ;         ; result = DeleteFile(nom$, #PB_FileSystem_Force)
         ;         FileToDelete$(0) = nom$
         
         ; delete the temprorary layer // puis, on supprime les images temporaire
         ;         For i =0 To ArraySize(layer())
         ;           FreeImage2(layer(i)\ImageTemp)
         ;         Next i
+        
+        
+        ; set the image of the sprite on the image of the layer
+        ;         UpdateWindowInfo("SAVE : #Save layer Image Start")
+        ;         Layer_SetSpriteToImage()
+        
         
         ; on sauvegarde tous les layers
         For i = 0 To nb
@@ -1739,9 +1762,7 @@ Procedure Doc_Save()
         
         FreeArray(FileToDelete$())
         
-        If IsWindow(#win_autosave)
-          CloseWindow(#win_autosave)
-        EndIf
+        CloseWindowInfo()
     
         ProcedureReturn 1
       EndIf 
@@ -1850,7 +1871,7 @@ Procedure.s ExportOnImage()
     Filtre = SelectedFilePattern() ; 0 = jpg, 1 = png, 2 = bmp
     
     ; set extension if needed
-    Ext$ = GetExtensionPart(filename$)
+    Ext$ = LCase(GetExtensionPart(filename$))
     If (Ext$ <> "jpg" And filtre = 0)
       filename$ + ".jpg"
       Ext$ = ".jpg"
@@ -1948,20 +1969,20 @@ EndProcedure
 
 
 Procedure testlayer(n)
-   ;<-- need to be comment
-  Debug "on update un ou des layers. Layerid : "+Str(n)
-  For i = 0 To ArraySize(layer())
-;     Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / image : "+Str(layer(i)\image)+" / imagetemp : "+Str(layer(i)\imagetemp)
-;       Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / bm : "+Str(layer(i)\Bm)
-    info$ = "layer "+Str(i)+" nom : "+layer(i)\name$+
-            " / image : "+Str(layer(i)\image)+
-            " / imagetemp : "+ Str(layer(i)\imagetemp)+
-            " / sprite : "+Str(layer(i)\sprite)
-    
-    Debug info$  
-
-  Next
-  ;--> 
+;   ;<-- need to be comment
+;   Debug "on update un ou des layers. Layerid : "+Str(n)
+;   For i = 0 To ArraySize(layer())
+;     ;     Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / image : "+Str(layer(i)\image)+" / imagetemp : "+Str(layer(i)\imagetemp)
+;     ;       Debug "layer "+Str(i)+" nom : "+layer(i)\name$+" / bm : "+Str(layer(i)\Bm)
+;     info$ = "layer "+Str(i)+" nom : "+layer(i)\name$+
+;             " / image : "+Str(layer(i)\image)+
+;             " / imagetemp : "+ Str(layer(i)\imagetemp)+
+;             " / sprite : "+Str(layer(i)\sprite)
+;     
+;     Debug info$  
+;     
+;   Next
+;   ;--> 
 EndProcedure
 
 Procedure File_SaveImage()
@@ -2031,8 +2052,23 @@ Procedure File_SaveImage()
         
         ;{ save the image
         
+        ; update image of layer if needed
+        ; Layer_SetSpriteToImage()
+        
+        ; select the format
+        Filtre = SelectedFilePattern() ; 0 = jpg, 1 = png, 2 = bmp
+
         ; get extension and name
-        ext$ = GetExtensionPart(name$)
+        ext$ = LCase(GetExtensionPart(name$))
+        If (Ext$ <> "jpg" And filtre = 0)
+          Ext$ = "jpg"
+        EndIf  
+        If (Ext$ <> "png" And filtre = 1) 
+          Ext$ = "png"
+        EndIf     
+        If (Ext$ <> "bmp" And filtre = 2)
+          Ext$ = "bmp"
+        EndIf   
         name$ = RemoveString(name$, ext$)
         name$ = RemoveString(name$,".")
         
@@ -2135,8 +2171,8 @@ Procedure File_SaveImage()
           savefile$ = name$+"_Screen."+ext$
           format = SelectFormat(savefile$)
           
-          If SaveImage(#Img_saveImage,savefile$,format)=0
-            MessageRequester("error","unable to save the part of the image screen !"+savefile$)
+          If SaveImage(#Img_saveImage, savefile$, format)=0
+            MessageRequester("error","unable to save the part of the image screen ! "+savefile$)
           EndIf
           
           ; puis on libère la mémoire
@@ -2301,6 +2337,7 @@ Procedure AutoSave()
         For i= 0 To ArraySize(layer())
           
           If layer(i)\Haschanged
+            ; Layer_SetSpriteToImage()
             layer(i)\Haschanged = 0 
             ; Debug "autosave !!! "
             Date$ = FormatDate("%yyyy%mm%dd", Date()) 
@@ -2335,9 +2372,7 @@ Procedure AutoSave()
         
       EndIf
       
-      If IsWindow(#win_autosave)
-        CloseWindow(#win_autosave)
-      EndIf
+      CloseWindowInfo()
       
       
       ; reset the clic/paint variable
@@ -2874,9 +2909,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2402
-; FirstLine = 21
-; Folding = AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA--BAAAAAAw
+; CursorPosition = 232
+; FirstLine = 177
+; Folding = HAAAA5AAAAAAAAGAAAAMDAAAAAACAAAAAHAAAAAAAAAAA+
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

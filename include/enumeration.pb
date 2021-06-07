@@ -64,6 +64,7 @@ Enumeration ; windows
   #Win_BGeditor
   #Win_Swatch
   #Win_BrushEditor
+  #Win_BrushImage
   
   
   ; Images settings / reglages images
@@ -113,7 +114,9 @@ Enumeration ; images
   #IMAGE_CursorColSeL
   
   
-  #Img_PreviewBrush
+  #Img_PreviewBrush ; the image of the brush image
+  #Img_PreviewBrushFinal ; the image of the brush with all changes
+  #Img_PreviewBrushFinalStroke ; the image of the stroke for the brush with all changes
   
   ; image pour les layers dessus, dessous (pas utilisé ?)
   #Img_dessus1
@@ -198,6 +201,9 @@ Enumeration ; images
   
   #img_selection
   #Img_AlphaSel
+  
+  ; image for some window
+  #Img_WindowbrushCanvasImgbrush
   
   #Img_Max
   
@@ -343,7 +349,7 @@ Enumeration ; Menu, menuitems
   #Menu_BackgroundEditor
   #Menu_LayerAddBackgroundOnAlpha
   #Menu_LayerEraseAlpha
-  
+  #Menu_LayerApplyAlpha
   
   ; Actions
   #Menu_ActionSave
@@ -378,6 +384,7 @@ Enumeration ; Menu, menuitems
   #menu_UIAdvanced
   
   #menu_BrushEditor
+  #menu_BrushImageWindow
  
   ; Help
   #Menu_about
@@ -474,11 +481,24 @@ Enumeration ; gadgets
   
   #G_ConfirmAction ; for all action, if needed
   
-  ;{ Tool brush, eraser, pen
+  ;{ Tool brush, eraser, pen, clonestamp
   #G_Cont_Brush ; container pour les parametres de l'outil brush, eraser, pen
   
   
   #G_FirstParamBrush ; attention, toujours le garde en premier pour les paramètres des brush
+  
+  ; Genral and quick gadgets
+  #G_BrushSizeNameG
+  #G_BrushSizeTB
+  #G_BrushSizeSG
+  #G_BrushAlphaNameG
+  #G_BrushAlphaTB
+  #G_BrushAlphaSG
+  #G_BrushMixNameG
+  #G_BrushMixTB
+  #G_BrushMixSG
+  #G_BrushEditor
+  #G_BrushPreset
   
   ;size
   #G_FrameSize
@@ -553,9 +573,15 @@ Enumeration ; gadgets
   ; filter
   #G_BrushFilter
   
+  ;{ tool clone stamp
+  #G_BrushSource
+  #G_BrushAlignment
+  ;}
   
   #G_LastParamBrush ; toujours en dernier pour les paramètres des Tools
                     ;}
+  
+ 
   
   ;{ Tool Move Layer, Transform, rotate
   #G_ActionX
@@ -642,7 +668,7 @@ Enumeration ; gadgets
   #G_PresetName
   ;}
   
-  ;{ options
+  ;{ options, paper
   #G_ListPaper
   #G_PaperAlpha
   #G_PaperAlphaSG ; stringgadget
@@ -654,6 +680,9 @@ Enumeration ; gadgets
   #G_PaperIntensity
   #G_PaperIntensitySG
   #G_PaperIntensityName
+  #G_PaperBrightness
+  #G_PaperBrightnessSG
+  #G_PaperBrightnessName
   ;}
   
   ;{ swatch, roughboard, gradient
@@ -760,13 +789,27 @@ Enumeration ; gadgets
   
   ;}
   
-  ;{ window brush editor
+  ;{ window brush editor & window brush image
+  ; brush editor
+  #G_brushImageFinal
+  #G_brushImageFinalStroke
+  #G_brushImageLoaded
   #G_brushAddRdNoiseToImage
   #G_brushNoiseToImgMin
   #G_brushNoiseToImgMax
   #G_brushNoiseToImgGrey
   #G_brushAlphaVsTime
   #G_brushAlphaVsTimeFactor
+  
+  ; brush image
+  #G_brushImageDir
+  #G_brushImageDirButton
+  #G_brushImageChooseBrushFolder
+  #G_brushImageSA
+  #G_brushImageCanvas
+  #G_brushImageImport
+  #G_brushImageImportTampon
+  #G_brushImageImportClipboard
   ;}
   
   ;}  
@@ -984,7 +1027,7 @@ Enumeration ; action on the layer, ToolType, stroke style
   #Action_Pen
   #Action_Brush
   #Action_Spray
-  #Action_Tampon
+  #Action_CloneStamp
   #Action_Particles
   
   #Action_Line
@@ -1014,9 +1057,9 @@ Enumeration ; action on the layer, ToolType, stroke style
   
   ;{ ToolType
   
-  ; pour les outils, le type d'outil
-  ; attention, ça doit être dans le même ordre que sur le combobox "caractéristique de l'outil" 
-  ; ou type de l'outil, dans AddtoolbarIE()
+  ; For tools, the tool type // pour les outils, le type d'outil
+  ; attention, shoub the same order as the combobox #G_IE_Type // ça doit être dans le même ordre que sur le combobox "caractéristique de l'outil" 
+  ; Tooltype in AddtoolbarIE() // ou type de l'outil, dans AddtoolbarIE()
   #ToolType_Brush = 0
   #ToolType_Pen
   #ToolType_Eraser
@@ -1051,8 +1094,8 @@ EndEnumeration
 ; CompilerEndIf
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 766
-; FirstLine = 33
-; Folding = 5fgFgwEAA-
+; CursorPosition = 386
+; FirstLine = 139
+; Folding = wfoBAAAAA+
 ; EnableXP
 ; EnableUnicode
