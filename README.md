@@ -22,7 +22,7 @@ Animatoon is developped in [Purebasic][1] and has been created by Blendman (Sinc
 
 ## Download ###
 
-### Animatoon 0.5.9.x (march-may 2021)
+### Animatoon 0.5.9.x (2021)
 
 # Windows : 
 You can download Animatoon from [the release directory][release directory (windows)] or from the [Github releases][gh-release] 
@@ -47,7 +47,9 @@ There isn't any release for the moment for those platforms.
 
 ## Thanks for the help & contributers
 
-IceSoft, Kernadec, Dobro, Attomo, G-rom, Le Soldat Inconnu (LSI), Kwanjeen, Djes, Falsam, Typhoon, Guillot, Netmaestro, Danilo, Rashad, Wilbert, Onilink, Purelust, Marc256, and probably a lot of others users of purebasic I have forgotten (sorry)...
+Main contributers : Blendman, IceSoft
+
+Other contributers : Kernadec, Dobro, Attomo, G-rom, Le Soldat Inconnu (LSI), Kwanjeen, Djes, Falsam, Typhoon, Guillot, Netmaestro, Danilo, Rashad, Wilbert, Onilink, Purelust, Marc256, and probably a lot of others users of purebasic I have forgotten (sorry)...
 
 
 ## Licence
