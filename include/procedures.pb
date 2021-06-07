@@ -12,7 +12,7 @@ Procedure FreeSprite2(sprite)
   EndIf
   
 EndProcedure
-
+ 
 ; text
 Procedure DrawTextEx(x.f,y.f,text$, couleur.l=0, lineHeight.w=19)  
   Protected nbLine.i=1 ; il y a au moins une ligne
@@ -517,6 +517,7 @@ Procedure ScreenUpdate(updateLayer=0, updateCanvas = 0)
               Layer_DrawImg(LayerId, layer(layerid)\alpha)
               
             Default 
+              ; DrawingMode(#PB_2DDrawing_AlphaBlend)
               Box(0,0,w,h,RGBA(255,255,255,255-layer(LayerId)\alpha))
               ; DrawAlphaImage(ImageID(Layer(LayerId)\ImageBM),0,0,layer(layerid)\alpha)
               ; SetAlphaMask()
@@ -671,8 +672,9 @@ XIncludeFile "procedures\window.pbi"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 14
-; Folding = hAAAAAAAAAAAAA5
+; CursorPosition = 455
+; FirstLine = 83
+; Folding = hAAAAAAAAgrvBA5
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

@@ -558,38 +558,257 @@ EndProcedure
 
 
 ;--- TOOLS
+
+
+;--- BRUSH, brush editor
+Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
+  
+  Shared brushImageCanvasHeight, brushImageId
+
+  s = 78
+  
+  ; update the list of images from current brush folder
+  If updatelist = 1
+    
+    ResizeGadget(#G_brushImageCanvas,#PB_Ignore,#PB_Ignore,#PB_Ignore,brushImageCanvasHeight)
+    SetGadgetAttribute(#G_brushImageSA, #PB_ScrollArea_InnerHeight, brushImageCanvasHeight)
+    
+    ; get the number of brush image in the folder
+    If ExamineDirectory(0, OptionsIE\DirBankbrush$+OptionsIE\DirBrush$,"*.*")
+      While NextDirectoryEntry(0)
+        If DirectoryEntryType(0) = #PB_DirectoryEntry_File
+          If i > GadgetWidth(#G_brushImageCanvas)-80
+            i = 0
+            J+80
+            If j > GadgetHeight(#G_brushImageCanvas)
+              ResizeGadget(#G_brushImageCanvas,#PB_Ignore,#PB_Ignore,#PB_Ignore,J+100)
+              SetGadgetAttribute(#G_brushImageSA, #PB_ScrollArea_InnerHeight, J+100)
+            EndIf
+          EndIf
+          i+80
+        EndIf
+      Wend
+      FinishDirectory(0)
+    EndIf
+    
+    ; create the image for the canvas brush image
+    FreeImage2(#Img_WindowbrushCanvasImgbrush)
+    If CreateImage(#Img_WindowbrushCanvasImgbrush, GadgetWidth(#G_brushImageCanvas), GadgetHeight(#G_brushImageCanvas))
+    EndIf
+    
+    
+    i=0
+    j=0 
+    
+    ; then draw the brush on the image
+    If StartDrawing(ImageOutput(#Img_WindowbrushCanvasImgbrush))
+      
+      Box(0,0,OutputWidth(), OutputHeight(),RGB(100,100,100))
+      
+      DrawingMode(#PB_2DDrawing_AlphaBlend)
+      ; draw the image for the brush from the current brush directory
+      If ExamineDirectory(0, OptionsIE\DirBankbrush$+OptionsIE\DirBrush$,"*.*")
+        While NextDirectoryEntry(0)
+          name$ = DirectoryEntryName(0)
+          ok = 0
+          If  DirectoryEntryType(0) = #PB_DirectoryEntry_File
+            t =  LoadImage(#PB_Any, OptionsIE\DirBankbrush$+OptionsIE\DirBrush$+"\"+name$ )
+            If t >0
+              
+              ResizeImage(t,s,s)
+              x = 2+i
+              y = 2+j
+              
+              NbBrushImage +1
+              ReDim BrushImage.sImage(NbBrushImage)
+              BrushImage(NbBrushImage)\filename$ = OptionsIE\DirBankbrush$+OptionsIE\DirBrush$+"\"+name$ 
+              BrushImage(NbBrushImage)\x = x/80
+              BrushImage(NbBrushImage)\y = y/80
+             
+              If name$ = OptionsIE\BrushName$
+                brushImageId = NbBrushImage
+;                 Box(x-1,y-1,s+2,s+2, RGBA(255,255,255,255))
+               EndIf
+              DrawImage(ImageID(#Img_checker),x,y,s,s)
+              DrawAlphaImage(ImageID(t),x,y)
+              FreeImage2(t)
+              i+80
+              If i > OutputWidth()-80
+                i = 0
+                J+80
+              EndIf
+            EndIf
+            
+          EndIf
+        Wend
+        FinishDirectory(0)
+      EndIf 
+      StopDrawing()
+    EndIf
+    
+    
+  Else
+    
+    For i=0 To ArraySize(BrushImage())
+      If BrushImage(i)\x = x And BrushImage(i)\y = y
+        brushImageId = i
+        OptionsIE\brushName$ = RemoveString(BrushImage(brushImageId)\filename$, OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" )
+        BrushUpdateImage(1)
+        Break
+      EndIf
+    Next
+    
+    
+  EndIf
+  
+  If StartDrawing(CanvasOutput(#G_brushImageCanvas))
+    DrawImage(ImageID(#Img_WindowbrushCanvasImgbrush),0,0)
+    x = BrushImage(brushImageId)\x*80
+    y = BrushImage(brushImageId)\y*80
+    DrawingMode(#PB_2DDrawing_Outlined)
+    Box(x,y,s+2,s+2, RGBA(255,255,255,255))
+    StopDrawing()
+  EndIf
+  
+EndProcedure
+Procedure EventBrushImage(eventgadget)
+  
+  gad = EventGadget
+  ; event for gagdeget for window brush editor
+  Select EventGadget
+      
+    Case #G_brushImageCanvas
+      If EventType() = #PB_EventType_LeftButtonDown  
+        If StartDrawing(CanvasOutput(gad))
+            x = GetGadgetAttribute(gad, #PB_Canvas_MouseX)/80
+            y = GetGadgetAttribute(gad, #PB_Canvas_MouseY)/80
+            StopDrawing()
+            WindowbrushUpdateImgList(0,x,y)
+          EndIf
+
+      EndIf
+      
+      
+    Case #G_brushImageDir
+;       name$ = GetGadgetText(#G_brushImageDir)
+;       If name$ <> #Empty$
+;         OptionsIE\DirBankbrush$ = name$
+;       EndIf
+      
+    Case #G_brushImageDirButton
+      
+    Case #G_brushImageChooseBrushFolder
+      OptionsIE\DirBrush$ = GetGadgetText(eventgadget)
+      ReDim BrushImage.sImage(0)
+      NbBrushImage = -1
+      WindowbrushUpdateImgList()
+      
+  EndSelect
+  
+EndProcedure
+Procedure OpenWindowBrush()
+  Shared brushImageCanvasHeight
+  ; the window to select a brush image
+  winW = 800
+  WinH = 500
+  
+  If OpenWindow(#Win_BrushImage, 0, 0, winw, WinH, Lang("Select a brush image"),
+                #PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
+    
+    ;  HideWindow(#Win_BGeditor,1)
+    ; set some variables needed
+    w1 = WindowWidth(#Win_BrushImage)
+    h1 = WindowHeight(#Win_BrushImage)
+    
+    x1 = 10
+    y1 = 10
+    w = w1-x1*2
+    x=x1
+    y=y1
+             
+
+    ; add gagdets
+    If StringGadget(#G_brushImageDir,x,y,W1-30-x1*2,20, OptionsIE\DirBankbrush$) : EndIf : x +GadgetWidth(#G_brushImageDir)
+    If ButtonGadget(#G_brushImageDirButton, x, y, 30, 20, "...") : EndIf : y +30
+    x = x1
+    ComboBoxGadget(#G_brushImageChooseBrushFolder,x,y,w,20)
+    ; get the folders of brush
+    If ExamineDirectory(0, OptionsIE\DirBankbrush$,"*.*")
+      While NextDirectoryEntry(0)
+        If DirectoryEntryType(0) <> #PB_DirectoryEntry_File
+          If DirectoryEntryName(0) <> ".." And DirectoryEntryName(0) <> "."
+            AddGadgetItem(#G_brushImageChooseBrushFolder, -1,DirectoryEntryName(0))
+            If DirectoryEntryName(0) = OptionsIE\DirBrush$
+              pos = i
+            EndIf
+            i+1
+          EndIf
+        EndIf
+      Wend
+      FinishDirectory(0)
+    EndIf
+    SetGadgetState(#G_brushImageChooseBrushFolder, pos)
+    y+30
+    
+    If ScrollAreaGadget(#G_brushImageSA,x,y,w,h1-y-60,w-25,h1-y)
+      If CanvasGadget(#G_brushImageCanvas,0,0,w,h1-y)
+        brushImageCanvasHeight = h1-y
+         WindowbrushUpdateImgList()
+      EndIf
+    EndIf
+    
+    ; buttons to add a brush image ??
+    ;   #G_brushImageImport
+    ;   #G_brushImageImportTampon
+    ;   #G_brushImageImportClipboard
+
+  EndIf
+  
+    
+EndProcedure
+; brush editor
+Procedure BrushEditorCloseWindow()
+  Shared brushEditor
+  brushEditor =0
+  BrushUpdateImage()
+  CloseWindow(#Win_BrushEditor)
+ 
+EndProcedure
 Procedure EventBrushEditor(EventGadget)
   
   ; event for gagdeget for window brush editor
-   Select EventGadget
-              
-     Case #G_brushAddRdNoiseToImage
-       brush(action)\AddNoiseRandomOnImagebrush = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgMin
-       brush(action)\AddNoiseOnImgMin = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgMax
-       brush(action)\AddNoiseOnImgMax = GetGadgetState(EventGadget)
-       
-     Case #G_brushNoiseToImgGrey
-       brush(action)\AddNoiseOnImgGrey = GetGadgetState(EventGadget)
-       
-     Case #G_brushAlphaVsTime
-       brush(action)\AlphaVsTime = GetGadgetState(EventGadget)
-   EndSelect
-   
-   BrushUpdateImage()
+  Select EventGadget
+      
+    Case #G_brushAddRdNoiseToImage
+      brush(action)\AddNoiseRandomOnImagebrush = GetGadgetState(EventGadget)
+      
+    Case #G_brushNoiseToImgMin
+      brush(action)\AddNoiseOnImgMin = GetGadgetState(EventGadget)
+      
+    Case #G_brushNoiseToImgMax
+      brush(action)\AddNoiseOnImgMax = GetGadgetState(EventGadget)
+      
+    Case #G_brushNoiseToImgGrey
+      brush(action)\AddNoiseOnImgGrey = GetGadgetState(EventGadget)
+      
+    Case #G_brushAlphaVsTime
+      brush(action)\AlphaVsTime = GetGadgetState(EventGadget)
+  EndSelect
+  
+  BrushUpdateImage()
    
 EndProcedure
 Procedure WindowBrushEditor()
   
+  Shared brushEditor
   
   
-  winW = 750
-  winH = 500
+  winW = 1000
+  winH = 600
   If OpenWindow(#Win_BrushEditor, 0, 0, winw, winH, Lang("Brush Editor"), #PB_Window_ScreenCentered|#PB_Window_SystemMenu, WindowID(#WinMain))
     
+    brushEditor = 1
+
     x = 10
     y = 10
     wsg = 60
@@ -597,16 +816,35 @@ Procedure WindowBrushEditor()
     oldaction = action
     action = #Action_Brush
     
-    wp = 170
-    panel = PanelGadget(#PB_Any, wp+5, 5, winw-10-wp, WinH-50)
-    AddGadgetItem(panel, -1, lang("Image"))
-    AddGadgetItem(panel, -1, lang("Size"))
+    wp = 250
     
-    AddGadgetItem(panel, -1, lang("Alpha"))
     
-    addSpinGadget(#G_brushAddRdNoiseToImage, brush(action)\AddNoiseRandomOnImagebrush, lang("Add Noise to Image Brush"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    addSpinGadget(#G_brushNoiseToImgMin, brush(action)\AddNoiseOnImgMin, lang("Add Noise to Image Min"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
-    addSpinGadget(#G_brushNoiseToImgMax, brush(action)\AddNoiseOnImgMax, lang("Add Noise to Image Max"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
+    ; image preview final
+    If Not IsImage(#Img_PreviewBrushFinal)
+      If CreateImage(#Img_PreviewBrushFinal,100,100,32,#PB_Image_Transparent) : EndIf
+    EndIf
+    If ImageGadget(#G_brushImageFinal,5,5,100,100,ImageID(#Img_PreviewBrushFinal))
+    EndIf
+   
+    
+    ; image for the stroke of the brush (preview final)
+    If Not IsImage(#Img_PreviewBrushFinalStroke)
+      If CreateImage(#Img_PreviewBrushFinalStroke,wp-5,100,32,#PB_Image_Transparent) : EndIf
+    EndIf
+    If ImageGadget(#G_brushImageFinalStroke,5,120,wp-5,100,ImageID(#Img_PreviewBrushFinalStroke))
+    EndIf
+    BrushUpdateImage()
+    
+    ; panel
+    panel = PanelGadget(#PB_Any,wp+5,5,winw-10-wp,WinH-50)
+    AddGadgetItem(panel,-1,lang("Image"))
+    AddGadgetItem(panel,-1,lang("Size"))
+    
+    AddGadgetItem(panel,-1,lang("Alpha"))
+    
+    addSpinGadget(#G_brushAddRdNoiseToImage, brush(action)\AddNoiseRandomOnImagebrush, lang("Add Noise to Image Brush"),x,y,wsg,h,0,5000,#PB_Spin_Numeric) : x+wsg+5
+    addSpinGadget(#G_brushNoiseToImgMin, brush(action)\AddNoiseOnImgMin, lang("Add Noise to Image Min"),x,y,wsg,h,0,5000,#PB_Spin_Numeric) : x+wsg+5
+    addSpinGadget(#G_brushNoiseToImgMax, brush(action)\AddNoiseOnImgMax, lang("Add Noise to Image Max"),x,y,wsg,h,0,5000,#PB_Spin_Numeric) : x+wsg+5
     ; addSpinGadget(#G_brushNoiseToImggrey, brush(action)\AddNoiseOnImgGrey, lang("Add Noise to Image Alpha"), x, y, wsg,h, 0,5000,#PB_Spin_Numeric ) : x+wsg+5
     y+h+5
     
@@ -649,7 +887,7 @@ Procedure WindowBrushEditor()
     Until quit >= 1
     
     BrushUpdateImage()
-    
+
     CloseWindow(#Win_BrushEditor)
   EndIf
   
@@ -658,6 +896,9 @@ Procedure WindowBrushEditor()
   EndIf
   
 EndProcedure
+
+
+
 ;--- EDITIONS
 
 
@@ -1486,8 +1727,11 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 442
-; FirstLine = 84
-; Folding = AgHA5lAAAAAAAAAAAA9
+; CursorPosition = 654
+; FirstLine = 70
+; Folding = AAAAAA30-4-p-BAAADAAAAAA5
+; EnableAsm
 ; EnableXP
+; Warnings = Display
+; EnablePurifier
 ; EnableUnicode

@@ -5,10 +5,10 @@
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
-#ProgramVersion   = "0.5.9.6"
-#ProgramRevision  = 2
+#ProgramVersion   = "0.5.9.8"
+#ProgramRevision  = 1
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
-#ProgramNbLine    = "21900"
+#ProgramNbLine    = "23600"
 ; Application
 #ProgramName      = "Animatoon"
 #ProgramAuteur    = "Blendman"
@@ -291,13 +291,13 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 77
-; FirstLine = 61
-; Folding = 4BAk
+; CursorPosition = 2
+; Folding = jBAk
 ; EnableXP
 ; EnableOnError
 ; UseIcon = teo.ico
 ; Executable = _release\windows\x86\0.596\animatoon0.596.exe
 ; DisableDebugger
+; Compiler = PureBasic 5.73 LTS (Windows - x86)
 ; Warnings = Display
 ; EnablePurifier

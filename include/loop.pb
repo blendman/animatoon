@@ -84,13 +84,13 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_Save
                   Doc_Save()
                   
-                Case #Menu_SaveImage ; image with all layer visible and background
+                Case #Menu_SaveImage ; save an image with all layers visibles and background
                   File_SaveImage()
                   
                 Case #Menu_Import
                   Layer_ImportImage()
                   
-                Case #Menu_ExportAll             
+                Case #Menu_ExportAll            
                   filename$ = SaveFileRequester("Save all images","","png|*.png",0)
                   If filename$ <>""
                     For i=0 To ArraySize(layer())
@@ -140,11 +140,12 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       If GetExtensionPart(filename$) <> "png"
                         filename$ + ".png"
                       EndIf
+                      ; Layer_SetSpriteToImage()
                       If OptionsIE\SaveImageRT
                         SaveImage(Layer(LayerId)\image, filename$,#PB_ImagePlugin_PNG)
                       Else
                         CopySprite(Layer(LayerId)\Sprite,#Sp_CopyForsave, #PB_Sprite_AlphaBlending)
-                        SaveSprite(#Sp_CopyForsave, filename$, #PB_ImagePlugin_PNG)
+                        SaveSprite(#Sp_CopyForsave, filename$+"_sprite", #PB_ImagePlugin_PNG)
                         FreeSprite2(#Sp_CopyForsave)
                       EndIf                  
                     EndIf
@@ -397,6 +398,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 Case #Menu_LayerEraseAlpha  
                   Layer_EraseAlpha()
                   
+                Case #Menu_LayerApplyAlpha
+                  Layer_ApplyAlpha()
                   ;}
                   
                   ;{ Filters
@@ -460,6 +463,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   
                 Case #menu_brusheditor
                   WindowBrushEditor()
+                  
+                Case #menu_BrushImageWindow
+                  OpenWindowBrush()
                   ;}
                   
                   ;{ Help
@@ -706,7 +712,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                         Layer_ValidChange(Action)  
                         OldAction = Action
                       EndIf  
-                      If NewPainting                      
+                      If NewPainting
+                        ; Layer_SetSpriteToImage()
                         ScreenUpdate()
                       EndIf 
                       xlm = GadgetX(#G_SplitLayerRB)+GadgetX(#G_LayerAdd)
@@ -738,15 +745,59 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                       ;{-- Tool parameters
                       
-                      
                       ;{ brush , eraser, pen
+                      ; General : quick gadgets
+                    Case #G_BrushSizeTB, #G_BrushSizeSG
+                      If eventgadget = #G_BrushSizeTB
+                        Brush(Action)\size = GetGadgetState(#G_BrushSizeTB)
+                        SetGadgetText(#G_BrushSizeSG, Str(Brush(Action)\size))
+                      Else
+                        Brush(Action)\size = Val(GetGadgetText(#G_BrushSizeSG))
+                        SetGadgetState(#G_BrushSizeTB, Brush(Action)\size)
+                      EndIf
+                      BrushUpdateImage(0,1)
+                      BrushUpdateColor() 
+                      SetGadgetState(#G_BrushSize, Brush(Action)\size)
                       
-                      ; size  
+                    Case #G_BrushAlphaTB, #G_BrushAlphaSG
+                      If eventgadget = #G_BrushAlphaTB
+                        Brush(Action)\Alpha = GetGadgetState(#G_BrushAlphaTB)
+                        SetGadgetText(#G_BrushAlphaSG, Str(Brush(Action)\Alpha))
+                      Else
+                        Brush(Action)\Alpha = Val(GetGadgetText(#G_BrushAlphaSG))
+                        SetGadgetState(#G_BrushAlphaTB, Brush(Action)\Alpha)
+                      EndIf
+                      SetGadgetState(#G_BrushAlpha, Brush(Action)\Alpha)
+                      color = RGBA(Brush(Action)\col\R,Brush(Action)\col\G,Brush(Action)\col\B,Brush(Action)\alpha)
+                      
+                    Case #G_BrushMixTB, #G_BrushMixSG
+                      If eventgadget = #G_BrushMixTB
+                        Brush(Action)\mix = GetGadgetState(#G_BrushMixTB)
+                        SetGadgetText(#G_BrushMixSG, Str(Brush(Action)\Mix))
+                      Else
+                        Brush(Action)\mix = Val(GetGadgetText(#G_BrushMixSG))
+                        SetGadgetState(#G_BrushMixTB, Brush(Action)\mix)
+                      EndIf
+                      SetGadgetState(#G_BrushMix, Brush(Action)\mix)
+                      If Brush(Action)\mix = 0
+                        If Brush(Action)\Wash = 1
+                          BrushUpdateImage(0,1)
+                          BrushUpdateColor() 
+                        EndIf
+                      EndIf
+                       
+                      ; size 
+                    Case #G_BrushPreview
+                      If EventType = #PB_EventType_LeftClick 
+                        OpenWindowBrush()
+                      EndIf
+                    
                     Case #G_BrushSizePressure
                       Brush(Action)\Sizepressure = GetGadgetState(#G_BrushSizePressure)
-                      
+                      ; base
                     Case #G_BrushSize, #G_BrushSizeW, #G_BrushSizeH 
                       Brush(Action)\size = GetGadgetState(#G_BrushSize)
+                      SetGadgetState(#G_BrushSizeTB, Brush(Action)\size)
                       If Brush(Action)\SizeMin> Brush(Action)\Size
                         SetGadgetState(#G_BrushSizeMin,Brush(Action)\size)
                         Brush(Action)\sizemin = Brush(Action)\size
@@ -1103,7 +1154,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                     Case #G_PresetSavePreset
                       file$ = GetParentItemText(#G_PresetTG) 
-                      SaveBrushPreset(1,file$)
+                      SaveBrushPreset(1, file$)
                       
                     Case #G_PresetTG 
                       brush$ = GetGadgetText(#G_PresetTG)
@@ -1133,8 +1184,33 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       PaperUpdate()
                       ScreenUpdate(0)
                       
-                    Case #G_PaperIntensity
-                      paper\intensity = GetGadgetState(#G_PaperIntensity)
+                    Case #G_PaperIntensity, #G_PaperIntensitySG
+                      If EventGadget = #G_PaperIntensity
+                        intensity = GetGadgetState(#G_PaperIntensity)
+                        SetGadgetText(#G_PaperIntensitySG, Str(GetGadgetState(#G_PaperIntensity)))
+                      Else
+                        intensity = Val(GetGadgetText(#G_PaperIntensitySG))
+                        SetGadgetState(#G_PaperIntensity, intensity)
+                      EndIf
+                      If intensity <> paper\intensity
+                        paper\intensity = intensity
+                        PaperUpdate()
+                        ScreenUpdate(0)
+                      EndIf
+                      
+                    Case #G_PaperBrightness, #G_PaperBrightnessSG
+                      If EventGadget = #G_PaperBrightness
+                        paperbrightness = GetGadgetState(#G_PaperBrightness)
+                        SetGadgetText(#G_PaperBrightnessSG, Str(GetGadgetState(#G_PaperBrightness)))
+                      Else
+                        paperbrightness = Val(GetGadgetText(#G_PaperBrightnessSG))
+                        SetGadgetState(#G_PaperBrightness, paperbrightness)
+                      EndIf
+                      If paperbrightness <> paper\brightness
+                        paper\brightness = paperbrightness
+                        PaperUpdate()
+                        ScreenUpdate(0)
+                      EndIf
                       
                     Case #G_PaperAlpha
                       SetGadgetText(#G_PaperAlphaSG, Str(GetGadgetState(#G_PaperAlpha)))
@@ -1265,6 +1341,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 EndSelect              
                 ;}
                 
+              Case #Win_BrushImage 
+                EventBrushImage(eventgadget)
+                
               Case #Win_BrushEditor  
                 EventBrushEditor(EventGadget)
                 
@@ -1273,11 +1352,14 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
             EndSelect
             
           Case #PB_Event_CloseWindow
-            
             If EventWindow = #WinMain
               quit = #eventquit
-            Else            
-              CloseWindow(EventWindow)
+            Else
+              If EventWindow = #Win_BrushEditor
+                BrushEditorCloseWindow()
+              Else
+                 CloseWindow(EventWindow)
+              EndIf
               MouseClic = 0               
               MenuOpen = 1
               ScreenUpdate()
@@ -1287,7 +1369,12 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
             EndIf
             
           Case #PB_Event_RestoreWindow, #PB_Event_ActivateWindow
+            ;{ 
+            mouseclic = 0
+            clic = 0
+            Paint = 0
             ScreenUpdate()  
+            ;}
             
             ; Case #WM_MOUSEMOVE
             
@@ -1478,8 +1565,8 @@ End
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 163
-; FirstLine = 35
-; Folding = hvDAgAAADcBDQBACAAAQbhBAA9
+; CursorPosition = 467
+; FirstLine = 81
+; Folding = hvTAcAAEbOVAzQBACA+AAMbhRAA9
 ; EnableXP
 ; EnableUnicode

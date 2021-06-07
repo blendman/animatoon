@@ -82,7 +82,7 @@ Procedure PaperUpdate(load=0)
   
   
   ; if we load a new image for the background
-  If load >= 1  Or Not IsImage(  #Img_Paper)
+  If load >= 1 Or Not IsImage(  #Img_Paper)
     
     If LoadImage(#Img_Paper, GetCurrentDirectory() + "data\Paper\"+OptionsIE\Paper$)
       
@@ -168,7 +168,29 @@ Procedure PaperUpdate(load=0)
     w = ImageWidth(tempImgPaper)
     h = ImageHeight(tempImgPaper)
     
-;      MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
+    If paper\intensity >1 Or paper\brightness >1
+      Echelle.d = (400+paper\intensity)/400
+      EchelleB.d = paper\brightness/100 ; 0.2
+      
+      If StartDrawing(ImageOutput(tempImgPaper))
+        For i= 0 To OutputWidth()-1
+          For j=0 To OutputHeight()-1
+            col = Point(i,j)
+            r = (Red(col) * Echelle  + 127 * (1 - Echelle)) * EchelleB
+            g = (Green(col)* Echelle  + 127 * (1 - Echelle))* EchelleB
+            b = (Blue(col)* Echelle  + 127 * (1 - Echelle)) * EchelleB
+             Check0(r)
+             Check0(g)
+             Check0(b)
+            Plot(i,j,RGB(r,g,b))
+          Next
+        Next
+        StopDrawing()
+      EndIf
+      ; tempImgPaper = IE_Contrast(tempImgPaper, paper\intensity, 100, 1)
+    EndIf
+    
+    ;      MessageRequester("paper", Str(w)+"/"+Str(h)+"|"+Str(SpriteWidth(#Sp_Paper))+"/"+Str(SpriteHeight(#Sp_Paper)))
     
     ; update the color of the BG
     If OptionsIE\UseCanvas = 0
@@ -177,25 +199,14 @@ Procedure PaperUpdate(load=0)
         Box(0, 0, OutputWidth(), OutputHeight(), paper\color) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
         StopDrawing()
       EndIf
+      
       ; draw on the sprite the new background
       If StartDrawing(SpriteOutput(#Sp_Paper))
-        
-        ; DrawingMode(#PB_2DDrawing_Default)
-        ; Box(0, 0, SpriteWidth(#Sp_Paper), SpriteHeight(#Sp_Paper), RGBA(255, 255, 255, 255))
-        
         DrawingMode(#PB_2DDrawing_AlphaBlend )
-        
         For i=0 To (doc\w/w)*z +1
-          
           For j = 0 To (doc\h/h)*z +1
-            ; ZoomSprite(#Sp_Paper,w*z,h*z)
-            ; DisplaySprite(#Sp_Paper,i*w*z+canvasX,j*h*z+canvasY)
-            
-            ; DisplaySprite(#Sp_Paper,i*w+canvasX,j*h+canvasY)
             DrawImage(ImageID(tempImgPaper),i*w,j*h)
-            
           Next j 
-          
         Next i       
         
         StopDrawing()
@@ -356,6 +367,70 @@ Procedure RecreateLayerUtilities()
 
 EndProcedure
 
+
+; layers getspriteimage
+Procedure Layer_SetSpriteToImage_(mode=0)
+  
+  ; to copy the image of the sprite on the image of the layer (to have the same result as the preview rendering !!!)
+  If ArraySize(layer()) <= LayerId And layerid >=0
+    
+    If Layer(layerId)\Haschanged
+      If Layer(layerId)\CopySpritetoImg = 0
+        Layer(layerId)\CopySpritetoImg = 1
+        
+        If mode = 0
+          
+          name$ = GetCurrentDirectory()+"\save\"+"temp_spriteImg.png"
+          If SaveSprite(Layer(LayerId)\Sprite, name$,#PB_ImagePlugin_PNG)
+            temp = LoadImage(#PB_Any, name$)
+            If temp <> 0
+              FreeImage2(Layer(LayerId)\Image)
+              Layer(LayerId)\Image = temp
+            EndIf
+          EndIf
+          
+        ElseIf mode=1
+          
+          ; copy the pixels form the sprite
+          If StartDrawing(SpriteOutput(Layer(layerid)\sprite))
+            W = OutputWidth()
+            H = OutputHeight()
+            ; create an array to stock the pixels of the sprite
+            Dim spritepixels(w*h)
+            ; get the buffer
+            buffer = DrawingBuffer ()
+            
+            For i = 0 To W-1 ; for each line
+              For j = 0 To H-1 ; for each column
+                spritepixels(i+j*w) = Point(i,j)
+              Next
+            Next
+            StopDrawing()
+          EndIf
+          
+          ; paste the pixels on the current layer image
+          If StartDrawing(ImageOutput(Layer(LayerId)\image))
+            For i = 0 To W-1 ; for each line
+              For j = 0 To H-1 ; for each column
+                Plot(i,j, spritepixels(i+j*w))
+              Next
+            Next
+            StopDrawing()
+          EndIf
+          
+          FreeArray(spritepixels())
+        EndIf
+        
+      EndIf
+    EndIf
+    
+  EndIf
+
+EndProcedure
+Procedure Layer_SetHasChanged()
+  Layer(layerId)\Haschanged = 1
+  Layer(layerId)\CopySpritetoImg = 0
+EndProcedure
 
 
 ; Layer UI & gadget
@@ -628,6 +703,8 @@ Procedure Layer_SetGadgetState()
 EndProcedure
 Procedure Layer_GetLayerId()
   
+  ; we clic on the layer UI
+  
   h = ImageHeight(#Img_LayerCenterSel)+1
   lx = GetGadgetAttribute(#G_layerListcanvas, #PB_Canvas_MouseX)
   ly = GetGadgetAttribute(#G_layerListcanvas, #PB_Canvas_MouseY)
@@ -649,7 +726,7 @@ Procedure Layer_GetLayerId()
     Case #PB_EventType_LeftButtonDown
       pos = ly/h
       i = ArraySize(layer())- pos
-      Debug i
+      ; Debug i
       If i <0
         i = 0
       ElseIf i> ArraySize(layer())
@@ -661,6 +738,17 @@ Procedure Layer_GetLayerId()
         Layer(i)\View = 1 - Layer(i)\View
         CanvasHasChanged = 1
       Else
+        ;         If i <> LayerId 
+        ;           If Layer(layerId)\Haschanged
+        ;             Layer_SetSpriteToImage()
+        ;           Else 
+        ;             If Layer(layerId)\CopySpritetoImg = 0
+        ;               Layer(layerId)\CopySpritetoImg = 1
+        ;             EndIf
+        ;           EndIf
+        ;         Else
+        ;           Layer_SetSpriteToImage()
+        ;         EndIf
         layerId = i
         testlayer(LayerId)
       EndIf
@@ -770,6 +858,8 @@ Procedure Layer_ChangeText()
   
   
 EndProcedure
+
+
 
 
 
@@ -979,7 +1069,7 @@ Procedure SetBm(i,sprite=1)
         Box(0,0,doc\w,doc\h,RGBA(0,0,0,255))
         
       Case #Bm_Multiply, #bm_darken
-        Box(0,0,doc\w,doc\h,RGBA(255,255,255,255))
+         Box(0,0,doc\w,doc\h,RGBA(255,255,255,255))
         
       Case #bm_Overlay, #Bm_LinearBurn, #Bm_Inverse, #Bm_LinearLight
         Box(0,0,doc\w,doc\h,RGBA(127,127,127,255))
@@ -1144,6 +1234,8 @@ Procedure Layer_SetBm(i, bm)
       
   EndSelect
   
+  ;Layer_SetSpriteToImage_()
+
   ; convert the image of layer if neeeded (add a colored box (with white, black, grey) for some blendmode)
   Layer_ConvertToBm(i)
   
@@ -1805,8 +1897,18 @@ Procedure Layer_DrawTempo()
           StopDrawing()
         EndIf
       EndIf
-      
+    Else
+      ; clonestamp use layer_tempo to draw on it the 
+      If action = #Action_CloneStamp
+        If StartDrawing(SpriteOutput(#sp_LayerTempo))
+          DrawShape()
+          StopDrawing()
+        EndIf
+      EndIf
     EndIf
+  Else
+    
+    
   EndIf
   
 EndProcedure
@@ -1848,7 +1950,7 @@ EndProcedure
 Procedure Layer_Clear(i, onlyAlpha=0)
   
   ; define the image to clear or cut
-  If layer(layerid)\MaskAlpha = 2
+  If layer(i)\MaskAlpha = 2
     img = layer(i)\ImageAlpha
   Else
     img = layer(i)\image
@@ -1892,7 +1994,7 @@ Procedure Layer_Clear(i, onlyAlpha=0)
   EndIf 
   
   ; because the layer is eraser, change the haschanged parameter
-  Layer(layerId)\Haschanged = 0
+  Layer(i)\Haschanged = 0
   
   ; update the screen or canvas.
   NewPainting = 1
@@ -2111,14 +2213,15 @@ Procedure Layer_Merge(mode=0)
 EndProcedure
 Procedure Layer_Fill(mode=0)
   
+  i = layerID
   
-  If layer(layerid)\MaskAlpha >= 2
+  If layer(i)\MaskAlpha >= 2
     img = layer(i)\ImageAlpha
   Else
     img = layer(i)\image
   EndIf
   
-  If layer(layerid)\MaskAlpha = 3
+  If layer(i)\MaskAlpha = 3
     MessageRequester(Lang("Info"),Lang("The layer mask is hiden"))
     ProcedureReturn 0
   EndIf
@@ -2126,6 +2229,7 @@ Procedure Layer_Fill(mode=0)
   If mode = 0 ; on remplit avec une couleur
     
     tmp = CopyImage(Img, #PB_Any)
+   
     
     If StartDrawing(ImageOutput(tmp))
       DrawingMode(#PB_2DDrawing_AllChannels)
@@ -2135,7 +2239,7 @@ Procedure Layer_Fill(mode=0)
       StopDrawing()
     EndIf
     FreeImage2(Img)
-    If layer(layerid)\MaskAlpha = 2
+    If layer(i)\MaskAlpha = 2
       layer(i)\ImageAlpha= CopyImage(tmp,#PB_Any)
     Else
       layer(i)\image= CopyImage(tmp,#PB_Any)
@@ -2444,6 +2548,20 @@ EndProcedure
 
 
 ; alpha selection
+Procedure Layer_ApplyAlpha()
+  
+  If OptionsIE\SelectAlpha = 1
+    If StartDrawing(ImageOutput(layer(layerid)\Image))
+      DrawingMode(#PB_2DDrawing_AlphaChannel)
+      ; Box(0, 0, doc\w, doc\h,RGBA(255,255,255,255))
+      DrawAlphaImage(ImageID(#Img_AlphaSel),0,0)
+      StopDrawing()
+    EndIf
+    NewPainting = 1
+    ScreenUpdate()
+  EndIf
+  
+EndProcedure
 Procedure Layer_SelectAlpha()
   
   ; CreateImage2(#Img_AlphaSel,doc\w,doc\h,"Alpha selection",32,#PB_Image_Transparent)
@@ -2468,8 +2586,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1898
-; FirstLine = 225
-; Folding = AAAAAAAAAAPAAAAAAAAAAAAAAAhDAIAAAAAAAo-BA5
+; CursorPosition = 1060
+; FirstLine = 70
+; Folding = AAAAAAAAAw+-AAAkBAAAwlYAAAAAAAAAAAAAAAAAAAAAA9
 ; EnableXP
 ; EnableUnicode

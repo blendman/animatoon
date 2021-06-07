@@ -1,11 +1,54 @@
 ﻿
 ; Brush
 
+
+; 
+Macro Brush_SetSizewithPression()
+  ; Tablet for pression // pour la pression tablet, à finir                     
+  
+  brushsiz.d = Brush(Action)\size * size/(8.54)                      
+  If brushsiz < 0
+    ;brushsiz = 0.05
+    brushsiz = 0
+  EndIf
+  b = (brushsiz * Brush(Action)\Pas*0.01) * Brush(Action)\SizeW*0.01
+  
+  ;{ transition, pas encore pris en compte : 
+  ; la transition = le fade entre les points pour lisser le changement de taille ou d'alpha.
+  If brushsiz_old.d <= 0
+    brushsiz_old = brushsiz
+  EndIf
+  
+  ;                     ratio.d = stroke(StrokeId)\dot(i-1)\size - stroke(StrokeId)\dot(i)\size
+  ;                     ratio.d = Abs(Brushsiz_old - Brushsiz)
+  ;                     ratio/dist
+  ;                    
+  
+  ;}
+  
+  ; FinalSize.d = (brushsiz_old+newsiz*v)*Brush(Action)\Sizepressure + (1-Brush(Action)\Sizepressure)     
+  FinalSize.d = (((size/8.54)*Brush(Action)\Sizepressure + (1-Brush(Action)\Sizepressure)))
+  
+  rndsiz.d = Random(Brush(Action)\Size,Brush(Action)\SizeMin)
+  rndsiz/Brush(Action)\Size
+  If rndsiz <= 0
+    rndsiz = 0.5 * (Brush(Action)\Size)/Brush(Action)\Size
+  EndIf
+  FinalSize = rndsiz * Brush(Action)\SizeRand + (1-Brush(Action)\SizeRand)*FinalSize
+  If finalsize * Brush(Action)\size < Brush(Action)\SizeMin
+    finalsize = Brush(Action)\SizeMin/Brush(Action)\size 
+  EndIf
+                    
+EndMacro
+
+
+
+
 Procedure BrushInitNb()
   
   ; pour définir le nombre d'image de brush qu'on a au maximum
   Brush(Action)\BrushNumMax=-1
-  Directory$ = "data\Presets\Brush\"+OptionsIE\DirBrush$+"\"
+  Directory$ = OptionsIE\DirBankBrush$+OptionsIE\DirBrush$+"\"
   ; Debug Directory$
   If ExamineDirectory(0, GetCurrentDirectory()+ Directory$, "*.png")  
     While NextDirectoryEntry(0)
@@ -30,22 +73,19 @@ Procedure BrushChangeColor(change=0,color=-1)
     EndIf
     
     
-    
-    
-    
     If StartDrawing(ImageOutput(#BrushCopy))  
       
       
       For i = 0 To w-1
         For j = 0 To h-1
           DrawingMode(#PB_2DDrawing_AlphaChannel)
-          a = Alpha(Point(i,j)) ; - (255 - Brush(Action)\Alpha) ;on récupère l'alpha du brush (pixel par pixel) qu'on modifie par la valeur transparence
+          a.d = Alpha(Point(i,j)) ; - (255 - Brush(Action)\Alpha) ;on récupère l'alpha du brush (pixel par pixel) qu'on modifie par la valeur transparence
           
           If a >0
             
             ; à revoir !!! c'est cool, ca fait un fondu vers du noise (diminution alpha et taille !!
             
-            a - Random(a*0.01, 0)*brush(action)\AlphaVsTime
+            a - Random(a*0.01, 0) * brush(action)\AlphaVsTime * 0.01
             
             If Brush(Action)\Intensity>=0
               If a < Brush(Action)\intensity           
@@ -61,13 +101,16 @@ Procedure BrushChangeColor(change=0,color=-1)
               a = 0
             EndIf 
             If a > Brush(Action)\softness
-              a - Brush(Action)\softness*0.5
+              ; a - Brush(Action)\softness*0.5
             EndIf
             
 ;             test ajout de grain
             If a >0
              ;a - a*0.01 ; Random(a*0.1,0)
-              a - Random(a*0.1,0)*brush(action)\AlphaVsTime
+              a - Random(a*0.1, 0)*brush(action)\AlphaVsTime * 0.01
+            EndIf
+            If a < 0.9
+              a=0
             EndIf
             
           EndIf
@@ -81,9 +124,9 @@ Procedure BrushChangeColor(change=0,color=-1)
           
           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), a))  
           
-          ;           ; test ajout de grain
-          ;           DrawingMode(#PB_2DDrawing_AlphaClip)
-          ;           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
+                    ; test ajout de grain
+                    DrawingMode(#PB_2DDrawing_AlphaClip)
+                    Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
           
         Next j
       Next i     
@@ -133,15 +176,41 @@ Procedure BrushUpdateColor()
 EndProcedure
 Procedure BrushUpdateImage(load=0,color=0)
   
+  Shared brushEditor
+  
+  ; need to check if action is a brush/erase/pen
+  ac = action
+  If action <> #Action_Brush And action <> #Action_Eraser And action <> #Action_Pen
+    ac = #Action_Brush
+    ; Debug "on change l'action"
+  EndIf
+  
+  ; if load new image
   If load >= 1
-    Directory$ = "data\Presets\Brush\"+OptionsIE\DirBrush$+"\brush"
-    LoadSprite(#Sp_BrushOriginal,Directory$+Str(Brush(Action)\id)+".png",#PB_Sprite_AlphaBlending)
-    LoadImage(#BrushOriginal,Directory$+Str(Brush(Action)\id)+".png")
+    Directory$ = OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" + OptionsIE\brushName$
+    Debug Directory$
+    If Not LoadSprite(#Sp_BrushOriginal,Directory$,#PB_Sprite_AlphaBlending) 
+      notok = 1
+    EndIf
+    ; LoadSprite(#Sp_BrushOriginal,Directory$+Str(Brush(Action)\id)+".png",#PB_Sprite_AlphaBlending)
+    If Not LoadImage(#BrushOriginal,Directory$)
+      notok = 1
+    EndIf
+    
+    If Notok=1
+      OptionsIE\brushName$ = "brush"+Str(Brush(ac)\Id)+".png"
+      BrushUpdateImage(1)
+      ProcedureReturn 0
+    Else
+      brush(ac)\Image$ = OptionsIE\brushName$
+      brush(ac)\BrushDir$ = OptionsIE\DirBrush$
+    EndIf
+    ; LoadImage(#BrushOriginal,Directory$+Str(Brush(ac)\id)+".png")
     color = 1
   EndIf
   
   
-  If brush(action)\Trim
+  If Brush(ac)\Trim
     tmp = TrimDoc(#BrushOriginal) ; c'est pour couper (retailler l'image)
     CopyImage(tmp,#BrushCopy)
     FreeImage2(tmp)
@@ -157,53 +226,53 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   BrushChangeColor(color)
   
-  w.d = (Brush(Action)\SizeW*0.01)*Brush(Action)\size * OptionsIE\zoom * 0.01
-  h.d = (Brush(Action)\SizeH*0.01)*Brush(Action)\size * OptionsIE\zoom * 0.01  
-  Brush(Action)\centerSpriteX = w/2
-  Brush(Action)\centerSpriteY = h/2
+  w.d = (Brush(ac)\SizeW*0.01)*Brush(ac)\size * OptionsIE\zoom * 0.01
+  h.d = (Brush(ac)\SizeH*0.01)*Brush(ac)\size * OptionsIE\zoom * 0.01  
+  Brush(ac)\centerSpriteX = w/2
+  Brush(ac)\centerSpriteY = h/2
   
-  sw = (Brush(Action)\SizeW * 0.01) * Brush(Action)\size + Brush(Action)\Smooth*2
-  sh = (Brush(Action)\sizeH * 0.01) * Brush(Action)\size + Brush(Action)\Smooth*2
+  sw = (Brush(Action)\SizeW * 0.01) * Brush(ac)\size + Brush(ac)\Smooth*2
+  sh = (Brush(ac)\sizeH * 0.01) * Brush(ac)\size + Brush(ac)\Smooth*2
   
   CheckIfInf(sw,2)
   CheckIfInf(sh,2)
   
-  ;If Brush(Action)\OldW <> sw Or Brush(Action)\OldH <> sh ; on va resize que si on change la taille W ou H ^^
-  ResizeImage(#BrushCopy,sw,sh,1-Brush(Action)\Smooth) ; in images.pbi
+  ;If Brush(ac)\OldW <> sw Or Brush(ac)\OldH <> sh ; on va resize que si on change la taille W ou H ^^
+  ResizeImage(#BrushCopy,sw,sh,1-Brush(ac)\Smooth) ; in images.pbi
   
   
-  Brush(Action)\OldW = sw 
-  Brush(Action)\OldH = sh
+  Brush(ac)\OldW = sw 
+  Brush(ac)\OldH = sh
   
   
   
   ;EndIf
   
-  Brush(Action)\CenterX = Sw/2
-  Brush(Action)\CenterY = Sh/2
-  Brush(Action)\w = sw
-  Brush(Action)\h = sh
+  Brush(ac)\CenterX = Sw/2
+  Brush(ac)\CenterY = Sh/2
+  Brush(ac)\w = sw
+  Brush(ac)\h = sh
   
-  If Brush(Action)\rotate > 0
-    tmp = RotateImageEx2(ImageID(#BrushCopy),Brush(Action)\rotate)
+  If Brush(ac)\rotate > 0
+    tmp = RotateImageEx2(ImageID(#BrushCopy),Brush(ac)\rotate)
     CopyImage(tmp,#BrushCopy)  
     FreeImage(tmp)
-    RotateSprite(#Sp_BrushCopy,Brush(Action)\rotate,#PB_Absolute)
+    RotateSprite(#Sp_BrushCopy,Brush(ac)\rotate,#PB_Absolute)
   EndIf
   
   ZoomSprite(#Sp_BrushCopy, w, h)
   
   
-  ; If Brush(Action)\Smooth; pour pallier le bug du smooth :( 
+  ; If Brush(ac)\Smooth; pour pallier le bug du smooth :( 
   If StartDrawing(ImageOutput(#BrushCopy))
     DrawingMode(#PB_2DDrawing_AlphaClip)
-    Box(0,0,sw,sh,RGBA(Red(Brush(Action)\colorQ),Green(Brush(Action)\colorQ),Blue(Brush(Action)\colorQ),255))
+    Box(0,0,sw,sh,RGBA(Red(Brush(ac)\colorQ),Green(Brush(ac)\colorQ),Blue(Brush(ac)\colorQ),255))
     
     ;       
     ;; ATTENTION A REVOIR !
     
     ; TEST add noise
-    If brush(action)\AddNoiseRandomOnImagebrush > 0
+    If Brush(ac)\AddNoiseRandomOnImagebrush > 0
       DrawingMode(#PB_2DDrawing_AlphaChannel)
       For i= 0 To sw-1
         For j=0 To sh-1
@@ -211,7 +280,7 @@ Procedure BrushUpdateImage(load=0,color=0)
           
           gris = 255 ; Random(255,0)
           If a > 0
-            a - Random(a* brush(action)\AddNoiseOnImgMax*0.1, a* brush(action)\AddNoiseOnImgMin*0.1)
+            a - Random(a* Brush(ac)\AddNoiseOnImgMax*0.1, a* Brush(ac)\AddNoiseOnImgMin*0.1)
             ;               Box(i, j, 1,1,RGBA(gris, gris, gris, a))
             Plot(i,j, RGBA(gris, gris, gris, a))
           EndIf
@@ -227,6 +296,10 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   If load = 1    
     UpdateBrushPreview()
+  EndIf
+  
+  If brushEditor = 1
+    UpdateBrushImagePreview()
   EndIf
   
   ; ChangeCursor()
@@ -676,6 +749,13 @@ Procedure OpenPreset(file$,brush$="")
       \AlphaRand = ReadPreferenceInteger("alphaRand",0)
       \AlphaMin = ReadPreferenceInteger("alphaMin",0)
       
+      ; noise
+      \AddNoise = ReadPreferenceInteger("AddNoise",0)
+      \AddNoiseOnImgGrey = ReadPreferenceInteger("AddNoiseOnImgGrey",0)
+      \AddNoiseOnImgMax = ReadPreferenceInteger("AddNoiseOnImgMax",0)
+      \AddNoiseOnImgMin = ReadPreferenceInteger("AddNoiseOnImgMin",0)
+      \AddNoiseRandomOnImagebrush = ReadPreferenceInteger("AddNoiseRandomOnImagebrush",0)
+      
       ; TOOL      
       \tool     = ReadPreferenceInteger("tool",0)
       
@@ -721,11 +801,16 @@ Procedure OpenPreset(file$,brush$="")
       \MixType = ReadPreferenceInteger("mixtyp",2)
       
       ; THE BRUSH
-      \image$ = ReadPreferenceString("image","aquarelle01.jpg")      
+      \image$ = ReadPreferenceString("image","aquarelle01.jpg") 
+      Debug  "brush image name : "+\image$
       \BrushDir$ = ReadPreferenceString("brushdir","blendman")
       OptionsIE\DirBrush$ = \BrushDir$
       \id = ReadPreferenceInteger("brush",5)
-      
+      If \Image$ = #Empty$
+        \Image$ = "brush"+Str(\id)+".png"
+      EndIf
+      OptionsIE\BrushName$ = \image$ 
+      Debug "OptionsIE\BrushName$ : "+OptionsIE\BrushName$
       
     EndWith
     ClosePreferences()  
@@ -854,6 +939,11 @@ Procedure SaveBrush()
     WritePreferenceInteger("alphaVsTime",\AlphaVsTime)
     WritePreferenceInteger("alphaRand",\AlphaRand)
     WritePreferenceInteger("alphaMin",\AlphaMin)
+    ; noise
+    WritePreferenceInteger("AddNoise",\AddNoise)
+    WritePreferenceInteger("AddNoiseOnImgMax",\AddNoiseOnImgMax)
+    WritePreferenceInteger("AddNoiseOnImgMin",\AddNoiseOnImgMin)
+    WritePreferenceInteger("AddNoiseRandomOnImagebrush",\AddNoiseRandomOnImagebrush)
     
     WritePreferenceString("image",\image$)
     WritePreferenceString("brushdir",\brushdir$)
@@ -887,14 +977,14 @@ Procedure SaveBrushPreset(mode=0,file$="")
   EndIf
   
   If file$ 
-    If OpenPreferences(file$)
+    If CreatePreferences(file$)
       SaveBrush()    
       ClosePreferences()
-    Else
-      If CreatePreferences(file$)
-        SaveBrush()
-        ClosePreferences()
-      EndIf
+;     Else
+;       If CreatePreferences(file$)
+;         SaveBrush()
+;         ClosePreferences()
+;       EndIf
     EndIf    
   EndIf  
   
@@ -904,8 +994,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 211
-; FirstLine = 153
-; Folding = 6-Pqf9HcAg6gAMw
+; CursorPosition = 205
+; FirstLine = 19
+; Folding = AAA5--AAAAAwBBg5
 ; EnableXP
+; DisableDebugger
 ; EnableUnicode
