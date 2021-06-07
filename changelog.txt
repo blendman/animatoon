@@ -6,7 +6,7 @@
 // Changes
 - add tooltip to preview brush gadget
 // Removed
-- Panel Tool\ "gen", remove buttons "<" and ">". Now, to change the image of the tool (brush, eraser..), clic on the brush image open the window brush image.
+- Panel Tool\"Base", remove buttons "<" and ">". Now, to change the image of the tool (brush, eraser..), clic on the brush image open the window brush image.
 // Fixes
 - patterns didn't loaded correctly in github folder
 
@@ -38,22 +38,22 @@ clic on layer UI, change Layer BM, Doc_Save(), autosave, exportimage (all layers
 - add paper contraste and brightness (+ trackbar, stringgadget To change it).
 - options : save/load : paper intensity And brightness.
 - layer_applyAlpha() (should be changed) : To apply an alpha selection on the layer selected
-- add new brush folder (brusheditor) With 40 images
+- add new brush folder (brusheditor) With images
 // Fixes
 - the brush image aren't no more loaded when use a brush preset.
 
 
-03/06/2021  0.5.9.7.6
+03/06/2021  (0.5.9.7.6)
 // tests
 - optimisation (big image, tiles system)
-- brush editor (tool To create a brush image (With circle)
+- brush editor (tool To create a brush image (With circle))
 
 
 02/06/2021  0.5.9.7.6
 // New
 - clic on preview brush image (panel tool (item "base")) : open windowbrushimage()
 - window brushImage (To Select the image For a brush) : StringGadget (directory For brush), canvas To see the images of the selected folder
-- window brushImage : when change combox -> canvas is updated With images from the folder selected
+- window brushImage : when change combobox -> canvas is updated With images from the folder selected
 - Panel "tool" : clic on brush image open the window brushImage
 - add Array sImage (name$, id) For brush image
 - options (load) : add brushname$, dirbankbrush$ (the folder of current images For the brush)
@@ -89,7 +89,7 @@ clic on layer UI, change Layer BM, Doc_Save(), autosave, exportimage (all layers
 
 28/05/2021  0.5.9.6.5
 // Fixes
-- fill : fill the layer0 Not the layerID
+- fill : fill the layer0 Not the layerID (=current layer)
 
 
 13/05/2021  0.5.9.6.4
@@ -99,7 +99,7 @@ clic on layer UI, change Layer BM, Doc_Save(), autosave, exportimage (all layers
 WIP - clone stamp : add paint function
 // Changes
 - structures brush : add \sizeW/H=100 by Default. 
-- structures brush : add \source, souceimage, alignment For clonestamp. 
+- structures brush : add \source, sourceimage, alignment For clonestamp. 
 - change some gadgets size/position For some tools
 - Add missing gadgettooltips For some tools 
 
