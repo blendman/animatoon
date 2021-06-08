@@ -87,6 +87,17 @@
 ; - wip : new drawing type "clean" (see my example in branch "paintclean.pb")
 ; - change panel layer : butons should be resized (position) when move splitters, scrollarea height smaller
 
+; CANVAS
+; - add the zoom
+; - add other blendmode
+; - add blendmode from wilbert code (asm)
+; OPTIMISATIONS (CANVAS) :
+; ok - clipoutput (canvas) : tests ok : pas vraiment de différent (gain 1 fps)
+; - copy zone affichée : gain 6fps -> 14fps (layer multiply)
+; ok, mais non - clipsprite (screen) : tests ok, mais ça n'apporte rien niveau optimisation 
+; - with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
+; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
+
 
 ; BUGS
 ; - bug when hide/show panel -> canvas/screen is moved on the left
@@ -96,36 +107,33 @@
 ; - Fill : bug PB with border in rgb(0,0,0)              
 ; - bug shape circle with outline > 2 (pixel alpha = 0 in outline)
 ; - shape : line preview when drawing isn't the same as the final line for line size > 3 (blue border ?)
-; wip - stamp tool : when paint on layer, use the pattern selected to paint.
 ; - center the view bug when UI panel (right or left) is hiden
 ; - reset the view bug when UI panel (right or left) is hiden
 ; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
 ; - after crop, selection should be deselected
 ; - fill with pattern could use the pattern selected
-
-; CANVAS
-; - add the zoom
-; - add other blendmode
-; - add blendmode from wilbert code (asm)
-
-; optimisations (canvas) :
-; ok - clipoutput (canvas) : tests ok : pas vraiment de différent (gain 1 fps)
-; - copy zone affichée : gain 6fps -> 14fps (layer multiply)
-; ok, mais non - clipsprite (screen) : tests ok, mais ça n'apporte rien niveau optimisation 
-; - with alpha of the brush (premul) if sizewidth<20 // bug avec l'alpha du brush si sizewidth <20 (bug resizeimage premul) : 
-; créer une copie de l'image au lieu de faire un resize et utiliser cette copie (qui sera une image genre 150*150, mais avec l'image resized en w.
+; - when save the preset (not export), it's name ="", so it's saved properly
+; - fill : color should be the same as brush.
+; - clone stamp : size and parameters aren't used
+; - clone stamp : should use do_paint() to get the same stroke as brush/eraser...
 
 
-
-; 07/06/2021  0.5.9.8.1
+; 07/06/2021  0.5.9.8.5
 ; // New
+; - clone stamp : paint function ok (need imrovement, but it's cool :))
+; - clone stamp : when choose tool, it create a temporary sprite & image, With the pattern And alpha = 0)
+; - clone stamp : when paint, it blend the alpha With the alpha of the brush (on tempo sprite and tempo image for pattern)
+; - clone stamp : if leftbuttonup, the tempo image is drawn on the image and sprite, and the temposprite and image alpha are erased
 ; - add menu : window brush image
+; - Panel tool\Gen : add gadgets for brush Hardness, intensity
 ; // Changes
 ; - add tooltip To preview brush gadget
+; // Fixes
+; - when change some brush parameters, the quick panel isn't updated
+; - patterns didn't loaded correctly in github version
+; - fixe a window flickering when save/autosave
 ; // Removed
 ; - On panel Tool, item "gen", remove buttons "<" And ">". Now, To change the image, clic on the brush image open the window brush image.
-; // Fixes
-; - patterns didn't loaded correctly in github folder
 
 
 ; 06/06/2021  0.5.9.8
@@ -1487,13 +1495,13 @@
 ; - le tampon
 ; - le dessin et trait (le brush ne tourne pas quand on clique)
 ; - les toolbar flottante ?
-; - ajouter des sliders pour la taille et transparence
+; ok - ajouter des sliders pour la taille et transparence
 ; - ajuster le "pas" (espace entre 3 points) à la taille.
 ; Animatoon optimised :
 ; - ajouter le système de stroke/dot
 ; - ajouter les dalles ???
 ; brush
-; - un brush editor fenêtre séparée
+; ok - un brush editor fenêtre séparée
 ; - avec ligne vector drawing
 ; - avec brush Circle (voir fichier brush editor)
 ; - brush qui diminue ou s'efface (taille, alpha)
@@ -1528,7 +1536,6 @@
 ; layers
 ; - layer link : layer son liés entre eux, si on bouge, rotate, scale les 2 sont tranformés
 ; - layer group : des dossier pour les regrouper (si on met sur yeux off : on ne voit plus aucun calque 
-; - select alpha (ctrl+clic) comme photoshop (on clic avec ctrl sur le calque, et ça sélectionne l'alpha)
 ; - alphatoStroke : ??? remplir le calque 
 
 ; bacground (paper)
@@ -1536,8 +1543,6 @@
 ; couleur du papier (donc, je crée une 2eme image avec le papier en mixant la couleur (blendmode color ?), voir ou non le fond, etc.
 
 ; editions
-; - ctrl+X : copier le calque (la selection) avec getclipboardimage() avant d'effacer
-; - ouvrir une image en tant que calque  : crée un nouveau calque plutôt que de coller l'image sur le calque courant.
 ; - undo
 ; - redo
 
@@ -1548,6 +1553,11 @@
 
 ;{ -------- OK ---------------------------
 ; ok :
+; 0.59x :
+; ok - ctrl+X : copier le calque (la selection) avec getclipboardimage() avant d'effacer
+; ok - ouvrir une image en tant que calque  : crée un nouveau calque plutôt que de coller l'image sur le calque courant.
+; ok - select alpha (ctrl+clic) comme photoshop (on clic avec ctrl sur le calque, et ça sélectionne l'alpha)
+
 ; 0.58x :
 ; - background (paper) parameters : alpha, scale, intensity, color. Background editor.
 
@@ -1560,24 +1570,19 @@
 ; 0.50
 ; - grid
 
-
 ; 0.49
 ; - speed line
 ; - radial line
-
 
 ; 0.45 :
 ; - colormix sur sprite only : on prend la couleur sur l'image et non sur le screen
 ; - Inverse fade color avec mixing (reprise du code animatoon agk)
 
-
 ; 0.36
 ; swatch : add, pick
 
-
 ; 0.34, 0.35
 ; - couleur selector
-
 
 ; 0.33
 ; - rotation tool + edition
@@ -1594,7 +1599,6 @@
 
 ; 0.28
 ; - brush follow angle,
-
 
 ; 0.27
 ; - mettre le keyboard en azerty pour fr
@@ -1616,12 +1620,10 @@
 ; - alpha blocké
 ; AR : - layer bm overlay
 
-
 ; 0.20
 ; - layer merge botom
 ; - layer delete
 ; - layer merge all
-
 
 ; ok 0.19
 ; - brush visco 
@@ -1629,15 +1631,12 @@
 ; - transform
 ; - layer move up
 
-
 ; ok 0.18
 ; - trait option
 ; - smooth option
 
-
 ; ok 0.17
 ; - pression tablet
-
 
 ; ok 0.16
 ; - resize images
@@ -1654,11 +1653,9 @@
 ; - rotation : ajouter la rotation sur l'image (le dessin)
 ; - layer move down
 
-
 ; ok 0.14
 ; - brush changer image
 ; - ajout trait et pas
-
 
 ; ok 0.13:
 ; - layer duplicate
@@ -1677,11 +1674,9 @@
 ; - center view
 ; - Reset view
 
-
 ; ok 0.12 :
 ; - layer bm multiply
 ; - layer bm add
-
 
 ; ok 0.11 :
 ; - ajout du pan (sorte de camera)
@@ -1781,7 +1776,8 @@
 ; ok - Fill With Pattern
 ; ok - Layer : image repeated (background)
 ; ok - Layer : Select alpha (in 0.575)
-; - Brush : add noise, dynamic brush
+; ok - Brush : add noise
+; - Brush : dynamic brush
 ; - Tool selection : Brush selection.
 ; - Menu selection : +, -, random, inverse
 ; - Move selection 
@@ -1963,8 +1959,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 121
-; FirstLine = 110
-; Folding = 7+
+; CursorPosition = 117
+; FirstLine = 102
+; Folding = ++
 ; EnableXP
 ; DisableDebugger

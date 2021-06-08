@@ -554,14 +554,18 @@ If GetActiveWindow() = #WinMain
                   ;{ calcul some parameters (size of the brush with pressure)
                   ; tablet 
                   size.d = Paint_GetTabletSizePression() ; 
+                  If size <=0
+                    size = 8.6
+                  EndIf
+                  
                   ;}
                   If size >0
                     ; blendmode
                     Layer_Bm(layerId)
                     
                     ; position of the brush
-                    xx = mx - Brush(Action)\CenterSpriteX  
-                    yy = My - Brush(Action)\CenterSpriteY 
+                    xx = mx - Brush(#action_brush)\CenterSpriteX  
+                    yy = My - Brush(#action_brush)\CenterSpriteY 
                     
                     ; keep the 1rst position
                     If clic= 0   
@@ -587,20 +591,38 @@ If GetActiveWindow() = #WinMain
                         ;{ calcul de position x et y / et on capture le premier point
                         zoum.d = 100
                         zoum = 100/OptionsIE\zoom 
-                        xx = (mx - canvasX)*zoum -Brush(Action)\CenterX 
-                        yy = (My - canvasY)*zoum -Brush(Action)\CenterY 
+                        xx = (mx - canvasX)*zoum -Brush(#action_brush)\CenterX 
+                        yy = (My - canvasY)*zoum -Brush(#action_brush)\CenterY 
                         If StartDrawingOnImage = 0
                           StartDrawingOnImage = 1
+                          OptionsIE\Shape = 1 ; to see the layer_temporary
                           StartX1 = xx
                           StartY1 = yy
                         EndIf
                         ;}
                         w = FinalSize * Brush(Action)\size
-                        
-                        Layer_DrawTempo()
-                        ;                         If StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-                        ;                           StopDrawing()
-                        ;                         EndIf
+                        ; ResizeImage(#
+                        ; Layer_DrawTempo()
+                        ; temporary to test : should use do_paint()
+                        If StartDrawing(SpriteOutput(#sp_LayerTempo))
+                          ;DrawingMode(#PB_2DDrawing_AlphaChannel)
+                           DrawingMode(#PB_2DDrawing_CustomFilter)
+                           CustomFilterCallback(@FiltreMelangeAlphaPat())  
+
+                          ;Circle(xx,yy,size,RGBA(0,0,0,255))
+                          DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
+                          StopDrawing()
+                        EndIf
+                        ; temporary to test : should use do_paint()
+                        If StartDrawing(ImageOutput(#image_patternForstamp))
+                          ;DrawingMode(#PB_2DDrawing_AlphaChannel)
+                          DrawingMode(#PB_2DDrawing_CustomFilter)
+                          CustomFilterCallback(@FiltreMelangeAlphaPat())  
+                          
+                          ; Circle(xx,yy,size,RGBA(0,0,0,255))
+                          DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
+                          StopDrawing()
+                        EndIf
                       EndIf
                     EndIf
                     
@@ -677,7 +699,7 @@ If GetActiveWindow() = #WinMain
                   
                   ;}
                   
-                  ;{ box with broder // box plain, avec bord...
+                  ;{ box with border // box plain, avec bord...
                   If Brush(Action)\ShapePlain  
                     If Brush(Action)\ShapeType = 0
                       ;Box(StartX, StartY, rx, ry, RGBA(Red(Brush(Action)\Color),Green(Brush(Action)\Color),Blue(Brush(Action)\Color),Brush(Action)\alpha)) 
@@ -1281,9 +1303,9 @@ EndIf
 
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 289
-; FirstLine = 68
-; Folding = b55G-kAI92YT9-NAGQ4AgAwAFIABAAAAAAg
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 567
+; FirstLine = 207
+; Folding = b55G-kAIc2Yf9-vBgA7GAPAGoABIAAAAAAA9
 ; EnableXP
 ; EnableUnicode

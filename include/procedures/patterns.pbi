@@ -162,9 +162,10 @@ Procedure CreatePatterns()
   
 EndProcedure
 
-Procedure SetStampPatternImage(x=-100, y=-100, panel = 1)
+Procedure SetStampPatternImage(x=0, y=0, panel = 1)
   
   Shared patternCaseW
+  Static Idpattern
   
   If panel = 0
     ; if we get pattern form a layer
@@ -175,60 +176,86 @@ Procedure SetStampPatternImage(x=-100, y=-100, panel = 1)
     ; we get pattern form a pattern image, from the pattern panel.
     
     ; to know on which pattern we are
-    w2 = patternCaseW ;(wcanvas/2) -16
-    patternx = x/w2
-    patterny = y/w2
-    
-    ; get the "ID of pattern
-    Idpattern = patternx + patterny*2
-    
-    patternx * w2
-    patterny * w2
-    
+    If x>=0 And y >=0
+      w2 = patternCaseW ;(wcanvas/2) -16
+      patternx = x/w2
+      patterny = y/w2
+      
+      ; get the "ID of pattern
+      Idpattern = patternx + patterny*2
+      
+      patternx * w2
+      patterny * w2
+      okupdate = 1
+    EndIf
+  
     ; update the panel canvas for pattern
     If Idpattern <= ArraySize(pattern())
       
       ; update the pattern canvas (on panel)
-      UpdatePatternsCanvasPanel(patternx, patterny)
-      
+      If okupdate
+        UpdatePatternsCanvasPanel(patternx, patterny)
+      EndIf
+    
       ; update the image of the pattern for the stamp tool
       FreeImage2(#image_patternForstamp)
       
       
       ; create the new pattern image
       theimage$ = GetCurrentDirectory()+OptionsIE\DirPattern$+pattern(Idpattern)\name$
-      
-      If CreateImage(#image_patternForstamp, Doc\w, doc\h, 32, #PB_Image_Transparent) = 0
-        AddLogError(1, "Unable to create the pattern stamp image : "+ theimage$)
-        MessageRequester(lang("Error"), Lang("unable to create the pattern image "+pattern(Idpattern)\name$))
-      Else
-        
-        tempimg = LoadImage(#PB_Any,  theimage$)
-        
-        If tempimg <> 0
-          ; draw on the image pattern
-          If StartDrawing(ImageOutput(#image_patternForstamp))
-            w =  OutputWidth()
-            h =  OutputHeight()
-            
-            For i =0 To doc\w /w
+      tempimg = LoadImage(#PB_Any,  theimage$)
+      w =  ImageWidth(tempimg)
+      h =  ImageHeight(tempimg)
+
+      ;If useimage = 1
+        If CreateImage(#image_patternForstamp, Doc\w, doc\h, 32, #PB_Image_Transparent) = 0
+          AddLogError(1, "Unable to create the pattern stamp image : "+ theimage$)
+          MessageRequester(lang("Error"), Lang("unable to create the pattern image "+pattern(Idpattern)\name$))
+        Else
+          
+          
+          If tempimg <> 0
+            ; draw on the image pattern
+            If StartDrawing(ImageOutput(#image_patternForstamp))
               
+              For i =0 To doc\w /w
+                For j = 0 To doc\h /h
+                  DrawAlphaImage(ImageID(tempimg), i * w, j * h)
+                Next j
+              Next i
+              
+              DrawingMode(#PB_2DDrawing_AlphaChannel)
+              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+              
+              StopDrawing()
+            EndIf
+            
+          EndIf
+          
+        EndIf
+      ;EndIf
+      
+      ; create the sprite temporary
+      If Not IsSprite(#sp_layertempo)
+        If CreateSprite(#Sp_LayerTempo,doc\w,doc\h,#PB_Sprite_AlphaBlending)
+        EndIf
+      EndIf
+       ; draw on the sprite
+      If IsSprite(#sp_LayerTempo)
+         If StartDrawing(SpriteOutput(#sp_LayerTempo))
+            For i =0 To doc\w /w
               For j = 0 To doc\h /h
                 DrawAlphaImage(ImageID(tempimg), i * w, j * h)
               Next j
-              
             Next i
-            
+            DrawingMode(#PB_2DDrawing_AlphaChannel)
+            Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
             StopDrawing()
           EndIf
-          
-          FreeImage(tempimg)
-          
-        EndIf
-        
+         
       EndIf
       
-      
+       FreeImage(tempimg)
     EndIf
         
   EndIf
@@ -238,8 +265,8 @@ Procedure SetStampPatternImage(x=-100, y=-100, panel = 1)
 EndProcedure
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 78
-; FirstLine = 17
-; Folding = 9-+-
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 231
+; FirstLine = 61
+; Folding = 1-+--
 ; EnableXP

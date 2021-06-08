@@ -38,7 +38,6 @@ EndMacro
 
 
 ; paper
-
 Procedure IE_UpdatePaperList()
   
   ; to update the list of paper
@@ -326,14 +325,16 @@ EndProcedure
 
 
 
-
-
 ; others sprite/image thant the layer, but drawn on the screen/canvas (sprite temporary, paper...)
 Procedure CreateLayertempo_(create=0)
   
   ; free the sprite
   If IsSprite(#sp_LayerTempo)
     FreeSprite(#sp_LayerTempo)
+  EndIf
+  
+  If IsSprite(#sp_LayerSelection)
+    FreeSprite(#sp_LayerSelection)
   EndIf
   
   ; recreate the sprite for layer temporary operation - like box, circle, gradient...
@@ -369,7 +370,9 @@ EndProcedure
 
 
 ; layers getspriteimage
-Procedure Layer_SetSpriteToImage_(mode=0)
+Procedure Layer_SetSpriteToImage_(mode=0) 
+  
+  ; not used, because sprite image has sometimes white or black background needed for some blendmode (multiply, add...)
   
   ; to copy the image of the sprite on the image of the layer (to have the same result as the preview rendering !!!)
   If ArraySize(layer()) <= LayerId And layerid >=0
@@ -2586,8 +2589,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1060
-; FirstLine = 70
-; Folding = AAAAAAAAAw+-AAAkBAAAwlYAAAAAAAAAAAAAAAAAAAAAA9
+; CursorPosition = 349
+; FirstLine = 12
+; Folding = AAAAAAAAgf0-AAAIDAAAgLxAAAAAAAAAAAAAAAAAAAAAA5
 ; EnableXP
 ; EnableUnicode

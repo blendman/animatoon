@@ -291,13 +291,13 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2
+; CursorPosition = 46
+; FirstLine = 31
 ; Folding = jBAk
 ; EnableXP
 ; EnableOnError
 ; UseIcon = teo.ico
-; Executable = _release\windows\x86\0.596\animatoon0.596.exe
+; Executable = _release\windows\x86\0.598\animatoon0.598.exe
 ; DisableDebugger
-; Compiler = PureBasic 5.73 LTS (Windows - x86)
 ; Warnings = Display
 ; EnablePurifier

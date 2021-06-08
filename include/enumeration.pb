@@ -212,10 +212,10 @@ EndEnumeration
 Enumeration ; sprite
   
   #SpriteZero = 0
-  #Layeractif = 50
+  ;#Layeractif = 50
   
   ; les sprites pour les brushs
-  #Sp_BrushOriginal = 100
+  #Sp_BrushOriginal ;= 100
   #Sp_BrushCopyResized
   #Sp_BrushCopy
   
@@ -228,13 +228,13 @@ Enumeration ; sprite
   ;#Sp_Marker
   #Sp_Select
   #Sp_Center
-  
+  #Sp_LayerTempo
+  #sp_LayerSelection
   
   ; les sprites que j'utilise ensuite pour les images par exemple
   #Sp_ToSaveImage
   
-  #Sp_LayerTempo
-  
+ 
   #Sp_CopyForsave
   
   
@@ -496,7 +496,14 @@ Enumeration ; gadgets
   #G_BrushAlphaSG
   #G_BrushMixNameG
   #G_BrushMixTB
-  #G_BrushMixSG
+  #G_BrushMixSG 
+  #G_BrushIntensityNameG
+  #G_BrushIntensityTB
+  #G_BrushIntensitySG
+  #G_BrushHardnessNameG
+  #G_BrushHardnessTB
+  #G_BrushHardnessSG
+  
   #G_BrushEditor
   #G_BrushPreset
   
@@ -1094,8 +1101,8 @@ EndEnumeration
 ; CompilerEndIf
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 386
-; FirstLine = 139
-; Folding = wfoBAAAAA+
+; CursorPosition = 501
+; FirstLine = 61
+; Folding = wfAMDAAAA+
 ; EnableXP
 ; EnableUnicode

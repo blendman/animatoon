@@ -815,6 +815,8 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddSTringTBGadget(#G_BrushSizeNameG, #G_BrushSizeTB, #G_BrushSizeSG, Brush(Action)\size,  lang("Size"), lang("Brush Size"),xx,h1+i,tbw,wb2,1,300) : i+25
       AddSTringTBGadget(#G_BrushAlphaNameG, #G_BrushAlphaTB, #G_BrushAlphaSG, Brush(Action)\Alpha,  lang("Alpha"), lang("Brush opacity"),xx,h1+i,tbw,wb2,1,255) : i+25
       AddSTringTBGadget(#G_BrushMixNameG, #G_BrushMixTB, #G_BrushMixSG, Brush(Action)\Mix,  lang("Mix"), lang("Brush Color mixing"),xx,h1+i,tbw,wb2,1,100) : i+25
+      AddSTringTBGadget(#G_BrushIntensityNameG, #G_BrushIntensityTB, #G_BrushIntensitySG, Brush(Action)\Intensity,  lang("Int"), lang("Brush Color intensity"),xx,h1+i,tbw,wb2,0,255) : i+25
+      AddSTringTBGadget(#G_BrushHardnessNameG, #G_BrushHardnessTB, #G_BrushHardnessSG, Brush(Action)\Hardness,  lang("Hard"), lang("Brush Color Hardness"),xx,h1+i,tbw,wb2,0,255) : i+25
       ;}
       
       ;{ Base parameters (size, image)
@@ -2120,8 +2122,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 841
-; FirstLine = 103
-; Folding = AAAAAOAADAAAAAAAwlAAAAAAAAABwIGAAAAAAAAA-
+; CursorPosition = 817
+; FirstLine = 79
+; Folding = AAAAAOAADAAAAAAAwjAAAAAAAAABwIGAAAAAAAAA-
 ; DisableDebugger
 ; EnableUnicode

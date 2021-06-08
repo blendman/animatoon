@@ -551,6 +551,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                     MoveCanvas = 1
                   Else
                     MoveCanvas = 0
+                    If action = #Action_CloneStamp
+                      SetStampPatternImage()
+                    EndIf
                   EndIf
                   
                 ElseIf EventGadget > #G_LastGadget
@@ -759,6 +762,18 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       BrushUpdateColor() 
                       SetGadgetState(#G_BrushSize, Brush(Action)\size)
                       
+                    Case #G_BrushHardnessTB, #G_BrushHardnessSG
+                      If eventgadget = #G_BrushHardnessTB
+                        Brush(Action)\Hardness = GetGadgetState(#G_BrushHardnessTB)
+                        SetGadgetText(#G_BrushHardnessSG, Str(Brush(Action)\Hardness))
+                      Else
+                        Brush(Action)\Hardness = Val(GetGadgetText(#G_BrushHardnessSG))
+                        SetGadgetState(#G_BrushHardnessTB, Brush(Action)\Hardness)
+                      EndIf
+                      BrushUpdateImage(0,1)
+                      BrushUpdateColor() 
+                      SetGadgetState(#G_brushHardness, Brush(Action)\Hardness)
+                      
                     Case #G_BrushAlphaTB, #G_BrushAlphaSG
                       If eventgadget = #G_BrushAlphaTB
                         Brush(Action)\Alpha = GetGadgetState(#G_BrushAlphaTB)
@@ -832,8 +847,22 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       Brush(Action)\Hardness = GetGadgetState(#G_brushHardness)
                       Brush(Action)\Intensity = GetGadgetState(#G_brushIntensity)
                       Brush(Action)\Softness = GetGadgetState(#G_brushSoftness)
+                      SetGadgetText(#G_BrushHardnessSG, Str(Brush(Action)\Hardness))
+                      SetGadgetState(#G_BrushHardnessTB, Brush(Action)\Hardness)
                       BrushUpdateImage(0,1)
                       BrushUpdateColor() 
+                      
+                    Case #G_BrushIntensityTB, #G_BrushIntensitySG
+                      If eventgadget = #G_BrushIntensityTB
+                        Brush(Action)\Intensity = GetGadgetState(#G_BrushIntensityTB)
+                        SetGadgetText(#G_BrushIntensitySG, Str(Brush(Action)\Intensity))
+                      Else
+                        Brush(Action)\Intensity = Val(GetGadgetText(#G_BrushIntensitySG))
+                        SetGadgetState(#G_BrushIntensityTB, Brush(Action)\Intensity)
+                      EndIf
+                      BrushUpdateImage(0,1)
+                      BrushUpdateColor() 
+                      SetGadgetState(#G_brushIntensity, Brush(Action)\Intensity)  
                       
                     Case #G_BrushPas                
                       Brush(Action)\pas = GetGadgetState(#G_BrushPas)
@@ -1132,8 +1161,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       If eventtype = #PB_EventType_LeftButtonDown 
                         pos_x = GetGadgetAttribute(#G_PatternCanvas, #PB_Canvas_MouseX) 
                         pos_y = GetGadgetAttribute(#G_PatternCanvas, #PB_Canvas_MouseY) 
-                        
-                        SetStampPAtternImage(pos_x, pos_y)
+                        SetStampPatternImage(pos_x, pos_y)
                       EndIf
                       
                       ;}
@@ -1447,7 +1475,20 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                 ElseIf Action >= #Action_Line And Action <=#Action_Gradient
                   If alt = 0
                     CreateShape()
-                  EndIf              
+                  EndIf 
+                ElseIf action = #Action_CloneStamp
+                  ;name$ = GetCurrentDirectory()+"temp_layertempo.png"
+                  ;If SaveSprite(#Sp_LayerTempo,name$,#PB_ImagePlugin_PNG)
+                    ;temp = LoadImage(#PB_Any, name$)
+                    If StartDrawing(ImageOutput(layer(layerid)\image))
+                      DrawAlphaImage(ImageID(#image_patternForstamp),0,0,255)
+                      StopDrawing()
+                    EndIf
+                    ;freeimage2(temp)
+                    SetStampPatternImage(-1,-1)
+                    NewPainting = 1
+                    ScreenUpdate(1)
+                  ;EndIf
                 EndIf
                 
               EndIf 
@@ -1564,9 +1605,9 @@ CloseScreen()
 End
 ;}
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 467
-; FirstLine = 81
-; Folding = hvTAcAAEbOVAzQBACA+AAMbhRAA9
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 1483
+; FirstLine = 73
+; Folding = hvTAcAAE0fiaMHKAwAiHAAZL9OEA-
 ; EnableXP
 ; EnableUnicode

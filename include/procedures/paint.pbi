@@ -1079,7 +1079,7 @@ Procedure DrawSymetry(RotImg,x,y,alpha)
 EndProcedure
 
 ;Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
-Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
+Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(LayerId)\Sprite)
   
   ; pour peindre sur le sprite et sur l'image
   ; il faut la même procédure pour un rendu identique
@@ -1174,7 +1174,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
             EndIf
             
             If OutputID = 0
-              StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+              StartDrawing(SpriteOutput(outputsprite))
             Else
               StartDrawing(ImageOutput(Layer(LayerId)\Image))
             EndIf
@@ -2225,10 +2225,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1196
-; FirstLine = 149
-; Folding = A5HAAAAAAAAAAAgGcAAIAAAA5BAAeAAA9O5
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 1081
+; FirstLine = 126
+; Folding = D5HAAAAAAAAAAAgGcAAYAAAw5DAAegHA9Oo8-+
 ; EnableAsm
 ; EnableXP
 ; EnableOnError

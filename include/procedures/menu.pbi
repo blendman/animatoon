@@ -479,9 +479,9 @@ EndProcedure
 Procedure CloseWindowInfo()
   If IsWindow(#win_autosave)
     CloseWindow(#win_autosave)
-    If GetActiveWindow() <> #winmain
-      SetActiveWindow(#WinMain)
-    EndIf
+;     If GetActiveWindow() <> #winmain
+;       SetActiveWindow(#WinMain)
+;     EndIf
   EndIf
 EndProcedure
 
@@ -2909,9 +2909,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 232
-; FirstLine = 177
-; Folding = HAAAA5AAAAAAAAGAAAAMDAAAAAACAAAAAHAAAAAAAAAAA+
+; CursorPosition = 483
+; Folding = AACAAYAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA-
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode
