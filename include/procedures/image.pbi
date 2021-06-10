@@ -44,6 +44,7 @@ EndProcedure
 
 
 
+
 ; MOdule by Wilbert
 DeclareModule Premultiply
   
@@ -179,8 +180,13 @@ Procedure UnPreMultiplyAlpha(image)
       For x=0 To ImageWidth(image)-1
         color = Point(x, y)
         alpha = Alpha(color)
+        alpha2 = Alpha(color)
         If alpha=0 : alpha=1 : EndIf
-        Plot(x, y, RGBA( (255 * Red(color) + (Alpha(color) /2)) /alpha, (255 * Green(color) + (Alpha(color) /2)) /alpha, (255 * Blue(color) + (Alpha(color) /2)) /alpha, Alpha(color)))
+        If alpha2>0
+          Plot(x, y, RGBA( (255 * Red(color) + (alpha2 /2)) /alpha, (255 * Green(color) + (alpha2 /2)) /alpha, (255 * Blue(color) + (alpha2 /2)) /alpha, alpha2))
+        Else
+          Plot(x, y, RGBA(Red(color), Green(color), Blue(color), alpha2))
+        EndIf
       Next
     Next
     StopDrawing()
@@ -2330,9 +2336,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 563
-; FirstLine = 105
-; Folding = AwHQLAAIAAAwBAAA5vNAAAAAAAAAAAAAAAAAAAAAAAA5
+; CursorPosition = 187
+; FirstLine = 121
+; Folding = A9--AAAAAAAgDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAw
 ; EnableAsm
 ; EnableXP
 ; EnableUnicode

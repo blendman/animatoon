@@ -540,6 +540,7 @@ Procedure OpenOptions()
             EndIf
             \SaveImageRT = 1
             
+            ; rendering
             \SpriteQuality  = ReadPreferenceInteger("Filtering",  1)
             
             ; view
@@ -602,7 +603,7 @@ Procedure OpenOptions()
             ; border // bordure
             \BordureX  = ReadPreferenceInteger("BordureX",      50)
             \BordureY  = ReadPreferenceInteger("BordureY",      50)
-            BarAnimH_IE         = ReadPreferenceInteger("BarAnimH",     80)
+            BarAnimH_IE = ReadPreferenceInteger("BarAnimH",     80)
             
             ; options background paper
             \paper$       = ReadPreferenceString("Paper", "paper1.png")
@@ -621,7 +622,6 @@ Procedure OpenOptions()
             \DirPattern$  = ReadPreferenceString("DirPattern", "data\Presets\Patterns\")
             \DirPreset$   = ReadPreferenceString("DirPresets", "data\Presets\Bank\Blendman\")
             \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
-            ; \DirBrush$    = ReadPreferenceString("DirBrush", "blendman")
             \BrushName$    = ReadPreferenceString("BrushName", "")
             
             \RB_Img$      = ReadPreferenceString("RB_img", GetCurrentDirectory() + "data\Presets\RoughBoard\rb.png") 
@@ -644,6 +644,8 @@ Procedure OpenOptions()
             \NbNewFile       = ReadPreferenceInteger("NbNewFile", 1)
             \NbMinutes       = ReadPreferenceInteger("NbMinutes", 0)
             
+            ; for tools
+            \UseSameColorForAllTool = ReadPreferenceInteger("UseSameColorForAllTool", 1) 
             
           EndWith
           
@@ -655,25 +657,10 @@ Procedure OpenOptions()
         Else
           
           ;{ tool (brush, eraser, pen, gradient....)
-          
-          ;     ; gradient
-          ;     PreferenceGroup("Gradient")
-          ;     With brush(#Action_Gradient)
-          ;       \Color    = ReadPreferenceInteger("GradientBG",    RGB(255, 255, 255))
-          ;       \ColorBG\R = Red(\Color)
-          ;       \ColorBG\G = Green(\Color)
-          ;       \ColorBG\B = Blue(\Color)
-          ;       \alpha = ReadPreferenceInteger("GradientBGAlpha",    255)
-          ;       \AlphaFG = ReadPreferenceInteger("GradientFGAlpha",    255)
-          ;       \ColorFG  = ReadPreferenceInteger("GradientFG",    0)
-          ;       \Type     = ReadPreferenceInteger("GradientType",  0)
-          ;     EndWith
-          
-          
-          If pgn$ = "Brush" Or pgn$ = "Eraser" Or pgn$ = "Pen"
+          If pgn$ = "Brush" Or pgn$ = "Eraser" Or pgn$ = "Pen" Or pgn$ = "Stamp"
             
             ; first I load the paint and eraser tool parameters
-            For i = 0 To 2 
+            For i = 0 To 3 
               
               ; we open the tools parameters (brush, pen...)
               ; on réouvre les tools brush, eraser et pen, 
@@ -692,10 +679,13 @@ Procedure OpenOptions()
                   theaction = #Action_Pen 
                   PreferenceGroup("Pen")
                   
+                Case 3 ;  clonestamp
+                  theaction = #Action_CloneStamp
+                  PreferenceGroup("Stamp") 
+                  
               EndSelect
               
               With Brush(theaction)
-                
                 
                 \Id  = ReadPreferenceInteger("BrushImage", 1)
                 If \Id <=0
@@ -824,7 +814,8 @@ Procedure OpenOptions()
                     \ShapePlain   = ReadPreferenceInteger("ShapePlain",    1)
                     \ShapeType    = ReadPreferenceInteger("ShapeType",     0)
                     \RoundX       = ReadPreferenceInteger("RoundX",        5)
-                    \RoundY       = ReadPreferenceInteger("RoundY",        5)          
+                    \RoundY       = ReadPreferenceInteger("RoundY",        5)  
+                    \UseBrushColor = ReadPreferenceInteger("UseBrushColor", 0)  
                   EndWith
                   
                 EndIf
@@ -834,7 +825,6 @@ Procedure OpenOptions()
             Next
             
           EndIf
-          
           ;}
           
         EndIf
@@ -930,6 +920,8 @@ Procedure WriteDefaultOption()
     WritePreferenceInteger("ShowPanelswatchs",        \ShowPanelswatchs)
     WritePreferenceInteger("ShowFullUI",              \ShowFullUI)
 
+    ; for tools
+    WritePreferenceInteger("UseSameColorForAllTool",              \UseSameColorForAllTool)
     
   EndWith
   
@@ -956,7 +948,7 @@ Procedure WriteDefaultOption()
   
   
   ;  save the paint tools parameters // puis on sauve les outils (brush, eraser et pen pour le moment, plus tard les autres
-  For i = 0 To 2
+  For i = 0 To 3
     
     Select  i 
       Case 0
@@ -970,6 +962,10 @@ Procedure WriteDefaultOption()
       Case 2 ;  pen
         theaction = #Action_Pen
         PreferenceGroup("Pen")
+        
+      Case 3 ;  clonestamp
+        theaction = #Action_CloneStamp
+        PreferenceGroup("Stamp")
         
     EndSelect
     
@@ -1037,7 +1033,7 @@ Procedure WriteDefaultOption()
   
   For i = #Action_Spray To #Action_Zoom 
     
-    If i <> #Action_Eraser
+    If i <> #Action_Eraser And i <> #Action_CloneStamp
       theaction  = i
       PreferenceGroup(StringField(tool$,i+1,","))
       
@@ -1054,7 +1050,7 @@ Procedure WriteDefaultOption()
         WritePreferenceInteger("ShapePlain", \ShapePlain)
         WritePreferenceInteger("ShapeType", \ShapeType)
         WritePreferenceInteger("RoundX", \RoundX)
-        WritePreferenceInteger("RoundY", \RoundY)          
+        WritePreferenceInteger("RoundY", \RoundY) 
       EndWith
       
     EndIf
@@ -2259,7 +2255,6 @@ Procedure AutoSave()
     If autosavetime_ >= OptionsIE\AutosaveTime * 60000
       AutosaveTimeStart = ElapsedMilliseconds()
       
-     CreateWindowInfo("AUTOSAVE")
       
       ; verify if a layer has changed
       For i = 0 To ArraySize(layer())
@@ -2272,6 +2267,8 @@ Procedure AutoSave()
       
       If OptionsIE\ImageHasChanged <> 0 Or LayerHasChanged = 1
         
+        CreateWindowInfo("AUTOSAVE")
+
         OptionsIE\ImageHasChanged = 0
         
         ;MessageRequester("infos", Str(autosavetime_)+"/"+Str(AutosaveTimeStart)+"/"+Str(ElapsedMilliseconds())+"/"+Str(OptionsIE\AutosaveTime)+"/")
@@ -2908,9 +2905,10 @@ EndProcedure
 ; Layers : see layer.pbi
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 483
-; Folding = AACAAYAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA-
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 2269
+; FirstLine = 61
+; Folding = AAEAAY0CshfidAAAAAAAAAAAAAABBAAAAgfAAAAAAAAAA--
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

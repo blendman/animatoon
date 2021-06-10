@@ -9,6 +9,10 @@ Procedure IE_TypeDrawing()
   
   Select Brush(Action)\Type 
       
+    Case #ToolType_CloneStamp
+      DrawingMode(#PB_2DDrawing_CustomFilter)
+      CustomFilterCallback(@FiltreMelangeAlphaPat()) 
+      
     Case #ToolType_Eraser ;1  ; eraser pen      
       DrawingMode(#PB_2DDrawing_CustomFilter)
       CustomFilterCallback(@Filtre_MelangeAlpha2())  
@@ -497,7 +501,7 @@ Procedure EllipseAA(X, Y, RadiusX, RadiusY, Color, Thickness = 1, Mode = #PB_2DD
 EndProcedure
 
 
-; line
+;{ line
 Procedure NormalL_OLd(X,Y, x3, y3, Color, alpha,Thickness = 1)
   
   ; BY LSI
@@ -1026,6 +1030,7 @@ Procedure DashDraw(P1x.f, P1y.f, P2x.f, P2y.f, DashValue.l=1, size.d=2, Color.l=
   
 EndProcedure
 
+;}
 
 
 
@@ -1079,21 +1084,24 @@ Procedure DrawSymetry(RotImg,x,y,alpha)
 EndProcedure
 
 ;Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
-Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(LayerId)\Sprite)
+Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
   
   ; pour peindre sur le sprite et sur l'image
   ; il faut la même procédure pour un rendu identique
-  ; outputID permet de savoir sur quoi on va peindre
+  ; outputID permet de savoir sur quoi on va peindre. 0 = sprite, 1 = image
   
   ; Debug "dessin sur "+Str(OutputID)
   
   CheckAlpha() ; alpha avec pression, random, etc...
   
-  water = brush(#Action_Brush)\Water* 0.3 ; * size
+  ;water = brush(#Action_Brush)\Water* 0.3 ; * size
+  water = brush(Action)\Water* 0.3 ; * size
   
-  alpha = alpha *(1-brush(#Action_Brush)\Water/255)
+ ; alpha = alpha *(1-brush(#Action_Brush)\Water/255)
+  alpha = alpha *(1-brush(Action)\Water/255)
   
   If alpha >0
+    
   If Brush(Action)\Trait
     
     dist  = point_distance(xx,yy,StartX1,StartY1) ; to find the distance between two brush dots
@@ -1110,7 +1118,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
     
     ; to add dots 
     v = 0
-    StrokeId = 0
+    ; StrokeId = 0
     
     For u = 0 To dist-1
       Scx.d = Rnd(Brush(Action)\scatter)* Brush(Action)\size * 0.01
@@ -1118,21 +1126,6 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
       
       x_result.d =  sinD * u + xx + scx
       y_result.d =  cosD * u + yy + scy
-      
-      ; CheckAlpha() ; alpha avec pression, random, etc...
-      
-      ;                                 If PaintOld > 0 
-      ;                                   size = FinalSize + u * ratio
-      ;                                   If size < 0
-      ;                                     size = FinalSize
-      ;                                   EndIf        
-      ;                                 Else
-      ;                                   size = FinalSize 
-      ;                                   PaintOld = 1
-      ;                                 EndIf
-      
-      
-      
       
       checkok = 0
       
@@ -1173,11 +1166,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
               StopDrawing()
             EndIf
             
-            If OutputID = 0
-              StartDrawing(SpriteOutput(outputsprite))
-            Else
-              StartDrawing(ImageOutput(Layer(LayerId)\Image))
-            EndIf
+            If StartDrawing(output) : EndIf
+            
         EndIf
         
         IE_TypeDrawing() ;  drawingmode (alphablend, clip si alphalock, etc..)
@@ -1186,7 +1176,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
         y_result + Brush(Action)\centerY -ImageHeight(RotImg)/2
         
         ; draw the image
-        alpha * (100-brush(#Action_Brush)\Water)*0.01
+;         alpha * (100-brush(#Action_Brush)\Water)*0.01
+        alpha * (100-brush(Action)\Water)*0.01
         
         If OutputID = 0
           ReDim Stroke(StrokeId)\dot.sDot(v)
@@ -1234,16 +1225,11 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
             StopDrawing()
           EndIf
           
-          If OutputID = 0
-            StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-          Else
-            StartDrawing(ImageOutput(Layer(LayerId)\Image))
+          If StartDrawing(output)
           EndIf
-          
-          
           IE_TypeDrawing() ; le drawingmode (alphablend, clip si alphalock, etc..
-          alpha * (100-brush(#Action_Brush)\Water)*0.01
-          
+;           alpha * (100-brush(#Action_Brush)\Water)*0.01
+          alpha * (100-brush(Action)\Water)*0.01
           
           DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha)          
           DrawSymetry(RotImg,x_result,y_result,alpha)
@@ -1258,7 +1244,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
           FreeImage(RotImg)
         Else
           IE_TypeDrawing() ; le drawingmode (alphablend, clip si alphalock, etc..
-          alpha * (100-brush(#Action_Brush)\Water)*0.01
+;           alpha * (100-brush(#Action_Brush)\Water)*0.01
+          alpha * (100-brush(Action)\Water)*0.01
           DrawAlphaImage(ImageID(#BrushCopy),x_result,y_result,alpha)
           DrawSymetry(#BrushCopy,x_result,y_result,alpha)
           If brush(action)\Water > 0 And action <> #Action_Eraser
@@ -1310,14 +1297,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, outputsprite=Layer(Lay
         StopDrawing()
       EndIf
       
-      If OutputID = 0
-        StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
-      Else
-        StartDrawing(ImageOutput(Layer(LayerId)\Image))
-      EndIf
-      
-      
-      
+      If StartDrawing(output) : EndIf
       IE_TypeDrawing() ; drawingmode (alphablend, clip si alphalock, etc..
       
       xx + Brush(Action)\centerX -ImageWidth(RotImg)/2 + scx
@@ -2226,9 +2206,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 1081
-; FirstLine = 126
-; Folding = D5HAAAAAAAAAAAgGcAAYAAAw5DAAegHA9Oo8-+
+; CursorPosition = 1247
+; FirstLine = 228
+; Folding = C7HAAAAAAAAAAAAN5AAwAAAgxHAA9APA5dQ4-0
 ; EnableAsm
 ; EnableXP
 ; EnableOnError

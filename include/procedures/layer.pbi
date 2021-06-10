@@ -699,8 +699,12 @@ Procedure Layer_SetGadgetState()
   If i >=0 And i <= ArraySize(layer())
     SetGadgetState(#G_LayerLocked, layer(i)\Locked)
     SetGadgetState(#G_LayerAlpha, layer(i)\alpha)
+    SetGadgetState(#G_LayerAlphaSpin, layer(i)\alpha)
     SetGadgetState(#G_LayerView, layer(i)\view)
     SetGadgetState(#G_LayerBM, layer(i)\Bm)
+    SetGadgetState(#G_LayerLockMove, layer(i)\LockMove)
+    SetGadgetState(#G_LayerLockPaint, layer(i)\LockPaint)
+    SetGadgetState(#G_LayerLockAlpha, layer(i)\LockAlpha)
   EndIf
 
 EndProcedure
@@ -1057,7 +1061,7 @@ EndProcedure
 
 
 ; update & blendmode (bm)
-Procedure SetBm(i,sprite=1)
+Procedure SetBm(i,sprite=1,bm=-1)
   
   ; bm sprite
   If Sprite = 1
@@ -1083,7 +1087,12 @@ Procedure SetBm(i,sprite=1)
     ; bm image
     DrawingMode(#PB_2DDrawing_AllChannels)  
     
-    Select layer(i)\bm
+    If bm=-1
+      bm = layer(i)\bm
+    Else
+    EndIf
+    
+    Select bm
         
       Case #bm_custom
         Box(0,0,doc\w,doc\h, RGBA(Brush(action)\ColorBG\R,Brush(action)\ColorBG\G, Brush(action)\ColorBG\B, Brush(action)\alpha))
@@ -1896,19 +1905,21 @@ Procedure Layer_DrawTempo()
           CreateLayertempo_(1)
         EndIf
         If StartDrawing(SpriteOutput(#sp_LayerTempo))
-          DrawShape()
+          DrawShape() ; macro in paint.pbi
           StopDrawing()
         EndIf
       EndIf
-    Else
-      ; clonestamp use layer_tempo to draw on it the 
-      If action = #Action_CloneStamp
-        If StartDrawing(SpriteOutput(#sp_LayerTempo))
-          DrawShape()
-          StopDrawing()
-        EndIf
-      EndIf
+;     Else
+;       ; clonestamp use layer_tempo to draw on it the 
+;       If action = #Action_CloneStamp
+;         If StartDrawing(SpriteOutput(#sp_LayerTempo))
+;           DrawShape()
+;           StopDrawing()
+;         EndIf
+;       EndIf
+      
     EndIf
+    
   Else
     
     
@@ -2302,7 +2313,6 @@ Procedure Layer_ValidChange(Action,i=-1)
     i=layerid
   EndIf
   
-  
   If Action = #Action_Move Or Action = #Action_Transform Or Action = #Action_Rotate
     
     If OptionsIE\confirmAction = 1
@@ -2330,7 +2340,7 @@ Procedure Layer_ValidChange(Action,i=-1)
           If Action = #Action_Transform          
             
             ResizeImage(tmp,Layer(i)\w,Layer(i)\h)  
-            tmp = UnPreMultiplyAlpha(tmp)
+            tmp = UnPreMultiplyAlpha(temp) ; :: UnPreMultiplyAlpha(tmp)
             Layer(i)\w = doc\w
             Layer(i)\h = doc\h
             Layer(i)\NewW = doc\w
@@ -2589,8 +2599,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 349
-; FirstLine = 12
-; Folding = AAAAAAAAgf0-AAAIDAAAgLxAAAAAAAAAAAAAAAAAAAAAA5
+; CursorPosition = 2342
+; FirstLine = 324
+; Folding = AAAAAAAAAf9-AAAfDAAAganIAAAAAIc+MAAAAAAAg+DAA9
 ; EnableXP
 ; EnableUnicode

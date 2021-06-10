@@ -180,7 +180,7 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   ; need to check if action is a brush/erase/pen
   ac = action
-  If action <> #Action_Brush And action <> #Action_Eraser And action <> #Action_Pen
+  If action <> #Action_Brush And action <> #Action_Eraser And action <> #Action_Pen And action <> #Action_CloneStamp
     ac = #Action_Brush
     ; Debug "on change l'action"
   EndIf
@@ -993,10 +993,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 205
-; FirstLine = 19
-; Folding = AAA5--AAAAAwBBg5
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 146
+; FirstLine = 11
+; Folding = gBA5--AAAAAwBBg5-
 ; EnableXP
 ; DisableDebugger
 ; EnableUnicode

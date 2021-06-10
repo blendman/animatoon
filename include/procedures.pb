@@ -35,8 +35,6 @@ XIncludeFile "procedures\swatch.pbi"
 
 XIncludeFile "procedures\roughboard.pbi"
 
-XIncludeFile "procedures\patterns.pbi"
-
 XIncludeFile "procedures\gadgets.pbi"  
 
 XIncludeFile "procedures\brush.pbi"
@@ -44,6 +42,8 @@ XIncludeFile "procedures\brush.pbi"
 XIncludeFile "procedures\image.pbi"
 
 XIncludeFile "procedures\imgfilters.pbi"
+
+XIncludeFile "procedures\patterns.pbi"
 
 XIncludeFile "procedures\paint.pbi"
 
@@ -671,10 +671,10 @@ CompilerEndIf
 XIncludeFile "procedures\window.pbi"
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 455
-; FirstLine = 83
-; Folding = hAAAAAAAAgrvBA5
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 45
+; FirstLine = 14
+; Folding = BAAzHAAAAYrvBA5
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

@@ -661,6 +661,8 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
     
   EndIf
   
+  SetGadgetText(#G_brushImageName, OptionsIE\brushName$)
+  
   If StartDrawing(CanvasOutput(#G_brushImageCanvas))
     DrawImage(ImageID(#Img_WindowbrushCanvasImgbrush),0,0)
     x = BrushImage(brushImageId)\x*80
@@ -754,8 +756,15 @@ Procedure OpenWindowBrush()
       If CanvasGadget(#G_brushImageCanvas,0,0,w,h1-y)
         brushImageCanvasHeight = h1-y
          WindowbrushUpdateImgList()
-      EndIf
+       EndIf
+       CloseGadgetList()
     EndIf
+    
+    y+h1-y-60+5
+    
+    If TextGadget(#G_brushImageName, x,y,w, 20, OptionsIE\brushName$) : EndIf
+    
+
     
     ; buttons to add a brush image ??
     ;   #G_brushImageImport
@@ -1727,9 +1736,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 654
-; FirstLine = 70
-; Folding = AAAAAA30-4-p-BAAADAAAAAA5
+; CursorPosition = 759
+; FirstLine = 55
+; Folding = AAAAAA10f--T-DAAAGAAAAAAw
 ; EnableAsm
 ; EnableXP
 ; Warnings = Display

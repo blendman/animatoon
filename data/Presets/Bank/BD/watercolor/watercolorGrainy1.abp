@@ -1,0 +1,37 @@
+﻿
+; // Animatoon brush Preset - Blendman 2011-21
+name = wc_colocool
+version = 6
+size = 37
+sizeMin = 1
+sizeX = 100
+sizeY = 100
+randSiz = 0
+size_min = 1
+sizepressure = 1
+brushsizeRndfactor = 0
+rotate = 0
+randRot = 360
+rotateangle = 0
+RotateMin = 0
+scatter = 0
+ScatterMin = 0
+alpha = 205
+alphapressure = 1
+alphaFactorVsTime = 0
+alphaVsTime = 0
+alphaRand = 0
+alphaMin = 0
+image = brush50.png
+brushdir = blendman
+brush = 50
+pas = 30
+paintline = 1
+hardness = 140
+softness = 0
+intensity = 0
+smooth = 0
+mixing = 20
+visco = 2
+mixtyp = 0
+group = 

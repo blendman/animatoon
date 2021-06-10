@@ -583,6 +583,8 @@ Enumeration ; gadgets
   ;{ tool clone stamp
   #G_BrushSource
   #G_BrushAlignment
+  #G_BrushStampUseColor
+  #G_BrushStampColorBM
   ;}
   
   #G_LastParamBrush ; toujours en dernier pour les paramètres des Tools
@@ -894,7 +896,7 @@ EndEnumeration
 
 
 ;-- LAYERS
-Enumeration ; BlendMode, LAyer set BM, layer type
+Enumeration ; BlendMode, Layer set BM, layer type
   
   ;{ BLENDMODE
   ; must be in the same order as the gadget of blendmode layer
@@ -1082,6 +1084,9 @@ Enumeration ; action on the layer, ToolType, stroke style
   #ToolType_Blur
   #ToolType_Sol
   #ToolType_Line
+  
+  ; other tool, not in the list, always after the last in the list
+  #ToolType_CloneStamp
   ;}
   
   ;{ stroke style
@@ -1100,9 +1105,9 @@ EndEnumeration
 
 ; CompilerEndIf
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 501
-; FirstLine = 61
-; Folding = wfAMDAAAA+
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 586
+; FirstLine = 141
+; Folding = wfAMHAAAg+
 ; EnableXP
 ; EnableUnicode

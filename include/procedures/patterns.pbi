@@ -64,7 +64,6 @@ Procedure UpdatePatternsImage()
       If DirectoryEntryType(0) = #PB_DirectoryEntry_File
         ; add the name of the image to the array pattern()
         Name$ = DirectoryEntryName(0)
-        
         ; redim the array pattern with new size
         ReDim Pattern(size)
         Pattern(size)\name$ = Name$
@@ -83,7 +82,7 @@ Procedure UpdatePatternsImage()
   wcanvas = GadgetWidth(#G_PatternCanvas)
   w2 = (wcanvas/2) -16
   patternCaseW = w2
-  h2 = (Round((2+ArraySize(pattern())) / (wcanvas/w2), #PB_Round_Up))*w2
+  h2 = (Round((3+ArraySize(pattern())) / (wcanvas/w2), #PB_Round_Up))*w2
   
   ResizeGadget(#G_PatternCanvas, #PB_Ignore, #PB_Ignore, #PB_Ignore, h2)
   
@@ -206,7 +205,11 @@ Procedure SetStampPatternImage(x=0, y=0, panel = 1)
       tempimg = LoadImage(#PB_Any,  theimage$)
       w =  ImageWidth(tempimg)
       h =  ImageHeight(tempimg)
-
+      
+      USecolor =GetGadgetState(#G_BrushStampUseColor)
+      colorbm =GetGadgetState(#G_BrushStampColorBM)
+      color = RGBA(Brush(Action)\Col\R, Brush(Action)\Col\G, Brush(Action)\Col\B, 255)
+      
       ;If useimage = 1
         If CreateImage(#image_patternForstamp, Doc\w, doc\h, 32, #PB_Image_Transparent) = 0
           AddLogError(1, "Unable to create the pattern stamp image : "+ theimage$)
@@ -224,6 +227,12 @@ Procedure SetStampPatternImage(x=0, y=0, panel = 1)
                 Next j
               Next i
               
+              If usecolor
+                DrawingMode(#PB_2DDrawing_CustomFilter) ;|#PB_2DDrawing_Transparent)     
+                CustomFilterCallback(@bm_multiply())
+                Box(0,0,doc\w,doc\h,color)
+              EndIf
+              
               DrawingMode(#PB_2DDrawing_AlphaChannel)
               Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
               
@@ -240,19 +249,27 @@ Procedure SetStampPatternImage(x=0, y=0, panel = 1)
         If CreateSprite(#Sp_LayerTempo,doc\w,doc\h,#PB_Sprite_AlphaBlending)
         EndIf
       EndIf
-       ; draw on the sprite
+      ; draw on the sprite
       If IsSprite(#sp_LayerTempo)
-         If StartDrawing(SpriteOutput(#sp_LayerTempo))
-            For i =0 To doc\w /w
-              For j = 0 To doc\h /h
-                DrawAlphaImage(ImageID(tempimg), i * w, j * h)
-              Next j
-            Next i
-            DrawingMode(#PB_2DDrawing_AlphaChannel)
-            Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-            StopDrawing()
+        If StartDrawing(SpriteOutput(#sp_LayerTempo))
+          
+          For i =0 To doc\w /w
+            For j = 0 To doc\h /h
+              DrawAlphaImage(ImageID(tempimg), i * w, j * h)
+            Next j
+          Next i
+          
+          If usecolor
+            DrawingMode(#PB_2DDrawing_CustomFilter)     
+            CustomFilterCallback(@bm_multiply())
+            Box(0,0,doc\w,doc\h,color)
           EndIf
-         
+          
+          DrawingMode(#PB_2DDrawing_AlphaChannel)
+          Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+          StopDrawing()
+        EndIf
+        
       EndIf
       
        FreeImage(tempimg)
@@ -266,7 +283,7 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 231
-; FirstLine = 61
-; Folding = 1-+--
+; CursorPosition = 84
+; FirstLine = 21
+; Folding = 9-----
 ; EnableXP

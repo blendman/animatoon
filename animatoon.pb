@@ -5,8 +5,8 @@
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
-#ProgramVersion   = "0.5.9.8"
-#ProgramRevision  = 1
+#ProgramVersion   = "0.5.9.9"
+#ProgramRevision  = 2
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
 #ProgramNbLine    = "23600"
 ; Application
@@ -48,11 +48,11 @@ XIncludeFile "include\procedures.pb" ;  screen et sprite & Canvas (main, for ren
 ; XIncludeFile "include\procedures\history.pbi" ; script, history
 ; XIncludeFile "include\procedures\swatch.pbi" 
 ; XIncludeFile "include\procedures\roughboard.pbi"
-; XIncludeFile "include\procedures\patterns.pbi"
 ; XIncludeFile "include\procedures\gadgets.pbi"
 ; XIncludeFile "include\procedures\brush.pbi"
 ; XIncludeFile "include\procedures\image.pbi" ; image réglages, blendmode
 ; XIncludeFile "include\procedures\imgfilters.pbi"
+; XIncludeFile "include\procedures\patterns.pbi"
 ; XIncludeFile "include\procedures\paint.pbi"
 ; XIncludeFile "include\procedures\layer.pbi"
 ; XIncludeFile "include\procedures\window.pbi"
@@ -291,8 +291,7 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 46
-; FirstLine = 31
+; CursorPosition = 8
 ; Folding = jBAk
 ; EnableXP
 ; EnableOnError

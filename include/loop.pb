@@ -52,6 +52,8 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
       RunScript(ScriptNumber)
       AutoSave()
       
+      ; SetWindowTitle(#WinMain, Str(OptionsIE\ImageHasChanged))
+      
       If event <> 0
         
         SaveScript(Event)      
@@ -552,7 +554,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   Else
                     MoveCanvas = 0
                     If action = #Action_CloneStamp
-                      SetStampPatternImage()
+                      SetStampPatternImage(-1,-1)
                     EndIf
                   EndIf
                   
@@ -834,9 +836,10 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                       
                       ; param  
-                    Case #G_IE_Type 
-                      Brush(Action)\Type = GetGadgetState(#G_IE_Type)
-                      
+                    Case #G_IE_Type
+                      If action <> #Action_CloneStamp
+                        Brush(Action)\Type = GetGadgetState(#G_IE_Type)
+                      EndIf
                       
                     Case #G_brushSmooth
                       Brush(Action)\Smooth = GetGadgetState(#G_brushSmooth)
@@ -947,25 +950,29 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                     Case #G_BrushWater
                       Brush(Action)\Water = GetGadgetState(#G_BrushWater)
                       
-                    Case #G_BrushPrevious
-                      BrushInitNb()
-                      If Brush(Action)\id > 1
-                        Brush(Action)\id -1
-                      Else
-                        Brush(Action)\Id = Brush(#Action_Brush)\BrushNumMax+1
-                      EndIf 
-                      BrushUpdateImage(1,1)
-                      BrushUpdateColor() 
+                    Case #G_BrushStampUseColor, #G_BrushStampColorBM
+                      Brush(action)\usecolor = GetGadgetState(#G_BrushStampUseColor)
+                      SetStampPatternImage(-1,-1)
                       
-                    Case #G_BrushNext
-                      BrushInitNb()
-                      If Brush(Action)\id < Brush(#Action_Brush)\BrushNumMax+1
-                        Brush(Action)\id +1
-                      Else
-                        Brush(Action)\id = 1
-                      EndIf                
-                      BrushUpdateImage(1,1)
-                      BrushUpdateColor()     
+;                     Case #G_BrushPrevious
+;                       BrushInitNb()
+;                       If Brush(Action)\id > 1
+;                         Brush(Action)\id -1
+;                       Else
+;                         Brush(Action)\Id = Brush(#Action_Brush)\BrushNumMax+1
+;                       EndIf 
+;                       BrushUpdateImage(1,1)
+;                       BrushUpdateColor() 
+;                       
+;                     Case #G_BrushNext
+;                       BrushInitNb()
+;                       If Brush(Action)\id < Brush(#Action_Brush)\BrushNumMax+1
+;                         Brush(Action)\id +1
+;                       Else
+;                         Brush(Action)\id = 1
+;                       EndIf                
+;                       BrushUpdateImage(1,1)
+;                       BrushUpdateColor()     
                       ;}
                       
                       ;{ Move, rotate, transform & line, fillarea for some parameters
@@ -1283,6 +1290,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                         BrushUpdateColor()      
                         color = RGBA(Brush(Action)\col\R,Brush(Action)\col\G,Brush(Action)\col\B,Brush(Action)\alpha)
                         SetColorSelector(color,Xx8,yy8,3,1)
+                        If action = #Action_CloneStamp
+                          SetStampPatternImage(-1,-1)
+                        EndIf
                       EndIf
                       
                       
@@ -1320,7 +1330,9 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                         Case #PB_EventType_LeftButtonUp
                           mouseDownC = #False
                           BrushChangeColor(1)  
-                          
+                          If action = #Action_CloneStamp
+                            SetStampPatternImage(-1,-1)
+                          EndIf
                       EndSelect
                       RGBtoHSL2()
                       
@@ -1435,7 +1447,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
             EndIf
             
           Case #WM_LBUTTONDOWN 
-             ; Debug "left down"
             ; we are on the drawing surface, to do action (painting, select...)
             If Mx>0 And My>0 And Mx<GadgetWidth(#G_ContScreen)-1 And My<GadgetHeight(#G_ContScreen)-1
               If GetActiveWindow() = #WinMain
@@ -1460,7 +1471,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
             
           Case #PB_Event_LeftClick, #WM_LBUTTONUP
             ;{ mouseleft up
-            ; clic = 0
             If Gad =0
               MouseClic = 0
               startzoom = 0
@@ -1477,18 +1487,13 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                     CreateShape()
                   EndIf 
                 ElseIf action = #Action_CloneStamp
-                  ;name$ = GetCurrentDirectory()+"temp_layertempo.png"
-                  ;If SaveSprite(#Sp_LayerTempo,name$,#PB_ImagePlugin_PNG)
-                    ;temp = LoadImage(#PB_Any, name$)
-                    If StartDrawing(ImageOutput(layer(layerid)\image))
-                      DrawAlphaImage(ImageID(#image_patternForstamp),0,0,255)
-                      StopDrawing()
-                    EndIf
-                    ;freeimage2(temp)
-                    SetStampPatternImage(-1,-1)
-                    NewPainting = 1
-                    ScreenUpdate(1)
-                  ;EndIf
+                  If StartDrawing(ImageOutput(layer(layerid)\image))
+                    DrawAlphaImage(ImageID(#image_patternForstamp),0,0,255)
+                    StopDrawing()
+                  EndIf
+                  SetStampPatternImage(-1,-1)
+                  NewPainting = 1
+                  ScreenUpdate(1)
                 EndIf
                 
               EndIf 
@@ -1605,9 +1610,9 @@ CloseScreen()
 End
 ;}
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 1483
-; FirstLine = 73
-; Folding = hvTAcAAE0fiaMHKAwAiHAAZL9OEA-
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 54
+; FirstLine = 20
+; Folding = hvTAcAAE0biKMNFAYAxj1DimwdIA+
 ; EnableXP
 ; EnableUnicode

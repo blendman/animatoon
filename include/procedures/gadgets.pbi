@@ -77,25 +77,25 @@ Procedure AddSTringTBGadget(gadName,gadTB,gadSG,val,name$,tip$,x,y,wtb,wsg,min,m
   ; wtg = width for the text gadget
   
   ; to color the gadget
-  color =  GetWindowColor(GetActiveWindow())
+  ; color =  GetWindowColor(GetActiveWindow())
   
   ; To add a gadget Name+trackbar +stringgadget !! test pour ajouter un gadget "spécial : nom, trackbar et stringgadget
   h = 20
   If gadname <> -1
-    If TextGadget(gadName, x+5, y, wtg, h, name$)
-      SetGadgetColor(gadName, #PB_Gadget_BackColor, color)       
-    EndIf 
+     If TextGadget(gadName, x+5, y, wtg, h, name$)
+;       ;SetGadgetColor(gadName, #PB_Gadget_BackColor, color)       
+     EndIf 
   Else
     wtg = 0
   EndIf  
   
   If TrackBarGadget(gadTB, x+2+wtg, y, wtb, h, min, max)
-    SetGadgetColor(gadTB, #PB_Gadget_BackColor, color)       
+;     SetGadgetColor(gadTB, #PB_Gadget_BackColor, color)       
     SetGadgetState(gadTB, val)
     GadgetToolTip(gadTB, tip$)
     
     If StringGadget(GadSG,x+4+wtg+wtb, y, wsg, h, Str(val))  
-      SetGadgetColor(GadSG, #PB_Gadget_BackColor, color)       
+;       SetGadgetColor(GadSG, #PB_Gadget_BackColor, color)       
       SetGadgetText(GadSG, Str(val))
       GadgetToolTip(GadSG, tip$)
       ProcedureReturn 1
@@ -537,7 +537,7 @@ Procedure SetColorSelector(color,x=0,y=0,mode=0,txt=1)
     SetGadgetText(#GADGET_ColorTxtG,Str(G))
     SetGadgetText(#GADGET_ColorTxtB,Str(B))
   EndIf
-  
+
 EndProcedure
 Procedure ColorSelect(x,y,selector=0)
   
@@ -551,7 +551,7 @@ Procedure ColorSelect(x,y,selector=0)
   
   ;If x>=0 And y>=0 And x<=GadgetWidth(gad) And y<=GadgetHeight(gad)
   
-  If selector =0; arc en ciel
+  If selector =0 ; arc en ciel
     
     ;     If StartDrawing(WindowOutput(#WinMain))
     ;       col = Point(WindowMouseX(#winmain),WindowMouseY(#winmain)) 
@@ -601,16 +601,21 @@ Procedure ColorSelect(x,y,selector=0)
     
   EndIf
   
-  
   Brush(Action)\ColorBG\R = Red(Brush(Action)\Color)
   Brush(Action)\ColorBG\G = Green(Brush(Action)\Color)
-  Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color)                      
+  Brush(Action)\ColorBG\B = Blue(Brush(Action)\Color) 
   BrushChangeColor(1)
   color = RGBA(Brush(Action)\col\R,Brush(Action)\col\G,Brush(Action)\col\B,Brush(Action)\alpha)
   
   SetColor()
   SetColorSelector(col,x,y,selector,1)
   
+  If action = #Action_CloneStamp Or action = #Action_Fill
+    Brush(#Action_Brush)\Color = Brush(Action)\Color
+    Brush(#Action_Brush)\ColorBG\R = Red(Brush(Action)\Color)
+    Brush(#Action_Brush)\ColorBG\G = Green(Brush(Action)\Color)
+    Brush(#Action_Brush)\ColorBG\B = Blue(Brush(Action)\Color) 
+  EndIf
   ;EndIf
   
 EndProcedure
@@ -772,12 +777,13 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   
   
   ClearGadgetItems(#G_PanelTool)
-  ;   n = CountGadgetItems(#G_PanelTool)
-  ;   For i = 0 To n
-  ;     RemoveGadgetItem(#G_PanelTool,0)
-  ;   Next i 
+;     n = CountGadgetItems(#G_PanelTool)
+;     For i = 0 To n
+;       RemoveGadgetItem(#G_PanelTool,0)
+;     Next i 
   
-  
+  ;HideGadget(#G_PanelTool, 1)
+
   OpenGadgetList(#G_PanelTool)
   ; add at least one panel item
   AddGadgetItem(#G_PanelTool,0, Lang("Gen"))
@@ -861,11 +867,14 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       If action=#Action_CloneStamp
         AddGadgetItem(#G_PanelTool,-1,Lang("Stamp"))
         i=3
+        xx=5
         ; add parameter for source, alignment...
-        ComboBoxGadget(#G_BrushSource,5,h1+i, 120,cbbh)
+        ComboBoxGadget(#G_BrushSource,5,h1+i,120,cbbh)
         AddGadgetItem(#G_BrushSource, -1, lang("Pattern"))
         AddGadgetItem(#G_BrushSource, -1, lang("Image"))
         SetGadgetState(#G_BrushSource, brush(action)\Source)
+        i+cbbh
+        AddCheckBox(#G_BrushStampUseColor,xx,h1+i,120,20,Lang("Use color"), brush(action)\usecolor,Lang("Use the color with the pattern"))
       EndIf
       
       
@@ -1191,18 +1200,17 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   
   CloseGadgetList()
   
+  ; HideGadget(#G_PanelTool, 0)
+
   
   ; change the color, in function of the tools
-  If action < #Action_Line Or action > #Action_Fill
+  If (action < #Action_Line Or action >= #Action_Fill) And action <> #Action_CloneStamp
     Brush(action)\color = Brush(#Action_Brush)\color
     Brush(action)\Col\R = Brush(#Action_Brush)\Col\R
     Brush(action)\Col\G = Brush(#Action_Brush)\Col\G
     Brush(action)\Col\B = Brush(#Action_Brush)\Col\B
     Brush(action)\ColorFG = Brush(#Action_Brush)\ColorFG
   EndIf
-  
-  
-  
   
 EndProcedure
 Procedure UpdateUIShowHide(fullUi=0, update=1)
@@ -1969,6 +1977,14 @@ Procedure SetToolParamToGad()
         ;         EndIf
         ;       Next i
         
+        If action = #Action_CloneStamp
+          \type = #ToolType_CloneStamp
+          Brush(action)\Col\R = Red( Brush(action)\color )
+          Brush(action)\Col\G =  Green( Brush(action)\color )
+          Brush(action)\Col\B =  Blue( Brush(action)\color )
+        EndIf
+        
+        
         ;{ puis on mets à jours les paramètres de l'outil
         
         ; size
@@ -1993,7 +2009,10 @@ Procedure SetToolParamToGad()
         
         ; stroke
         SetGadgetState(#G_brushIntensity,\Intensity)
-        SetGadgetState(#G_BrushStroke,\Stroke)
+         If action <> #Action_CloneStamp
+           SetGadgetState(#G_BrushStroke,\Stroke)
+         EndIf
+         
         SetGadgetState(#G_BrushSymetry,\symetry)
         SetGadgetState(#G_brushSoftness,\Softness)
         SetGadgetState(#G_brushHardness,\Hardness)
@@ -2099,6 +2118,14 @@ Procedure UpdateTool(Gad)
   EndIf
   
   If action <= #Action_Fill
+;     If brush(action)\UseBrushColor 
+;       brush(action)\color = brush(#Action_Brush)\color
+;     EndIf
+;     If action = #Action_CloneStamp
+;       txt$ = Str(Brush(#Action_CloneStamp)\color)+" / "+Str(Brush(#Action_Brush)\color)
+;       MessageRequester("", txt$)
+;     EndIf
+    
     SetColor()
     SetColorSelector(brush(action)\color,0,0,4,1)
   EndIf
@@ -2121,9 +2148,9 @@ Procedure UpdateColorFG()
 EndProcedure
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 817
-; FirstLine = 79
-; Folding = AAAAAOAADAAAAAAAwjAAAAAAAAABwIGAAAAAAAAA-
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 612
+; FirstLine = 26
+; Folding = A5BAAOAAPAAAoBEAgaZSAAAAAEAKgXMBYAAAA9f+4
 ; DisableDebugger
 ; EnableUnicode

@@ -160,13 +160,6 @@ If GetActiveWindow() = #WinMain
                   
                 Case #Action_Brush, #Action_Eraser, #Action_Pen 
                   
-                  OptionsIE\ImageHasChanged = 1
-                  
-                  
-                  ; For autosave // pour l'autosave OU pour updater l'image du layer
-                  ; Layer(layerId)\Haschanged = 1 
-                  Layer_SetHasChanged()
-                  
                   ;{ brush, eraser, pen
                   
                   Paint = 1 ; we paint // on peint (c'est pour voir si c'est la souris ou non)
@@ -184,6 +177,11 @@ If GetActiveWindow() = #WinMain
                   ;}
                   
                   If size > 0 ; only if brush is visible, of course // on ne dessine que si on a notre brush visible, pardi :)
+                    
+                    ; For autosave // pour l'autosave OU pour updater l'image du layer
+                    OptionsIE\ImageHasChanged = 1
+                    Layer_SetHasChanged()
+                    
                     
                     ;******** then we paint // puis on dessine
                     ; NewPainting = 1
@@ -379,7 +377,9 @@ If GetActiveWindow() = #WinMain
                         ;                           
                         ;                         Else
                         ;}
-                          If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
+                        
+                        ; draw on the current sprite layer
+                        If Brush(Action)\Stroke <> #Stroke_Gersam  ; temporaire
                             
                             ;{ calcul de position x et y / et on capture le premier point
                             zoum.d = 100
@@ -393,13 +393,13 @@ If GetActiveWindow() = #WinMain
                             EndIf
                             ;}
                             
-                            ; sinon, on dessine directement sur le sprite qu'on va afficher ensuite
+                            ; on dessine directement sur le sprite qu'on va afficher ensuite
                             If StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
                               w = FinalSize * Brush(Action)\size
                               Select Brush(Action)\Stroke 
                                   
                                 Case #Stroke_Rough                                  
-                                  DoPaint(xx,yy,StartX1,StartY1,size,Color)
+                                  DoPaint(xx,yy,StartX1,StartY1,size,Color,0,SpriteOutput(Layer(LayerId)\Sprite))
                                   
                                 Case #Stroke_LineAA                                  
                                   LineLSI(xx,yy,StartX1,StartY1,Color,FinalSize*Brush(Action)\size,alpha)                             
@@ -488,7 +488,7 @@ If GetActiveWindow() = #WinMain
                           Select Brush(Action)\Stroke 
                               
                             Case #Stroke_Rough
-                              DoPaint(xx,yy,StartX1,StartY1,size,Color,1)
+                              DoPaint(xx,yy,StartX1,StartY1,size,Color,1,ImageOutput(img))
                               ; DoPaintForImageLayer(xx,yy,StartX1,StartY1,size)
                               
                             Case  #Stroke_Knife                         
@@ -554,9 +554,9 @@ If GetActiveWindow() = #WinMain
                   ;{ calcul some parameters (size of the brush with pressure)
                   ; tablet 
                   size.d = Paint_GetTabletSizePression() ; 
-                  If size <=0
-                    size = 8.6
-                  EndIf
+;                   If size <=0
+;                     size = 8.6
+;                   EndIf
                   
                   ;}
                   If size >0
@@ -564,8 +564,8 @@ If GetActiveWindow() = #WinMain
                     Layer_Bm(layerId)
                     
                     ; position of the brush
-                    xx = mx - Brush(#action_brush)\CenterSpriteX  
-                    yy = My - Brush(#action_brush)\CenterSpriteY 
+                    xx.d = mx - Brush(action)\CenterSpriteX  
+                    yy.d = My - Brush(action)\CenterSpriteY 
                     
                     ; keep the 1rst position
                     If clic= 0   
@@ -591,8 +591,8 @@ If GetActiveWindow() = #WinMain
                         ;{ calcul de position x et y / et on capture le premier point
                         zoum.d = 100
                         zoum = 100/OptionsIE\zoom 
-                        xx = (mx - canvasX)*zoum -Brush(#action_brush)\CenterX 
-                        yy = (My - canvasY)*zoum -Brush(#action_brush)\CenterY 
+                        xx.d = (mx - canvasX)*zoum -Brush(action)\CenterX 
+                        yy.d = (My - canvasY)*zoum -Brush(action)\CenterY 
                         If StartDrawingOnImage = 0
                           StartDrawingOnImage = 1
                           OptionsIE\Shape = 1 ; to see the layer_temporary
@@ -601,28 +601,42 @@ If GetActiveWindow() = #WinMain
                         EndIf
                         ;}
                         w = FinalSize * Brush(Action)\size
-                        ; ResizeImage(#
-                        ; Layer_DrawTempo()
+                        
                         ; temporary to test : should use do_paint()
                         If StartDrawing(SpriteOutput(#sp_LayerTempo))
-                          ;DrawingMode(#PB_2DDrawing_AlphaChannel)
-                           DrawingMode(#PB_2DDrawing_CustomFilter)
-                           CustomFilterCallback(@FiltreMelangeAlphaPat())  
-
-                          ;Circle(xx,yy,size,RGBA(0,0,0,255))
-                          DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
-                          StopDrawing()
+                          DoPaint(xx,yy,StartX1,StartY1,size,Color,0,SpriteOutput(#sp_LayerTempo))
                         EndIf
-                        ; temporary to test : should use do_paint()
+                        
+                        ; then draw on the layer
+                        ;zoum.d = 100
+                        ;zoum = 100/OptionsIE\zoom
+                        xx.d = (mx - canvasX)*zoum -Brush(Action)\CenterX 
+                        yy.d = (My - canvasY)*zoum -Brush(Action)\CenterY
                         If StartDrawing(ImageOutput(#image_patternForstamp))
-                          ;DrawingMode(#PB_2DDrawing_AlphaChannel)
-                          DrawingMode(#PB_2DDrawing_CustomFilter)
-                          CustomFilterCallback(@FiltreMelangeAlphaPat())  
-                          
-                          ; Circle(xx,yy,size,RGBA(0,0,0,255))
-                          DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
-                          StopDrawing()
+                          DoPaint(xx,yy,StartX1,StartY1,size,Color,1,ImageOutput(#image_patternForstamp))
                         EndIf
+                        
+                        StartX1 = xx
+                        StartY1 = yy
+;                           If StartDrawing(SpriteOutput(#sp_LayerTempo))
+;                             ;DrawingMode(#PB_2DDrawing_AlphaChannel)
+;                              DrawingMode(#PB_2DDrawing_CustomFilter)
+;                              CustomFilterCallback(@FiltreMelangeAlphaPat())  
+;   
+;                             ;Circle(xx,yy,size,RGBA(0,0,0,255))
+;                             DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
+;                             StopDrawing()
+;                           EndIf
+;                           ; temporary to test : should use dopaint()
+;                           If StartDrawing(ImageOutput(#image_patternForstamp))
+;                             ;DrawingMode(#PB_2DDrawing_AlphaChannel)
+;                             DrawingMode(#PB_2DDrawing_CustomFilter)
+;                             CustomFilterCallback(@FiltreMelangeAlphaPat())  
+;                             
+;                             ; Circle(xx,yy,size,RGBA(0,0,0,255))
+;                             DrawAlphaImage(ImageID(#BrushCopy), xx, yy, 255)
+;                             StopDrawing()
+;                           EndIf
                       EndIf
                     EndIf
                     
@@ -919,6 +933,7 @@ If GetActiveWindow() = #WinMain
           
           ;{ display the top layer , over the current layer //on affiche les calques du dessus
           If OptionsIE\Shape=1 
+            SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
             ZoomSprite(#Sp_LayerTempo, Doc\W*z, Doc\H*z)
             DisplayTransparentSprite(#Sp_LayerTempo, canvasX, canvasY, layer(layerid)\alpha)  
           EndIf
@@ -935,23 +950,6 @@ If GetActiveWindow() = #WinMain
               Next i 
             EndIf
           EndIf
-          
-          
-          
-          ;{ old
-          ;           If my <> OldMx Or My <> OldMy
-          ;             ;RotateSprite(OptionsIE\CursorSpriteId,Random(Brush(Action)\RandRot),0)
-          ;             SpriteBlendingMode(5,3)
-          ;             OPtionsIE\cursorX = 0
-          ;             ZoomSprite(OptionsIE\CursorSpriteId,OptionsIE\CursorW * Z, OptionsIE\CursorH * z)
-          ;             DisplayTransparentSprite(OptionsIE\CursorSpriteId,mx-(OptionsIE\CurSorW/2)*z,my-(OptionsIE\CursorH/2)*z,100)
-          ;             SpriteBlendingMode(0,8)
-          ;             
-          ;             OldMx = Mx
-          ;             OldMY = My
-          ;             
-          ;           EndIf
-          ;}
           
           ;}
           
@@ -1304,8 +1302,8 @@ EndIf
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 567
-; FirstLine = 207
-; Folding = b55G-kAIc2Yf9-vBgA7GAPAGoABIAAAAAAA9
+; CursorPosition = 182
+; FirstLine = 59
+; Folding = b55F-kAIo95f--FAQAdDg-hBKQACAAAAAAA-
 ; EnableXP
 ; EnableUnicode

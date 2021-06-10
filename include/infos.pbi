@@ -111,21 +111,55 @@
 ; - reset the view bug when UI panel (right or left) is hiden
 ; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
 ; - after crop, selection should be deselected
-; - fill with pattern could use the pattern selected
+; - fill with pattern could use the pattern selected or image (at choice)
 ; - when save the preset (not export), it's name ="", so it's saved properly
+; - if change color selector and clic on same tool, the position of the cursor isn't the same (so color isn't the same)
+
+
+; 09/06/2021  0.5.9.9.3
+; // Fixes
+; - fixe a bug with unpremultiply
+
+
+; 09/06/2021  0.5.9.9.2
+; // New
+; wip - options : all tools can use same color (+save/load).
+; wip - Tool : add \useBrushColor, to use the brush color (for bucket fill for example)
+; Changes 
+; - CloneStamp : use preview blendmode as normal, to avoid some bug (need to see how to do to get other blendmode).
+; // Fixes
+; - when select clonestamp tool, gadget stamp weren't updated
+; - clonestamp : when choose new color, pattern isn't updated
+; - clonestamp : color gadget isn't updated
+; - patterns : the height of gadget isn't Ok to see all patterns
 ; - fill : color should be the same as brush.
-; - clone stamp : size and parameters aren't used
-; - clone stamp : should use do_paint() to get the same stroke as brush/eraser...
+; - fill/clonestamp : when change color should be the same as brush.
+; - autoasave : windowinfo() is opened even if no change on layer
+; - clic on layer doesn't update the spingadget layer\alpha
+; - clic on layer doesn't update the gadgets : layer\lockmove, lockpaint, lockalpha
+
+
+; 08/06/2021  0.5.9.9
+; // New
+; - cloneStamp : add color to the pattern (blendmode multiply)
+; // Changes
+; - Options : save/load cloneStamp parameters
+; // Fixes
+; - cloneStamp : use same paint function as brush
+; - cloneStamp : change tool parameters didn't update the tool
+; - cloneStamp : when change tool and select again clonestamp, it reset its pattern
 
 
 ; 07/06/2021  0.5.9.8.5
 ; // New
-; - clone stamp : paint function ok (need imrovement, but it's cool :))
-; - clone stamp : when choose tool, it create a temporary sprite & image, With the pattern And alpha = 0)
-; - clone stamp : when paint, it blend the alpha With the alpha of the brush (on tempo sprite and tempo image for pattern)
-; - clone stamp : if leftbuttonup, the tempo image is drawn on the image and sprite, and the temposprite and image alpha are erased
+; - cloneStamp : paint function ok (need imrovement, but it's cool :))
+; - cloneStamp : when choose tool, it create a temporary sprite & image, With the pattern And alpha = 0)
+; - cloneStamp : when paint, it blend the alpha With the alpha of the brush (on tempo sprite and tempo image for pattern)
+; - cloneStamp : if leftbuttonup, the tempo image is drawn on the image and sprite, and the temposprite and image alpha are erased
 ; - add menu : window brush image
 ; - Panel tool\Gen : add gadgets for brush Hardness, intensity
+
+; 07/06/2021  0.5.9.8.1
 ; // Changes
 ; - add tooltip To preview brush gadget
 ; // Fixes
@@ -1959,8 +1993,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 117
-; FirstLine = 102
+; CursorPosition = 121
+; FirstLine = 105
 ; Folding = ++
 ; EnableXP
 ; DisableDebugger

@@ -4,6 +4,9 @@ Declare CreateOptionsFile()
 Declare AddLogError(error, info$) ; needed for error with initsprite/initkeyboard...
 Declare Doc_Save()
 
+;patterns
+Declare CreatePatterns()
+Declare SetStampPatternImage(x=0, y=0, panel = 1)
 
 ; gadets, ui
 Declare IE_UpdateGadget(gadget=1)
@@ -92,8 +95,7 @@ Declare BrushResetColor()
 
 ; window
 Declare WindowLayerProp()
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 18
-; FirstLine = 6
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 9
 ; EnableXP
 ; EnableUnicode

@@ -108,13 +108,14 @@ EndStructure
 
 ; utile
 Structure Vector2f
-  x.f : y.f
+  x.f
+  y.f
 EndStructure
 
 
 
 
-; Script
+;{ Script
 Structure sEvent
   
   Event.i
@@ -128,9 +129,10 @@ Structure sScript ; les actions ou script
   
 EndStructure
 Global Dim script.sScript(0)
+;}
 
 
-; the options
+;{ the options
 Structure sOptions
   
   ; cursor
@@ -187,8 +189,12 @@ Structure sOptions
   GradientType.a
   GradientBG.i
   GradientFG.i
+  
+  ; Color, to use the same color for all tools
+  UseSameColorForAllTool.a
   ;}
   
+  ; for the program
   ; general
   Name$
   Version$
@@ -332,6 +338,7 @@ Structure sOptions
   
 EndStructure
 Global OptionsIE.sOptions
+
 ; define option by default
 With OptionsIE
   \Paper$ = "paper0.png"
@@ -341,6 +348,7 @@ With OptionsIE
   \ConfirmExit = 1
   \ToolbarH = 36
 EndWith 
+;}
 
 
 ; template
@@ -401,7 +409,7 @@ Structure Brush
   Name$
   Version.a ; la version d'animatoon 
   
-  Type.a
+  type.a
   Brush.w
   Id.w ; le numero de l'image
   BrushName$ ; the name of the brush (filename$)
@@ -493,6 +501,7 @@ Structure Brush
   Water.a ; if we add some water (erase a few colors on the layer)
   Wash.a ; is the brush washed when mouse UP ? to get the orginial color (color BG) // lave-t-on le brush chaque fois qu'on relève la souris (il reprend la couleur originale)
   MixLayer.a
+  UseBrushColor.a ; the tool use its own color or the brush color ?
   
   ; The colors, for mixtype =0 //  pour le mixtype = 0
   Col.sColor
@@ -512,6 +521,7 @@ Structure Brush
   
   ColorFG.i
   
+  usecolor.a
   
   ; other parameters // autres paramètres
   symetry.a ; if we use symetry
@@ -854,10 +864,10 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 709
-; FirstLine = 56
-; Folding = AAAACUh
-; Markers = 389
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 524
+; FirstLine = 129
+; Folding = AYBMIAF+
+; Markers = 397
 ; EnableXP
 ; EnableUnicode
