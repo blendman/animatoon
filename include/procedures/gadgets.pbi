@@ -195,6 +195,11 @@ Procedure SG(x,y,w,txt$,col=-1)
   ProcedureReturn gad
 EndProcedure
 
+Procedure SetGadgetState2(gadget, state)
+  If IsGadget(gadget)
+    SetGadgetState(gadget, state)
+  EndIf
+EndProcedure
 
 ;}
 
@@ -802,6 +807,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
   xg = 2
   cbbh = 22 ; combobogadget height
   cbbw = 60 ; combobogadget width
+  cbbw = 70
   xa1 = 8
   wb2 = 40
   tbw = ScreenX-20-wb2-30
@@ -881,22 +887,23 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddGadgetItem(#G_PanelTool,-1,Lang("Tra"))
       ;{ alpha, aspect & flow
       i = 5
-      If FrameGadget(#G_FrameAlpha,0,h1+3,ScreenX-15,80,Lang("Transparency"))
+      If FrameGadget(#G_FrameAlpha,0,h1+3,ScreenX-15,50,Lang("Transparency"))
         i+20
       EndIf
       
       AddSpinGadget(#G_BrushAlpha,Brush(Action)\Alpha, lang("transparency of the brush"), xa1,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-      AddCheckBox(#G_BrushAlphaRand,GadgetX(#G_BrushAlpha)+wb+5,h1+i,ub,20, lang("Rand"),Brush(Action)\AlphaRand, lang("Transparency varie randomly"))    
-      AddCheckBox(#G_BrushAlphaPressure,GadgetX(#G_BrushAlphaRand)+ub+5,h1+i,58,20, lang("Pressure"),Brush(Action)\alphaPressure, lang("Transparency varie with pressure"))    
+      AddCheckBox(#G_BrushAlphaRand,GadgetX(#G_BrushAlpha)+wb+5,h1+i,ub,20, lang("R"),Brush(Action)\AlphaRand, lang("Transparency varie randomly"))    
+      AddCheckBox(#G_BrushAlphaPressure,GadgetX(#G_BrushAlphaRand)+ub+5,h1+i,58,20, lang("P"),Brush(Action)\alphaPressure, lang("Transparency varie with pressure"))    
       i+ub
       
       ; aspect
-      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,50,Lang("Aspect"))
+      If FrameGadget(#G_FrameAspect,0,h1+3+i,ScreenX-15,80,Lang("Aspect"))
         i+20
       EndIf 
       AddSpinGadget(#G_brushHardness, Brush(Action)\Hardness, lang("Hardness of the image"), 5,h1+i,wb,20,0,255,#PB_Spin_Numeric)
       AddSpinGadget(#G_brushSoftness, Brush(Action)\Softness, lang("Softness of the image"), 5+wb+xg,h1+i,wb,20,0,255,#PB_Spin_Numeric)
-      CheckBoxGadget(#G_brushSmooth, 5+xg*2+wb*2,h1+i,65,20, lang("Smooth"))
+      i+ub
+      CheckBoxGadget(#G_brushSmooth, 5,h1+i,65,20, lang("Smooth"))
       GadgetToolTip(#G_brushSmooth,lang("Smooth the image of the brush (or not).")) 
       i+ub+10
       ;}
@@ -965,14 +972,14 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddGadgetItem(#G_PanelTool,-1,Lang("Col"))
       ;{ color
       i =5
-      If FrameGadget(#G_FrameColor,0,h1+3,ScreenX-15,110,Lang("Color"))
+      If FrameGadget(#G_FrameColor,0,h1+3,ScreenX-15,125,Lang("Color"))
         i+20
       EndIf   
-      AddSpinGadget(#G_BrushMix, Brush(Action)\mix,lang("Mixing color"), 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
-      AddSpinGadget(#G_BrushVisco, Brush(Action)\Visco,lang("Viscosity"), 5+wb+2,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
-      AddCheckBox(#G_BrushLavage,5+wb*2+4,h1+i,45,20,lang("Wash"),Brush(Action)\Wash,lang("Wash the brush after paint"))
+      AddSpinGadget(#G_BrushMix, Brush(Action)\mix,lang("Mixing color (% of mixed color)"), 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
+      AddSpinGadget(#G_BrushVisco, Brush(Action)\Visco,lang("Viscosity (time before to mix the colors)"), 5+wb+2,h1+i,wb,20,0,1000,#PB_Spin_Numeric)
+      
       i+ub
-      ComboBoxGadget(#G_BrushMixLayer,5,h1+i,70,cbbh); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
+      ComboBoxGadget(#G_BrushMixLayer,5,h1+i,cbbw,cbbh)
       AddGadgetItem(#G_BrushMixLayer,0, Lang("All above"))
       AddGadgetItem(#G_BrushMixLayer,1, Lang("Layer Only"))
       AddGadgetItem(#G_BrushMixLayer,2, Lang("All layers"))
@@ -981,18 +988,28 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       SetGadgetState(#G_BrushMixLayer,brush(action)\MixLayer)
       ;ButtonGadget(#G_BrushMixLayerCustom,80,h1+i,20,20,"+")
       ;GadgetToolTip(#G_BrushMixLayerCustom,"Define the layers to pick the color. Only available if 'custom' is choose to define the layers for color mixing")
-      i+ub
       
-      ;AddCheckBox(#G_BrushMixTyp,5,h1+i,70,20,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
-      ComboBoxGadget(#G_BrushMixTyp,5,h1+i,70,20); ,"Inverse Mix",Brush(Action)\MixType,"Inverse the type of mixing")
-      GadgetToolTip(#G_BrushMixTyp, Lang("Choose the color blending type"))
+      AddCheckBox(#G_BrushLavage,5+70+5,h1+i,45,20,lang("Wash"),Brush(Action)\Wash,lang("Wash the brush after paint"))
+
+      i+ub
+      ComboBoxGadget(#G_BrushMixTyp,5,h1+i,cbbw,20)
+      GadgetToolTip(#G_BrushMixTyp, Lang("Choose the color Mix type : classic (mix the 2 colors), Inverse (inverse the mix color), Old (old technic, to blend color)"))
       AddGadgetItem(#G_BrushMixTyp,0, Lang("Classic"))
       AddGadgetItem(#G_BrushMixTyp,1, Lang("Inverse"))
-      AddGadgetItem(#G_BrushMixTyp,2, Lang( "Old"))
+      AddGadgetItem(#G_BrushMixTyp,2, Lang("Old"))
       AddGadgetItem(#G_BrushMixTyp,3, Lang("New"))
       SetGadgetState(#G_BrushMixTyp,brush(action)\MixType)
-      i+ub + ub
+      i+ub
+      ; blendmode
+      If ComboBoxGadget(#G_BrushBlendmode,5,h1+i,cbbw,20)
+        GadgetToolTip(#G_BrushBlendmode, Lang("Choose the color blendmode"))
+        AddGadgetItem(#G_BrushBlendmode,0, Lang("Normal"))
+        AddGadgetItem(#G_BrushBlendmode,1, Lang("Dissolve"))
+        SetGadgetState(#G_BrushBlendmode,brush(action)\blendmode)
+      EndIf
       
+      i+ub
+      AddGadgetItem(#G_BrushMixTyp,0, Lang("Classic"))
       If FrameGadget(#G_FrameWater,0,i+h1+3,ScreenX-15,110, Lang("Water"))
         i+20
         AddSpinGadget(#G_BrushWater, Brush(Action)\Water,"Add water", 5,h1+i,wb,20,0,100,#PB_Spin_Numeric)
@@ -1785,8 +1802,8 @@ Procedure UpdateBrushPreview()
       Box(0, 0, 100, 100, RGBA(240, 240, 240, 220))
       DrawAlphaImage(ImageID(tmp),1,1)
       StopDrawing()
-    EndIf    
-    SetGadgetState(#G_BrushPreview, ImageID(#Img_PreviewBrush))
+    EndIf 
+    SetGadgetState2(#G_BrushPreview, ImageID(#Img_PreviewBrush))
     FreeImage2(tmp)
   EndIf
   
@@ -1984,58 +2001,7 @@ Procedure SetToolParamToGad()
           Brush(action)\Col\B =  Blue( Brush(action)\color )
         EndIf
         
-        
-        ;{ puis on mets à jours les paramètres de l'outil
-        
-        ; size
-        SetGadgetState(#G_BrushSize,\Size)
-        SetGadgetState(#G_BrushSizeH,\sizeH)
-        SetGadgetState(#G_BrushSizeW,\SizeW)
-        SetGadgetState(#G_BrushSizePressure,\Sizepressure)
-        SetGadgetState(#G_BrushSizeMin,\SizeMin)
-        SetGadgetState(#G_BrushSizeRand,\SizeRand)
-        
-        ; alpha
-        SetGadgetState(#G_BrushAlpha,\Alpha)
-        ; SetGadgetState(#G_BrushAlphaMin,\AlphaMin)
-        SetGadgetState(#G_BrushAlphaPressure,\AlphaPressure)
-        SetGadgetState(#G_BrushAlphaRand,\AlphaRand)
-        
-        ; dynamics
-        SetGadgetState(#G_BrushScatter,\Scatter)
-        SetGadgetState(#G_BrushRandRotate,\RandRot)
-        SetGadgetState(#G_BrushRotate,\Rotate)
-        SetGadgetState(#G_BrushRotateAngle,\RotateByAngle)
-        
-        ; stroke
-        SetGadgetState(#G_brushIntensity,\Intensity)
-         If action <> #Action_CloneStamp
-           SetGadgetState(#G_BrushStroke,\Stroke)
-         EndIf
-         
-        SetGadgetState(#G_BrushSymetry,\symetry)
-        SetGadgetState(#G_brushSoftness,\Softness)
-        SetGadgetState(#G_brushHardness,\Hardness)
-        SetGadgetState(#G_BrushPas,\Pas)
-        SetGadgetState(#G_brushTrait,\Trait)
-        
-        ; misc
-        SetGadgetState(#G_BrushSymetry,\symetry)
-        ; on update l'image
-        BrushUpdateImage(1,1)
-        
-        ; color
-        SetGadgetState(#G_BrushMix,\Mix)
-        SetGadgetState(#G_BrushMixTyp,\MixType)
-        SetGadgetState(#G_BrushMixLayer,\MixLayer)
-        SetGadgetState(#G_BrushVisco,\Visco)
-        ; SetGadgetState(#G_BrushWater,\Water)
-        SetGadgetState(#G_BrushLavage,\Wash)
-        SetGadgetState(#G_BrushWater, \Water)
-        
-        ;}
-        
-        
+        BrushUpdateUI()
         
     EndSelect
     
@@ -2148,9 +2114,9 @@ Procedure UpdateColorFG()
 EndProcedure
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 612
-; FirstLine = 26
-; Folding = A5BAAOAAPAAAoBEAgaZSAAAAAEAKgXMBYAAAA9f+4
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 895
+; FirstLine = 120
+; Folding = B5BAA7AAMAAAgGQAAO2JNAAAAgAQB9iJADgFAg-9-
 ; DisableDebugger
 ; EnableUnicode

@@ -96,8 +96,21 @@ Procedure IE_TypeDrawing()
         ;           DrawAlphaImage(ImageID(#Img_AlphaSel),0,0)  
         ;           DrawingMode(#PB_2DDrawing_AlphaClip)
         ;         EndIf    
-      Else        
-        DrawingMode(#PB_2DDrawing_AlphaBlend)        
+      Else
+        Select brush(action)\Blendmode
+          Case #Bm_Normal
+            DrawingMode(#PB_2DDrawing_AlphaBlend)   
+            
+          Case #bm_multiply
+            DrawingMode(#PB_2DDrawing_CustomFilter|#PB_2DDrawing_AlphaBlend)
+            CustomFilterCallback(@Paint_Multiply())
+            
+          Case #Bm_Dissolve 
+            DrawingMode(#PB_2DDrawing_CustomFilter|#PB_2DDrawing_AlphaBlend)
+            CustomFilterCallback(@Paint_Dissolve())
+            
+        EndSelect
+          
       EndIf
       
       
@@ -1083,6 +1096,23 @@ Procedure DrawSymetry(RotImg,x,y,alpha)
   
 EndProcedure
 
+Procedure Paint_EraseAlpha(RotImg,x_result,y_result,Water)
+  ; to erase the alpha at the same time as we paint.
+  If (brush(action)\UseWater Or brush(action)\Water > 0) And action <> #Action_Eraser
+    a = brush(action)\col\A  + water - brush(action)\alpha*0.5
+    water1 = Setmaximum(a , 255-brush(action)\alpha)
+    If (brush(action)\Water > 0 Or a >0) 
+      ;If water1 >  0 Or brush(action)\Water >0 
+      ;   If (brush(action)\Water > 0 ) And action <> #Action_Eraser
+      DrawingMode(#PB_2DDrawing_CustomFilter)
+      CustomFilterCallback(@Filtre_MelangeAlpha2())            
+      DrawAlphaImage(ImageID(RotImg),x_result,y_result,Water1)
+      DrawSymetry(RotImg,x_result,y_result,Water1)
+      ;EndIf
+    EndIf
+  EndIf
+  
+EndProcedure
 ;Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
 Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
   
@@ -1092,7 +1122,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
   
   ; Debug "dessin sur "+Str(OutputID)
   
-  CheckAlpha() ; alpha avec pression, random, etc...
+  CheckAlpha() ; Macro in paint.pbi, alpha with pression, random, etc...
   
   ;water = brush(#Action_Brush)\Water* 0.3 ; * size
   water = brush(Action)\Water* 0.3 ; * size
@@ -1186,21 +1216,18 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
           stroke(StrokeId)\dot(v)\Y = y_result
           stroke(StrokeId)\dot(v)\Alpha = alpha
           stroke(StrokeId)\dot(v)\Rot = Zeangle
+          stroke(StrokeId)\dot(v)\Color = color
         Else
           x_result =  stroke(StrokeId)\dot(v)\X
           y_result =  stroke(StrokeId)\dot(v)\y
           alpha = stroke(StrokeId)\dot(v)\Alpha 
+          color = stroke(StrokeId)\dot(v)\Color 
         EndIf
       
         DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha) 
         DrawSymetry(RotImg,x_result,y_result,alpha)
         
-        If brush(action)\Water > 0 And action <> #Action_Eraser
-          DrawingMode(#PB_2DDrawing_CustomFilter)
-          CustomFilterCallback(@Filtre_MelangeAlpha2())            
-          DrawAlphaImage(ImageID(RotImg),x_result,y_result,Water)
-          DrawSymetry(RotImg,x_result,y_result,Water)
-        EndIf
+        Paint_EraseAlpha(RotImg,x_result,y_result,Water)
         
         FreeImage(RotImg)
       Else
@@ -1234,26 +1261,21 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
           DrawAlphaImage(ImageID(RotImg),x_result,y_result,alpha)          
           DrawSymetry(RotImg,x_result,y_result,alpha)
           
-          If brush(action)\Water > 0 And action <> #Action_Eraser
-            DrawingMode(#PB_2DDrawing_CustomFilter)
-            CustomFilterCallback(@Filtre_MelangeAlpha2())            
-            DrawAlphaImage(ImageID(RotImg),x_result,y_result,Water)
-            DrawSymetry(RotImg,x_result,y_result,Water)
-          EndIf
+          Paint_EraseAlpha(RotImg,x_result,y_result,Water)
           
           FreeImage(RotImg)
+          
         Else
+          
           IE_TypeDrawing() ; le drawingmode (alphablend, clip si alphalock, etc..
 ;           alpha * (100-brush(#Action_Brush)\Water)*0.01
           alpha * (100-brush(Action)\Water)*0.01
           DrawAlphaImage(ImageID(#BrushCopy),x_result,y_result,alpha)
           DrawSymetry(#BrushCopy,x_result,y_result,alpha)
-          If brush(action)\Water > 0 And action <> #Action_Eraser
-            DrawingMode(#PB_2DDrawing_CustomFilter)
-            CustomFilterCallback(@Filtre_MelangeAlpha2())            
-            DrawAlphaImage(ImageID(#BrushCopy),x_result,y_result,Water)
-            DrawSymetry(#BrushCopy,x_result,y_result,Water)
-          EndIf
+          
+          ; erase alpha
+          Paint_EraseAlpha(#BrushCopy,x_result,y_result,Water)
+          
         EndIf
         
       EndIf
@@ -1306,12 +1328,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
       DrawAlphaImage(ImageID(RotImg),xx,yy,Brush(Action)\alpha)
       DrawSymetry(RotImg,x_result,y_result,alpha)
       
-      If brush(action)\Water > 0 And action <> #Action_Eraser
-        DrawingMode(#PB_2DDrawing_CustomFilter)
-        CustomFilterCallback(@Filtre_MelangeAlpha2())            
-        DrawAlphaImage(ImageID(RotImg),x_result,y_result,water)
-        DrawSymetry(RotImg,x_result,y_result,Water)
-      EndIf
+      Paint_EraseAlpha(RotImg,x_result,y_result,Water)
       
       FreeImage(RotImg)
     Else 
@@ -1319,12 +1336,8 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
       DrawAlphaImage(ImageID(#BrushCopy),xx+scx,yy+scy,Brush(Action)\alpha)
       DrawSymetry(#BrushCopy,x_result,y_result,alpha)
       
-      If brush(action)\Water > 0 And action <> #Action_Eraser
-        DrawingMode(#PB_2DDrawing_CustomFilter)
-        CustomFilterCallback(@Filtre_MelangeAlpha2())            
-        DrawAlphaImage(ImageID(#BrushCopy),x_result,y_result,Water)
-        DrawSymetry(#BrushCopy,x_result,y_result,Water)
-      EndIf
+      Paint_EraseAlpha(#BrushCopy,x_result,y_result,Water)
+     
     EndIf  
     
   EndIf
@@ -2083,7 +2096,7 @@ Procedure AddDot(x1, y1, size, col)
       i+1
       ReDim \dot(i)
       \dot(i)\size = size
-      \dot(i)\Colo = col
+      \dot(i)\Color = col
       \dot(i)\x = x1
       \dot(i)\y = y1
       
@@ -2188,7 +2201,7 @@ Procedure CreateDot(mx,my,pression,col,clear=0)
     EndIf
     \size = ((Brush(Action)\Sizepressure)*(Brush(Action)\Size * pression/8.74) +(1-Brush(Action)\Sizepressure) * Brush(Action)\Size) * (rndsiz * 0.01)
     \Alpha = ((Brush(Action)\AlphaPressure)*(Brush(Action)\Alpha * pression/8.74) +(1-Brush(Action)\Alphapressure) * Brush(Action)\Alpha) * (rndalpha * 0.01)
-    \Colo = col
+    \Color = col
     \sizeW = Brush(Action)\SizeW
     \sizeH = Brush(Action)\sizeH
     \x = mx-Brush(Action)\CenterX
@@ -2205,10 +2218,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 1247
-; FirstLine = 228
-; Folding = C7HAAAAAAAAAAAAN5AAwAAAgxHAA9APA5dQ4-0
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 103
+; FirstLine = 78
+; Folding = byPAAAAAAAAAAAAawBAgPAAAo9BAAPwDAen9
 ; EnableAsm
 ; EnableXP
 ; EnableOnError

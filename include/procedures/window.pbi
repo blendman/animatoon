@@ -5,7 +5,16 @@
 ; Date 06/2015 
 
 
+Procedure Addbuttons(win)
+  
+  w1 = WindowWidth(win)
+  h1 = WindowHeight(win)
+  h=30
+  w=80
+  ButtonGadget(#GADGET_WinBGED_BtnOk, w1-w-10, h1-h-5, w, h, Lang("Ok"))
+  ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-(w+10)*2, h1-h-5, w, h, Lang("Cancel"))
 
+EndProcedure
 
 ;--- FILE
 Macro WinDocNewCont(typ)
@@ -389,12 +398,7 @@ Procedure WindowPref()
     
     
     ; Add 2 buttons
-    w1 = WindowWidth(#Win_Pref)
-    h1 = WindowHeight(#Win_Pref)
-
-    ButtonGadget(#GADGET_WinBGED_BtnOk, w1-70, h1 -25, 60, 20, Lang("Ok"))
-    ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-140, h1-25, 60, 20, Lang("Cancel"))
-
+    Addbuttons(#Win_Pref)
     ;}
     
     ;{ define variables by default
@@ -567,9 +571,12 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
 
   s = 78
   
-  ; update the list of images from current brush folder
+  ; update the list of images from current brush folder or change the image of the brush
+  
+  
   If updatelist = 1
     
+    ;{ update the list of images
     ResizeGadget(#G_brushImageCanvas,#PB_Ignore,#PB_Ignore,#PB_Ignore,brushImageCanvasHeight)
     SetGadgetAttribute(#G_brushImageSA, #PB_ScrollArea_InnerHeight, brushImageCanvasHeight)
     
@@ -646,9 +653,10 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
       StopDrawing()
     EndIf
     
+    ;}
     
   Else
-    
+    ;{ change the image of the brush
     For i=0 To ArraySize(BrushImage())
       If BrushImage(i)\x = x And BrushImage(i)\y = y
         brushImageId = i
@@ -657,7 +665,7 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
         Break
       EndIf
     Next
-    
+    ;}
     
   EndIf
   
@@ -755,15 +763,16 @@ Procedure OpenWindowBrush()
     If ScrollAreaGadget(#G_brushImageSA,x,y,w,h1-y-60,w-25,h1-y)
       If CanvasGadget(#G_brushImageCanvas,0,0,w,h1-y)
         brushImageCanvasHeight = h1-y
-         WindowbrushUpdateImgList()
+        
        EndIf
        CloseGadgetList()
     EndIf
     
     y+h1-y-60+5
     
-    If TextGadget(#G_brushImageName, x,y,w, 20, OptionsIE\brushName$) : EndIf
+    If TextGadget(#G_brushImageName, x,y,w, 20, OptionsIE\brushName$,#PB_Text_Border) : EndIf
     
+    WindowbrushUpdateImgList()
 
     
     ; buttons to add a brush image ??
@@ -909,6 +918,115 @@ EndProcedure
 
 
 ;--- EDITIONS
+Procedure.s Win_DocResize()
+  
+  Static keepProportion
+  
+  w=400
+  h=300
+  If OpenWindow(#Win_DocResize,0,0,w,h,"Resize Document",#PB_Window_ScreenCentered|#PB_Window_SystemMenu, 
+                WindowID(#WinMain))
+    
+    SetGadgetFont(#PB_Default, FontID(#FontDefaultGadget)) 
+    
+    oldw = doc\w
+    oldh = doc\h
+    x=10
+    y=10
+    w1=70
+    w2=100
+    h1=25
+    w3= 250
+    If TextGadget(#PB_Any,x,y+2,w1,h1, lang("Width")+" : ") : EndIf
+    If SpinGadget(#G_WinResize_NewW, x+w1,y,w2,h1,1,10000,#PB_Spin_Numeric) 
+        SetGadgetState(#G_WinResize_NewW,Doc\w)
+    EndIf
+    y+h1+5
+    If TextGadget(#PB_Any,x,y+2,w1,h1, lang("Height")+" : ") : EndIf 
+    If SpinGadget(#G_WinResize_NewH, x+w1,y,w2,h1,1,10000,#PB_Spin_Numeric) 
+       SetGadgetState(#G_WinResize_NewH,Doc\h)
+    EndIf
+    y+h1+25
+    
+    If CheckBoxGadget(#G_WinResize_KeepProportion,x,y,200,h1,lang("Keep proportions"))
+      
+      SetGadgetState(#G_WinResize_KeepProportion, keepProportion)
+    EndIf
+    y+h1+5
+    If TextGadget(#PB_Any,x,y,w1,h1, lang("Options")+" : ") : EndIf 
+    If ComboBoxGadget(#G_WinResize_CbbOptions,x+w1+10,y,w3,h1)
+      AddGadgetItem(#G_WinResize_CbbOptions, 0, lang("Normal (Nearest Neighbour)"))
+      AddGadgetItem(#G_WinResize_CbbOptions, 1, lang("Bilinear (Smooth)"))
+      SetGadgetState(#G_WinResize_CbbOptions,0)
+    EndIf
+    
+    Addbuttons(#Win_DocResize)
+    
+    SetGadgetFont(#PB_Default, #PB_Default) 
+    
+    Repeat
+      event = WaitWindowEvent(10)
+      eventgadget = EventGadget()
+      
+      Select event
+          
+        Case #PB_Event_Gadget
+          
+          Select eventgadget
+              
+            Case #GADGET_WinBGED_BtnOk
+              quit = 2
+              
+            Case #GADGET_WinBGED_BtnCancel
+              quit = 1
+              
+            Case #G_WinResize_KeepProportion
+              keepProportion = GetGadgetState(#G_WinResize_KeepProportion)
+              oldw = GetGadgetState(#G_WinResize_NewW)
+              oldh = GetGadgetState(#G_WinResize_NewH)
+              
+            Case #G_WinResize_NewW
+              w = GetGadgetState(#G_WinResize_NewW)
+              If keepProportion
+                h = (oldh*w)/oldw
+                SetGadgetState(#G_WinResize_NewH,h)
+              EndIf
+              
+            Case #G_WinResize_NewH
+              h = GetGadgetState(#G_WinResize_NewH)
+              If keepProportion
+                w = (oldw*h)/oldw
+                SetGadgetState(#G_WinResize_NewW,w)
+              EndIf
+              
+          EndSelect
+      
+        Case #PB_Event_CloseWindow
+          quit = 1
+          
+      EndSelect
+      
+    Until quit >= 1
+    
+    If quit=2
+      w = GetGadgetState(#G_WinResize_NewW)
+      h = GetGadgetState(#G_WinResize_NewH)
+      s = GetGadgetState(#G_WinResize_CbbOptions)
+      If s = 0
+        smooth = #PB_Image_Raw
+      Else
+        smooth = #PB_Image_Smooth
+      EndIf
+      newsize$ = Str(w)+","+Str(h)+","+Str(smooth)+","
+    EndIf
+    
+    CloseWindow(#Win_DocResize)
+
+  EndIf
+  
+  ProcedureReturn newsize$
+EndProcedure
+
 
 
 ;--- IMAGES
@@ -1735,10 +1853,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 759
-; FirstLine = 55
-; Folding = AAAAAA10f--T-DAAAGAAAAAAw
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 1019
+; FirstLine = 124
+; Folding = BAGAAAAAAAgBEIB--PAAAAAAAAAAA+
 ; EnableAsm
 ; EnableXP
 ; Warnings = Display

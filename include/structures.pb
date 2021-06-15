@@ -432,6 +432,8 @@ Structure Brush
   AlphaRand.a ; random alpha
   AlphaMin.a ; minimum alpha
   
+  UseWater.a
+  
   AddNoiseRandomOnImagebrush.a
   AddNoiseOnImgMin.w
   AddNoiseOnImgMax.w
@@ -521,7 +523,12 @@ Structure Brush
   
   ColorFG.i
   
-  usecolor.a
+  ; Blendmode, to paint
+  Blendmode.a
+  
+  
+  ; for stampclone
+  Usecolor.a
   
   ; other parameters // autres paramètres
   symetry.a ; if we use symetry
@@ -820,7 +827,7 @@ Structure sDot
   Size.w
   SizeW.a ; taille en W et H
   SizeH.a
-  Colo.a
+  Color.i
   Sprite.i
   
 EndStructure
@@ -864,10 +871,10 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 524
-; FirstLine = 129
-; Folding = AYBMIAF+
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 526
+; FirstLine = 122
+; Folding = AYBMIA2+
 ; Markers = 397
 ; EnableXP
 ; EnableUnicode

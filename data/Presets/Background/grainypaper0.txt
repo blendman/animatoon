@@ -1,0 +1,2 @@
+paper,grainpaper03.jpg,255,9,238,70,
+color,-1,

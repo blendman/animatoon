@@ -1,5 +1,51 @@
 ﻿
 ************************* CHANGELOG ********************************
+14/06/2021  0.5.9.9.8
+// Changes
+- cut : "clear" the layer only if copy is ok
+- changes in Edit_Select()
+// Fixes
+- savebrushpreset If name$ = #Empty$, it save an empty name
+- openpreset : some gadgets For tool aren't updated
+- Change tool : some gadgets For tool aren't updated
+- when Layer_ApplyAlpha() : selection should be deselectionned
+- after crop, selection should be deselected
+- cut/copy layer content only If a selection is valid
+- when ctrl+A (Select all), we don't see the selection box
+
+
+13/06/2021  0.5.9.9.6
+// New
+- Reisze_Doc window (With some options)
+// changes
+- Brush\Usewater : only use it when brush\usewater= 1
+- Resize_Doc only If W Or H is changed
+- Resize_Doc : now unpremultiply all images
+- Resize_Doc : add option For use smooth of Not If resize
+- export image : delete the "_screen" in the exported name
+// fixes
+- fixe text langage error (english).
+
+
+12/06/2021  0.5.9.9.5
+// Changes
+- improve the "water" option when painting, much better.
+// fixes
+- the brush image isn't loaded at start.
+
+
+11/06/2021  0.5.9.9.4
+// New
+- Layer_importImage : add multiselection To Import several image at once.
+
+
+10/06/2021  0.5.9.9.3
+// New
+- Windowbrushimage : textgadget For image name
+// Fixes
+- fixe a bug With unpremultiply
+
+
 09/06/2021  0.5.9.9.2
 // New
 wip - options : all tools can use same color (+save/load).
@@ -36,7 +82,6 @@ Changes
 - cloneStamp : when paint, it blend the alpha With the alpha of the brush (on tempo sprite And tempo image For pattern)
 - cloneStamp : If leftbuttonup, the tempo image is drawn on the image And sprite, And the temposprite And image alpha are erased
 - Panel tool\Gen : add gadgets For brush Hardness, intensity
-
 07/06/2021  0.5.9.8.1
 // New
 - add menu : window brush image

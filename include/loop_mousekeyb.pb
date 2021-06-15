@@ -195,7 +195,7 @@ If GetActiveWindow() = #WinMain
                       
                       Select Brush(Action)\MixLayer ; check the layer to pick the color for mixing //on vérifie sur quels layers on peut prendre la couleur
                           
-                        Case 0 ; all under // tous ceux en dessous (defaut)
+                        Case 2 ; all under // tous ceux en dessous (defaut)
                           
                           ClearScreen(RGB(120,120,120))                                          
                           ; Puis on affiche le fond (paper)                             
@@ -218,7 +218,7 @@ If GetActiveWindow() = #WinMain
                           Layer_Draw_OnScreen(LayerId)
                           
                           
-                        Case 2 ; all //tous
+                        Case 0 ; all //tous
                           ClearScreen(RGB(120,120,120))                    
                           ; Puis on affiche le fond (paper)          
                           PaperDraw()                     
@@ -395,6 +395,7 @@ If GetActiveWindow() = #WinMain
                             
                             ; on dessine directement sur le sprite qu'on va afficher ensuite
                             If StartDrawing(SpriteOutput(Layer(LayerId)\Sprite))
+                              
                               w = FinalSize * Brush(Action)\size
                               Select Brush(Action)\Stroke 
                                   
@@ -533,8 +534,8 @@ If GetActiveWindow() = #WinMain
                   
                   ; draw the screen
                   If clear = 1 And OptionsIE\UseCanvas = 0
-                    If action = #Action_Eraser Or layer(LayerId)\MaskAlpha = 2
-                      If layer(LayerId)\Bm <> #Bm_Normal Or layer(LayerId)\MaskAlpha = 2
+                    If layer(LayerId)\Bm <> #Bm_Normal Or layer(LayerId)\MaskAlpha = 2
+                      If action = #Action_Eraser Or layer(LayerId)\MaskAlpha = 2 Or brush(action)\water >0 Or (brush(action)\UseWater>0 And brush(action)\col\A >0)
                         Newpainting = 1
                         ScreenUpdate() 
                       EndIf
@@ -880,9 +881,7 @@ If GetActiveWindow() = #WinMain
               
             Case #Action_Select 
               ;{  
-              
               newpainting = 0
-              
               ; start rectangle selection 
               If Clic = 0
                 Clic = 1
@@ -1302,8 +1301,8 @@ EndIf
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 182
-; FirstLine = 59
-; Folding = b55F-kAIo95f--FAQAdDg-hBKQACAAAAAAA-
+; CursorPosition = 398
+; FirstLine = 129
+; Folding = 855F-1AIo0x-8-FAAAYbi-0JKQACAAAAAAA-
 ; EnableXP
 ; EnableUnicode

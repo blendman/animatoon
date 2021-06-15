@@ -77,7 +77,7 @@ Module Premultiply
     MOV rsi, rax
     !premultiply.l_premul0:
     MOVZX eax, word [rdx + 2]
-    cmp ah, 255
+    CMP ah, 255
     !je premultiply.l_premul1
     MOVZX ebx, byte [rsi + rax]
     MOV [rdx + 2], bl
@@ -104,9 +104,9 @@ Module Premultiply
     MOV rsi, rax
     !premultiply.l_unpremul0:
     MOVZX eax, word [rdx + 2]
-    cmp ah, 255
+    CMP ah, 255
     !je premultiply.l_unpremul1
-    cmp ah, 0
+    CMP ah, 0
     !je premultiply.l_unpremul1
     MOVZX ebx, byte [rsi + rax]
     MOV [rdx + 2], bl
@@ -142,7 +142,7 @@ Module Premultiply
     SUB bx, bx
     !premultiply.l_filltable1:
     MOV eax, 255
-    cmp cl, ch
+    CMP cl, ch
     !jae premultiply.l_filltable2
     MUL cl
     ADD ax, bx
@@ -1779,6 +1779,69 @@ EndProcedure
 
 
 ;{ filtre, mask...
+;{ painting blendmode
+Procedure Paint_Dissolve(x, y, SourceColor, TargetColor)
+  
+  If Alpha(SourceColor)=0 Or Alpha(TargetColor) =0
+    A = Alpha(SourceColor)+ Alpha(TargetColor)
+    If A >255
+      A =255
+    EndIf
+  Else
+    A = (Alpha(SourceColor)* Alpha(TargetColor))/255
+    If A >255
+      A =255
+    EndIf
+  EndIf
+  
+  color =   RGBA(Red(SourceColor),
+                 Green(SourceColor),
+                 Blue(SourceColor), 
+                 A) 
+  
+  ProcedureReturn color
+EndProcedure
+Procedure Paint_Multiply(x, y, SourceColor, TargetColor)
+  
+  If Alpha(SourceColor)=0 Or Alpha(TargetColor) =0
+    A = Alpha(SourceColor)+ Alpha(TargetColor)
+    If A >255
+      A =255
+    EndIf
+  Else
+    A = (Alpha(SourceColor)* Alpha(TargetColor))/255
+    If A >255
+      A =255
+    EndIf
+  EndIf
+  
+  
+  
+  ;If Alpha(SourceColor) =0
+    color =   RGBA(Red(SourceColor),
+                   Green(SourceColor),
+                   Blue(SourceColor), 
+                   A) 
+;   Else
+;     
+;     color =   RGBA((Red(SourceColor)*Red(TargetColor))/255,
+;                    (Green(SourceColor)*Green(TargetColor))/255,
+;                    (Blue(SourceColor)*Blue(TargetColor))/255, 
+;                    A) 
+;   EndIf
+
+  
+                 
+  ProcedureReturn color
+  ;ProcedureReturn RGBA((Red(SourceColor)*Red(TargetColor))/255,(Green(SourceColor)*Green(TargetColor))/255,(Blue(SourceColor)*Blue(TargetColor))/255, Alpha(SourceColor))
+ 
+  ; ProcedureReturn (SourceColor & $00FFFFFF) | (Alpha(SourceColor)*Alpha(TargetColor)/255)<<24
+  ; ProcedureReturn (SourceColor) | (Alpha(SourceColor)*Alpha(TargetColor)/255)
+EndProcedure
+;}
+
+;{ filters
+  
 Procedure Filtre_MaskAlpha(x, y, SourceColor, TargetColor)
   ; by LSI ?
   ProcedureReturn (SourceColor & $00FFFFFF) | (Alpha(SourceColor)*Alpha(TargetColor)/255)<<24
@@ -1794,7 +1857,7 @@ Procedure FiltreInverseBlendAlpha(x, y, SourceColor, TargetColor)
   ; don't work
   alpha = 255- ((Alpha(TargetColor)-Alpha(SourceColor)))
   If alpha >= 0 
-      ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha)
+    ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha)
   Else
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), 0)
   EndIf
@@ -1843,7 +1906,6 @@ Procedure FiltreWater(x, y, SourceColor, TargetColor)
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha(SourceColor) - Alpha(TargetColor))
   EndIf
 EndProcedure
-
 Procedure FilterLight(x, y, SourceColor, TargetColor)
   
   r = Red(TargetColor)
@@ -1870,7 +1932,6 @@ Procedure FilterLight(x, y, SourceColor, TargetColor)
   ;A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
-
 Procedure FilterColor(x, y, SourceColor, TargetColor)
   
   r = Red(TargetColor)
@@ -1899,7 +1960,6 @@ Procedure FilterColor(x, y, SourceColor, TargetColor)
   A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
-
 Procedure FilterMagicWitch(x, y, SourceColor, TargetColor)
   ; c'est un test  = une erreur, mais ça fait comme un filtre de sélection :)
   r = Red(TargetColor)
@@ -1927,7 +1987,6 @@ Procedure FilterMagicWitch(x, y, SourceColor, TargetColor)
   A = Alpha(TargetColor) 
   ProcedureReturn RGBA(R,G,B,A)
 EndProcedure
-
 Procedure FilterDark(x, y, SourceColor, TargetColor)
   
   r = Red(TargetColor)
@@ -1948,14 +2007,10 @@ Procedure FilterDark(x, y, SourceColor, TargetColor)
   
   ProcedureReturn RGBA(R,G,B,A)  
 EndProcedure
-
 Procedure FilterRed(x, y, SourceColor, TargetColor)
   ; Ne modifie que la composante rouge de la Source
   ProcedureReturn RGBA(Red(SourceColor), Green(TargetColor), Blue(TargetColor), Alpha(TargetColor))
 EndProcedure
-
-
-
 Procedure FiltreSmudge(x, y, SourceColor, TargetColor) 
   
   If Alpha(TargetColor) - Alpha(SourceColor) >= 0  
@@ -1966,7 +2021,6 @@ Procedure FiltreSmudge(x, y, SourceColor, TargetColor)
     ProcedureReturn RGBA(Red(TargetColor), Green(TargetColor), Blue(TargetColor), Alpha(SourceColor))
   EndIf
 EndProcedure
-
 Procedure FilterGlass(x, y, SourceColor, TargetColor)
   
   If (x+y)%5=0
@@ -1980,7 +2034,6 @@ Procedure FilterGlass(x, y, SourceColor, TargetColor)
   
   ProcedureReturn Point(xn,yn)
 EndProcedure
-
 Procedure FilterNoise(x, y, SourceColor, TargetColor)
   
   If (x+y)%3=0
@@ -1994,7 +2047,6 @@ Procedure FilterNoise(x, y, SourceColor, TargetColor)
   
   ProcedureReturn Point(xn,yn)
 EndProcedure
-
 Procedure FilterLine(x, y, SourceColor, TargetColor)
   
   ; If Alpha(SourceColor)>0
@@ -2012,14 +2064,12 @@ Procedure FilterLine(x, y, SourceColor, TargetColor)
   ; EndIf
   
 EndProcedure
-
 Procedure PixelFilterCallback(x, y, SourceColor, TargetColor)
   #pixelSize=5
   xn=#pixelSize*(x/#pixelSize)
   yn=#pixelSize*(y/#pixelSize)
   ProcedureReturn Point(xn,yn)
 EndProcedure
-
 Procedure SetBlurRadius(radius)
   
   Global BlurRadius=radius
@@ -2064,7 +2114,6 @@ Procedure BlurFilter(x, y, SourceColor, TargetColor)
   
   ProcedureReturn res
 EndProcedure
-
 Procedure BlurFilterSpace(x, y, SourceColor, TargetColor)
   Global BlurRadius
   Global BlurFactor.f
@@ -2102,7 +2151,6 @@ Procedure BlurFilterSpace(x, y, SourceColor, TargetColor)
   
   ProcedureReturn res
 EndProcedure
-
 Procedure solEffect(x,y,sourceColor,targetColor)
   Protected xn.l,yn.l
   If (x+y)%5=0
@@ -2118,6 +2166,9 @@ EndProcedure
 
 
 ;}
+;}
+
+
 
 ;}
 
@@ -2336,9 +2387,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 187
-; FirstLine = 121
-; Folding = A9--AAAAAAAgDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAw
+; CursorPosition = 1800
+; FirstLine = 72
+; Folding = AwHwAAAAAAAgHAAAAAAAAAAAAAAOA+fggSAAAAAAwAGAA9
 ; EnableAsm
 ; EnableXP
 ; EnableUnicode

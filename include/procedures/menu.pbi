@@ -422,10 +422,12 @@ Procedure CreateWindowInfo(info$, name$="")
     name$ = lang("Information")
   EndIf
   
-  If OpenWindow(#win_autosave, (WindowWidth(#WinMain)- w)/2, 170, w, 110, name$, #PB_Window_SystemMenu, WindowID(#WinMain))
+  If OpenWindow(#win_autosave, (WindowWidth(#WinMain)- w)/2, 170, w, 110, name$,
+                #PB_Window_BorderLess, WindowID(#WinMain))
     Paint = 0
     clic = 0
     mouseclic = 0
+    SetActiveWindow(#WinMain)
     If StartDrawing(WindowOutput(#win_autosave))
       DrawingMode(#PB_2DDrawing_Default)
       Box(0,0,OutputWidth(),OutputHeight(), RGB(150,150,150))
@@ -695,6 +697,7 @@ Procedure OpenOptions()
                 \BrushForm = ReadPreferenceInteger("BrushForm", 0)
                 
                 \BrushDir$ = ReadPreferenceString("BrushDir", "blendman")
+                \BrushName$ = ReadPreferenceString("BrushName", "")
                 If ExamineDirectory(0, OptionsIE\DirBankBrush$+ \brushDir$+"\", "*.png")
                   While NextDirectoryEntry(0)
                     If DirectoryEntryType(0) = #PB_DirectoryEntry_File
@@ -836,7 +839,10 @@ Procedure OpenOptions()
     ; change some parameters For selection
     OptionsIE\SelectionType = Brush(#Action_Select)\Type
     If OptionsIE\brushName$ = ""
-      OptionsIE\brushName$ = "brush"+Str(Brush(#action_brush)\id)+".png"
+      OptionsIE\brushName$ = brush(#Action_Brush)\BrushName$
+      If OptionsIE\brushName$ = ""
+        OptionsIE\brushName$ = "brush"+Str(Brush(#action_brush)\id)+".png"
+      EndIf
     EndIf
   
     ClosePreferences()
@@ -973,6 +979,8 @@ Procedure WriteDefaultOption()
       
       WritePreferenceInteger("BrushImage",\Id)
       WritePreferenceInteger("BrushNum",  \BrushNum)
+      ; Debug "save option : "+Str(theaction)+" : "+\BrushName$
+      WritePreferenceString("BrushName",  \BrushName$)
       WritePreferenceInteger("BrushForm", \BrushForm)
       WritePreferenceString("BrushDir",   RemoveString(\BrushDir$, GetCurrentDirectory()))
       
@@ -2027,7 +2035,7 @@ Procedure File_SaveImage()
     ;       name$ = RemoveString(name$,".")
     ;     EndIf
     
-    name$ = SaveFileRequester("Save Image","","jpg|*.jpg|png|*.png|bmp|*.bmp",0)
+    name$ = SaveFileRequester(lang("Save Image"),"","jpg|*.jpg|png|*.png|bmp|*.bmp",0)
     
     If name$ <>""  
       
@@ -2164,7 +2172,7 @@ Procedure File_SaveImage()
           
           ; on sauve l'image
           ;Debug "on sauve l'image"
-          savefile$ = name$+"_Screen."+ext$
+          savefile$ = name$+"."+ext$
           format = SelectFormat(savefile$)
           
           If SaveImage(#Img_saveImage, savefile$, format)=0
@@ -2387,10 +2395,7 @@ EndProcedure
 ;}
 
 ;{ editions
-Procedure Edit_Copy()
-  
-  ; first free the selection image
-  FreeImage2(#img_selection)
+Procedure Edit_Copy(cut=1)
   
   ; define parameters for the iumage copy
   x = OptionsIE\SelectionX
@@ -2398,10 +2403,15 @@ Procedure Edit_Copy()
   w = OptionsIE\SelectionW
   h = OptionsIE\SelectionH
   If w=0 Or h=0
+    MessageRequester(lang("Info"), Lang("You must have a valid selection to do that operation"))
+    ProcedureReturn #Null
     w= ImageWidth(layer(layerid)\Image)
     h= ImageHeight(layer(layerid)\Image)
   EndIf
   
+  ; free the selection image
+  FreeImage2(#img_selection)
+
   ; grab the image
   tmp = GrabImage(layer(layerid)\Image, #PB_Any, X, Y, W, H)
   Layer(layerId)\Haschanged = 1
@@ -2438,7 +2448,7 @@ Procedure Edit_Copy()
     SetClipboardImage(tmp)
     FreeImage2(tmp)
   EndIf
-  
+  ProcedureReturn 1
 EndProcedure
 Procedure Edit_Paste()
   
@@ -2486,201 +2496,198 @@ Procedure Edit_Paste()
   
 EndProcedure
 
-Procedure Edit_Select(selectAll=1)
-  
-  ; reset some selection parameters
-  OptionsIE\Selection = 1-selectAll
-  OptionsIE\SelectionType = 0
-  
-  OptionsIE\SelectAlpha = 0
-  
-  OptionsIE\SelectionX = 0
-  OptionsIE\SelectionY = 0
-  OptionsIE\SelectionW = doc\w
-  OptionsIE\SelectionH = doc\h
-  
-  ScreenUpdate()
-  
-EndProcedure
-
 Procedure ResizeDoc(canvas=0)
   
   ; If OpenWindow(#Win_ResizeDoc,
   
   ; need To be changed by a window to resize the doc (like to create a new doc)
-  w = Val(InputRequester("Width","New Width of the Document", ""))
-  h = Val(InputRequester("Height","New Height of the Document", ""))
-  oldW = doc\w
-  oldH = doc\h
+  newsize$ = Win_DocResize()
+  ;w = Val(InputRequester("Width","New Width of the Document", ""))
+  ;h = Val(InputRequester("Height","New Height of the Document", ""))
+  Debug "newsize$ : "+ newsize$
   
-  If w*h >= 3000*3000
-    rep = MessageRequester("Info","The new size will be big. Continue ?",#PB_MessageRequester_YesNo)
-  Else 
-    ok = 1
-  EndIf
-  
-  If rep = #PB_MessageRequester_Yes Or ok =1
-    
-    ok =0
-    
-    If w >= 1
-      ok = 1
-      doc\w = w
-    EndIf
-    If  h >= 1
-      ok = 1
-      doc\h = h
-    EndIf
-    
-    If oldW > doc\w Or oldH > doc\h
+  If newsize$ <> #Empty$
+    oldW = doc\w
+    oldH = doc\h
+    w = Val(StringField(newsize$, 1, ","))
+    h = Val(StringField(newsize$, 2, ","))
+    smooth = Val(StringField(newsize$, 3, ","))
+     
+    If w<>doc\w Or h<>doc\h
       
-      rep = MessageRequester("Info","The new size is smaller than the original, The image will be cropped. Continue ?",#PB_MessageRequester_YesNo)
-      
-      If rep = #PB_MessageRequester_Yes     
+      If w*h >= 3000*3000
+        rep = MessageRequester("Info","The new size will be big. Continue ?",#PB_MessageRequester_YesNo)
+      Else 
         ok = 1
-      Else
-        ok = 0
+      EndIf
+      
+      If rep = #PB_MessageRequester_Yes Or ok =1
+        
+        ok =0
+        
+        If w >= 1
+          ok = 1
+        EndIf
+        If  h >= 1
+          ok = 1
+        EndIf
+        
+        If oldW > doc\w Or oldH > doc\h
+          rep = MessageRequester("Info","The new size is smaller than the original, The image will be cropped. Continue ?",#PB_MessageRequester_YesNo)
+          If rep = #PB_MessageRequester_Yes     
+            ok = 1
+          Else
+            ok = 0
+          EndIf
+        EndIf
+        
+        If ok
+          
+          ;Debug "On va redimensionner. New size : "+Str(doc\w)+"/"+Str(doc\h)
+          
+          n = ArraySize(layer())
+          n1 = (n+1)*10 +20
+          ;Debug "nb layer : "+Str(n)
+          StatusBarProgress(#Statusbar,3,5,#PB_StatusBar_BorderLess,0,n1)
+          
+          If canvas = 0  
+            
+            ; resize the document size //  on agrandit le document, on redimensionne 
+            
+            For i=0 To n
+              
+              StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
+              
+              ; on redimensionne nos calques (images et bm)
+              If IsImage(layer(i)\ImageTemp)
+                ResizeImage(layer(i)\ImageTemp,doc\w,doc\h,smooth)
+                UnpremultiplyAlpha(layer(i)\ImageTemp)
+              EndIf
+              If ResizeImage(layer(i)\Image,doc\w,doc\h,smooth)
+                UnpremultiplyAlpha(layer(i)\Image)
+              EndIf
+              
+              If IsImage(layer(i)\ImageBM)
+                ResizeImage(layer(i)\ImageBM,doc\w,doc\h,smooth)
+                UnpremultiplyAlpha(layer(i)\ImageBM)
+              EndIf
+              
+              FreeSprite(layer(i)\Sprite)
+              Layer(i)\Sprite = CreateSprite(#PB_Any,doc\w,doc\h,#PB_Sprite_AlphaBlending)
+              Layer(i)\w = doc\w
+              Layer(i)\h = doc\h
+              Layer(i)\NewW = doc\w
+              Layer(i)\NewH = doc\h
+              Layer_UpdateSprite(i)
+            Next i 
+            
+          Else 
+            ;{ Resize the canvas // on agrandit/diminue la surface de travail 
+            
+            ;Debug "canvas resize ! "
+            
+            StatusBarProgress(#Statusbar, 3, 5)
+            
+            ; on crée des images temporaires, on va dessiner dessus chaque calque image et calque BM
+            ; puis, on effacera les calque (image et bm) et on redessinera l'image orginal 
+            ; (non agrandie, car on ne fait qu'agrandir le canvas, pas l'image complète
+            
+            Tmp = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
+            TmpBm = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
+            
+            If Tmp > 0 And TmpBm > 0
+              
+              For i=0 To n
+                
+                ;Debug i
+                
+                StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
+                
+                ; d'abord, on sauve les images et imageBm
+                If StartDrawing(ImageOutput(Tmp))
+                  DrawingMode(#PB_2DDrawing_AllChannels)
+                  Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+                  DrawingMode(#PB_2DDrawing_AlphaBlend)
+                  DrawAlphaImage(ImageID(layer(i)\Image),0,0)
+                  StopDrawing()          
+                EndIf
+                If StartDrawing(ImageOutput(TmpBm))
+                  DrawingMode(#PB_2DDrawing_AllChannels)
+                  Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+                  DrawingMode(#PB_2DDrawing_AlphaBlend)
+                  DrawAlphaImage(ImageID(layer(i)\ImageBM),0,0)
+                  StopDrawing()          
+                EndIf
+                
+                ; resize the image and redraw on it the drawing
+                ; not needed to UnpremultiplyAlpha()
+                ResizeImage(layer(i)\Image,doc\w,doc\h)
+                If StartDrawing(ImageOutput(layer(i)\Image))
+                  DrawingMode(#PB_2DDrawing_AllChannels)
+                  Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+                  DrawingMode(#PB_2DDrawing_AlphaBlend)
+                  DrawAlphaImage(ImageID(Tmp),0,0)
+                  StopDrawing()          
+                EndIf
+                
+                ; puis, on les efface et on redessine dessus
+                If IsImage(layer(i)\ImageBM)
+                  ResizeImage(layer(i)\ImageBM,doc\w,doc\h)
+                  
+                  If StartDrawing(ImageOutput(layer(i)\ImageBM))
+                    DrawingMode(#PB_2DDrawing_AllChannels)
+                    Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
+                    DrawingMode(#PB_2DDrawing_AlphaBlend)
+                    DrawAlphaImage(ImageID(TmpBm),0,0)
+                    StopDrawing()          
+                  EndIf
+                EndIf
+                
+                ; change sprite
+                FreeSprite2(layer(i)\Sprite)
+                layer(i)\Sprite = CreateSprite(#PB_Any,doc\w,doc\h,#PB_Sprite_AlphaBlending)
+                
+                Layer(i)\w = doc\w
+                Layer(i)\h = doc\h
+                
+                Layer_UpdateSprite(i)
+                ;Debug "size : " +Str(ImageWidth(layer(layerid)\Image))+"/"+Str(layer(layerId)\Image)
+              Next i 
+              
+              ; on supprime les images temporaires
+              
+              FreeImage2(Tmp)
+              FreeImage2(TmpBm)
+              
+            EndIf  
+            
+            ;}
+            
+          EndIf  
+          
+          
+          ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
+          RecreateLayerUtilities()
+          
+          
+        EndIf
+        If w >= 1
+          doc\w = w
+        EndIf
+        If  h >= 1
+          doc\h = h
+        EndIf
+        NewPainting = 1
+        StatusBarProgress(#Statusbar, 3, n1-10,#PB_StatusBar_BorderLess,0,n1)
+        ScreenUpdate(1)
+        StatusBarProgress(#Statusbar, 3, n1,#PB_StatusBar_BorderLess,0,n1)
+        IE_StatusBarUpdate()
+        ;Debug "New size : "+Str(doc\w)+"/"+Str(doc\h)
       EndIf
       
     EndIf
-    
-    If ok
-      
-      
-      ;Debug "On va redimensionner. New size : "+Str(doc\w)+"/"+Str(doc\h)
-      
-      
-      n = ArraySize(layer())
-      n1 = (n+1)*10 +20
-      ;Debug "nb layer : "+Str(n)
-      StatusBarProgress(#Statusbar,3,5,#PB_StatusBar_BorderLess,0,n1)
-      
-      If canvas = 0  
-        
-        ; resize the document size //  on agrandit le document, on redimensionne 
-        
-        For i=0 To n
-          
-          StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
-          
-          ; on redimensionne nos calques (images et bm)
-          If IsImage(layer(i)\ImageTemp)
-            ResizeImage(layer(i)\ImageTemp,doc\w,doc\h)
-          EndIf
-          ResizeImage(layer(i)\Image,doc\w,doc\h)
-          If IsImage(layer(i)\ImageBM)
-            ResizeImage(layer(i)\ImageBM,doc\w,doc\h)
-          EndIf
-          
-          FreeSprite(layer(i)\Sprite)
-          Layer(i)\Sprite = CreateSprite(#PB_Any,doc\w,doc\h,#PB_Sprite_AlphaBlending)
-          Layer(i)\w = doc\w
-          Layer(i)\h = doc\h
-          Layer(i)\NewW = doc\w
-          Layer(i)\NewH = doc\h
-          Layer_UpdateSprite(i)
-        Next i 
-        
-      Else 
-        ;{ Resize the canvas // on agrandit/diminue la surface de travail 
-        
-        ;Debug "canvas resize ! "
-        
-        StatusBarProgress(#Statusbar, 3, 5)
-        
-        ; on crée des images temporaires, on va dessiner dessus chaque calque image et calque BM
-        ; puis, on effacera les calque (image et bm) et on redessinera l'image orginal 
-        ; (non agrandie, car on ne fait qu'agrandir le canvas, pas l'image complète
-        
-        Tmp = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
-        TmpBm = CreateImage(#PB_Any,doc\w,doc\h,32,#PB_Image_Transparent)
-        
-        If Tmp > 0 And TmpBm > 0
-          
-          For i=0 To n
-            
-            ;Debug i
-            
-            StatusBarProgress(#Statusbar, 3, (i+1)*10,#PB_StatusBar_BorderLess,0,n1)
-            
-            ; d'abord, on sauve les images et imageBm
-            If StartDrawing(ImageOutput(Tmp))
-              DrawingMode(#PB_2DDrawing_AllChannels)
-              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-              DrawingMode(#PB_2DDrawing_AlphaBlend)
-              DrawAlphaImage(ImageID(layer(i)\Image),0,0)
-              StopDrawing()          
-            EndIf
-            If StartDrawing(ImageOutput(TmpBm))
-              DrawingMode(#PB_2DDrawing_AllChannels)
-              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-              DrawingMode(#PB_2DDrawing_AlphaBlend)
-              DrawAlphaImage(ImageID(layer(i)\ImageBM),0,0)
-              StopDrawing()          
-            EndIf
-            
-            ; puis, on redimensionne nos calques (images et bm)
-            ResizeImage(layer(i)\Image,doc\w,doc\h)
-            If StartDrawing(ImageOutput(layer(i)\Image))
-              DrawingMode(#PB_2DDrawing_AllChannels)
-              Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-              DrawingMode(#PB_2DDrawing_AlphaBlend)
-              DrawAlphaImage(ImageID(Tmp),0,0)
-              StopDrawing()          
-            EndIf
-          
-            ; puis, on les efface et on redessine dessus
-            If IsImage(layer(i)\ImageBM)
-              ResizeImage(layer(i)\ImageBM,doc\w,doc\h)
-              
-              If StartDrawing(ImageOutput(layer(i)\ImageBM))
-                DrawingMode(#PB_2DDrawing_AllChannels)
-                Box(0,0,doc\w,doc\h,RGBA(0,0,0,0))
-                DrawingMode(#PB_2DDrawing_AlphaBlend)
-                DrawAlphaImage(ImageID(TmpBm),0,0)
-                StopDrawing()          
-              EndIf
-            EndIf
-            
-            ; change sprite
-            FreeSprite2(layer(i)\Sprite)
-            layer(i)\Sprite = CreateSprite(#PB_Any,doc\w,doc\h,#PB_Sprite_AlphaBlending)
-            
-            Layer(i)\w = doc\w
-            Layer(i)\h = doc\h
-            
-            Layer_UpdateSprite(i)
-            ;Debug "size : " +Str(ImageWidth(layer(layerid)\Image))+"/"+Str(layer(layerId)\Image)
-          Next i 
-          
-          ; on supprime les images temporaires
-          
-          FreeImage2(Tmp)
-          FreeImage2(TmpBm)
-          
-        EndIf  
-        
-        ;}
-        
-      EndIf  
-      
-      
-      ; I have to delete the sprite layer tempo (the sprite for temporary operations) and other sprite and re create it (because it has new size)
-      RecreateLayerUtilities()
-
-      
-    EndIf
-    
-    NewPainting = 1
-    StatusBarProgress(#Statusbar, 3, n1-10,#PB_StatusBar_BorderLess,0,n1)
-    ScreenUpdate(1)
-    StatusBarProgress(#Statusbar, 3, n1,#PB_StatusBar_BorderLess,0,n1)
-    IE_StatusBarUpdate()
-    
-    ;Debug "New size : "+Str(doc\w)+"/"+Str(doc\h)
-    
   EndIf
-  
+
 EndProcedure
 Procedure CropDoc()
   
@@ -2795,7 +2802,7 @@ Procedure CropDoc()
     
   EndIf
   
-  
+  Edit_Select(0)
   OptionsIE\SelectionX =0
   OptionsIE\SelectionY =0
   OptionsIE\Selection =0
@@ -2886,6 +2893,33 @@ EndProcedure
 
 ;{ selection
 
+Procedure Edit_Select(selectAll=1)
+  
+  ; reset some selection parameters
+  OptionsIE\Selection = 0
+  OptionsIE\SelectionType = 0
+
+  If selectAll =1
+    OptionsIE\Selection = 2
+    OptionsIE\SelectionType = #selectionRectangle
+    ;MessageRequester("", "ok c'est sélectionné")
+  ;Else
+  ;MessageRequester("", "c'est Désélectionné")
+    ; NewPainting =1
+  EndIf
+  
+  OptionsIE\SelectAlpha = 0
+  
+  OptionsIE\SelectionX = 0
+  OptionsIE\SelectionY = 0
+  OptionsIE\SelectionW = doc\w * selectAll
+  OptionsIE\SelectionH = doc\h * selectAll
+  
+  ScreenUpdate()
+  
+EndProcedure
+
+
 Procedure SelectionSet()
   
   ; not finished
@@ -2906,9 +2940,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 2269
-; FirstLine = 61
-; Folding = AAEAAY0CshfidAAAAAAAAAAAAAABBAAAAgfAAAAAAAAAA--
+; CursorPosition = 2902
+; FirstLine = 20
+; Folding = CEAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAQBXAAAAAAA59
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

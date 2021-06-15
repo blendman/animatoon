@@ -439,34 +439,38 @@ EndProcedure
 ; Layer UI & gadget
 Procedure Layer_importImage(update=1)
   
-  filename$ = OpenFileRequester(lang("Import Image as a new layer"),"","Allformat|*png;*.jpg;*.bmp|png|*.png|jpg|*.jpg|bmp|*.bmp|",0)
+  filename$ = OpenFileRequester(lang("Import Image as a new layer"),"","Allformat|*png;*.jpg;*.bmp|png|*.png|jpg|*.jpg|bmp|*.bmp|",0,#PB_Requester_MultiSelection )
   
   If filename$ <>""
-    
-    temp = LoadImage(#PB_Any,Filename$)
-    If temp  = 0
-      MessageRequester(Lang("Error"), lang("Unable to image the image as new layer."))
-    Else
+    While filename$
       
-      ; on ajoute un layer
-      Layer_Add()
-      
-      ; et on dessine l'image dessus.
-      If StartDrawing(ImageOutput(layer(LayerId)\image))
-        DrawingMode(#PB_2DDrawing_AlphaBlend)
-        DrawAlphaImage(ImageID(temp),0,0)
-        StopDrawing()
+      temp = LoadImage(#PB_Any,Filename$)
+      If temp  = 0
+        MessageRequester(Lang("Error"), lang("Unable to load the image as new layer : "+Filename$))
+      Else
+        
+        ; on ajoute un layer
+        Layer_Add()
+        
+        ; et on dessine l'image dessus.
+        If StartDrawing(ImageOutput(layer(LayerId)\image))
+          DrawingMode(#PB_2DDrawing_AlphaBlend)
+          DrawAlphaImage(ImageID(temp),0,0)
+          StopDrawing()
+        EndIf
+        
+        If update
+          NewPainting = 1
+          ScreenUpdate()
+        EndIf
+        
+        FreeImage2(temp)
       EndIf
       
-      If update
-        NewPainting = 1
-        ScreenUpdate()
-      EndIf
-      
-      FreeImage2(temp)
-    EndIf
+      filename$ = NextSelectedFileName()
+    Wend
   EndIf
-  
+ 
 EndProcedure
 Procedure Layer_UpdateList(all=-1)
   
@@ -1696,7 +1700,7 @@ Procedure Layer_DrawSelection(x.f=-1, y.f=-1, color.q=-1, realtime = 0)
   ; to draw or erase the selection
   If realtime = 1
     
-    If OptionsIE\Selection = 1
+    If OptionsIE\Selection >= 1
 
       ; draw on the screen or the canvas.
       z.d = OptionsIE\zoom * 0.01
@@ -1706,7 +1710,6 @@ Procedure Layer_DrawSelection(x.f=-1, y.f=-1, color.q=-1, realtime = 0)
       h = OptionsIE\SelectionH * z
       
       DrawingMode(#PB_2DDrawing_Outlined|#PB_2DDrawing_XOr)
-      
     
       ; The selection
       Select OptionsIE\SelectionType
@@ -1722,8 +1725,7 @@ Procedure Layer_DrawSelection(x.f=-1, y.f=-1, color.q=-1, realtime = 0)
     EndIf
     
   Else
-    
-    ; draw on the sprite or an image on the canvas.
+    ;{ draw on the sprite or an image on the canvas.
     If x=-1
       x = OptionsIE\SelectionX
     EndIf
@@ -1745,7 +1747,7 @@ Procedure Layer_DrawSelection(x.f=-1, y.f=-1, color.q=-1, realtime = 0)
         Ellipse(x+W/2, y+h/2, w/2, h/2, color)
         
     EndSelect
-    
+    ;}
   EndIf
 
 EndProcedure
@@ -1813,17 +1815,18 @@ Procedure Layer_Draw_OnScreen(i)
 EndProcedure
 Procedure Layer_DrawBorder(i)
   
-  If layer(i)\selected Or OptionsIE\Selection = 1
+  If layer(i)\selected Or OptionsIE\Selection >= 1
     
     z.d = OptionsIE\zoom * 0.01
     
     If StartDrawing(ScreenOutput())
       DrawingMode(#PB_2DDrawing_Outlined)
-      ; bordure du calque
+      ; layer border // bordure du calque
       If layer(layerId)\selected
         Box(canvasX+Layer(layerId)\x*z,canvasY+layer(layerID)\y*z,layer(layerId)\w*Z,layer(layerId)\h*z,RGB(255,0,0))
       EndIf
       
+      ; selection
       Layer_DrawSelection(0, 0, RGB(0,0,0), 1)
       
       StopDrawing()
@@ -2598,9 +2601,9 @@ EndProcedure
 ; window properties for layer (windowprop) : see window.pbi
 
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 2342
-; FirstLine = 324
-; Folding = AAAAAAAAAf9-AAAfDAAAganIAAAAAIc+MAAAAAAAg+DAA9
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 1817
+; FirstLine = 80
+; Folding = AAAAAAAAAAAA7AAAAAAAAAAAAAAgHAvBAAAAAAAAAAAAAw
 ; EnableXP
 ; EnableUnicode

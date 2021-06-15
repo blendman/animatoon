@@ -1,6 +1,6 @@
 ﻿
 ; // Animatoon brush Preset - Blendman 2011-21
-name = watercolorcool
+name = watercolorline1erjet
 version = 6
 size = 55
 sizeMin = 1
@@ -26,7 +26,7 @@ AddNoise = 0
 AddNoiseOnImgMax = 0
 AddNoiseOnImgMin = 0
 AddNoiseRandomOnImagebrush = 0
-image = brush17042021170429.png
+image = watercolorshadow.png
 brushdir = brusheditor
 brush = 18
 pas = 30

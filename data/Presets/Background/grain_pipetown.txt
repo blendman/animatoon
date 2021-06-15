@@ -1,0 +1,3 @@
+infos,villeauxtuyaux,
+paper,grainpaper03.jpg,255,9,238,77,
+color,-1,

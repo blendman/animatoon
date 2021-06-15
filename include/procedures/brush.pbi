@@ -124,9 +124,9 @@ Procedure BrushChangeColor(change=0,color=-1)
           
           Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), a))  
           
-                    ; test ajout de grain
-                    DrawingMode(#PB_2DDrawing_AlphaClip)
-                    Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
+          ; test ajout de grain
+          DrawingMode(#PB_2DDrawing_AlphaClip)
+          Plot(i,j,RGBA(Red(colorQ), Green(colorQ), Blue(colorQ), Random(50,0))) 
           
         Next j
       Next i     
@@ -187,8 +187,10 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   ; if load new image
   If load >= 1
+    notok =0
     Directory$ = OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" + OptionsIE\brushName$
-    Debug Directory$
+    
+    ;Debug Directory$
     If Not LoadSprite(#Sp_BrushOriginal,Directory$,#PB_Sprite_AlphaBlending) 
       notok = 1
     EndIf
@@ -203,7 +205,9 @@ Procedure BrushUpdateImage(load=0,color=0)
       ProcedureReturn 0
     Else
       brush(ac)\Image$ = OptionsIE\brushName$
-      brush(ac)\BrushDir$ = OptionsIE\DirBrush$
+      brush(ac)\BrushName$ = OptionsIE\brushName$
+      brush(ac)\BrushDir$ = OptionsIE\DirBrush$ 
+      ;Debug  "brush image : "+brush(ac)\Image$ + " / action : "+Str(ac)
     EndIf
     ; LoadImage(#BrushOriginal,Directory$+Str(Brush(ac)\id)+".png")
     color = 1
@@ -336,18 +340,18 @@ Procedure BrushGetMixColor(mx,my)
   
   color1 = RGB(brush(action)\Col\R,brush(action)\Col\G,brush(action)\Col\B)
   
-  If MixWithImg = 0
-    
-    If StartDrawing(ScreenOutput())
-      DrawingMode(#PB_2DDrawing_AllChannels)
-      ; If rx>0 And rx<ScreenWidth()-1 And ry>0 And ry<ScreenHeight()-1                        
-      If rx>0 And rx<OutputWidth()-1 And ry>0 And ry<OutputHeight()-1 
-        Color1 = Point(rx,ry) 
-      EndIf
-      StopDrawing()
-    EndIf
-    
-  Else
+;   If MixWithImg = 0
+;     
+;     If StartDrawing(ScreenOutput())
+;       DrawingMode(#PB_2DDrawing_AllChannels)
+;       ; If rx>0 And rx<ScreenWidth()-1 And ry>0 And ry<ScreenHeight()-1                        
+;       If rx>0 And rx<OutputWidth()-1 And ry>0 And ry<OutputHeight()-1 
+;         Color1 = Point(rx,ry) 
+;       EndIf
+;       StopDrawing()
+;     EndIf
+;     
+;   Else
     rx = mx/z - canvasX/z
     ry = my/z - canvasY/z
     If StartDrawing(ImageOutput(layer(layerid)\Image))
@@ -356,12 +360,13 @@ Procedure BrushGetMixColor(mx,my)
         Color1 = Point(rx,ry) 
         alpha  = Alpha(Color1)        
         If alpha = 0
-          color1 = RGB(brush(action)\Col\R,brush(action)\Col\G,brush(action)\Col\B)
+          color1 = RGBA(brush(action)\Col\R,brush(action)\Col\G,brush(action)\Col\B,0)
+          ; color1 = RGB(brush(action)\Col\R,brush(action)\Col\G,brush(action)\Col\B)
         EndIf        
       EndIf 
       StopDrawing()
     EndIf
-  EndIf
+;   EndIf
   
   ProcedureReturn color1 
 EndProcedure
@@ -476,6 +481,8 @@ Procedure BrushCheckMixClassic(mx,my)
         Brush(Action)\Col\R = SetMaximum(Brush(Action)\NewCol\R*v + Brush(Action)\oldCol\R *u,255)
         Brush(Action)\Col\G = SetMaximum(Brush(Action)\NewCol\G*v + Brush(Action)\oldCol\G *u,255)
         Brush(Action)\Col\B = SetMaximum(Brush(Action)\NewCol\B*v + Brush(Action)\oldCol\B *u,255)
+        Brush(Action)\Col\A = SetMaximum(Brush(Action)\NewCol\A*v + Brush(Action)\alpha*0.55 *u,255)
+        ;Brush(Action)\Col\A = SetMaximum((Brush(Action)\NewCol\A*v + Brush(Action)\water *u) * Brush(action)\Usewater,255)
         
       Else
         
@@ -497,15 +504,19 @@ Procedure BrushCheckMixClassic(mx,my)
         Brush(Action)\OldCol\R = Brush(Action)\Col\R 
         Brush(Action)\OldCol\G = Brush(Action)\Col\G
         Brush(Action)\OldCol\B = Brush(Action)\Col\B
+        Brush(Action)\OldCol\A = Brush(Action)\Col\A
         
         Brush(Action)\NewCol\R = Red(colorValue) ;//SetMaximum(GetColorR(colorValue)*v# + Brush(Action)\Col\R *u#,255)
         Brush(Action)\NewCol\G = Green(colorValue) ;//SetMaximum(GetColorG(colorValue)*v# + Brush(Action)\Col\G *u#,255)
         Brush(Action)\NewCol\B = Blue(colorValue)  ;//SetMaximum(GetColorB(colorValue)*v# + Brush(Action)\Col\B *u#,255)
+        Brush(Action)\NewCol\A = Alpha(colorValue)  
         
         ; et on mélange pour les nouveaux :)
         Brush(Action)\Col\R = SetMaximum(Brush(Action)\NewCol\R*v + Brush(Action)\oldCol\R *u,255)
         Brush(Action)\Col\G = SetMaximum(Brush(Action)\NewCol\G*v + Brush(Action)\oldCol\G *u,255)
         Brush(Action)\Col\B = SetMaximum(Brush(Action)\NewCol\B*v + Brush(Action)\oldCol\B *u,255)
+        Brush(Action)\Col\A = SetMaximum(Brush(Action)\NewCol\A*v + Brush(Action)\oldCol\A *u,255)
+        ; Brush(Action)\Col\A = SetMaximum((Brush(Action)\NewCol\A + Brush(Action)\oldCol\A)*0.5,255)
         
         ; Debug RGB(Brush(Action)\Col\R,Brush(Action)\Col\G,Brush(Action)\Col\B)
         
@@ -569,8 +580,9 @@ Procedure BrushCheckMixClassic(mx,my)
     
   Else ; si mix = 0
     Brush(Action)\Col\R = Brush(Action)\ColorBG\R
-    Brush(Action)\Col\G = Brush(Action)\ColorBG\G ; ColorBG\G	
-    Brush(Action)\Col\B = Brush(Action)\ColorBG\B ; ColorBG\B
+    Brush(Action)\Col\G = Brush(Action)\ColorBG\G 	
+    Brush(Action)\Col\B = Brush(Action)\ColorBG\B 
+    Brush(Action)\Col\A = Brush(Action)\ColorBG\A 
   EndIf
   
   R = SetMaximum(Brush(Action)\Col\R + Rnd2(0,Brush(Action)\ColRnd\R),255)
@@ -586,7 +598,7 @@ Procedure BrushCheckMixClassic(mx,my)
   Brush(Action)\colTmp\B = B
   color_new = RGB(R,G,B)
   
-  BrushChangeColor(1,color_new)
+  BrushChangeColor(1, color_new)
   
   ; Brush(Action)\colorQ = Color_New
   ; SetSpriteColor(SpriteBrush,R,G,B,Brush(Action)\alphaCur)
@@ -684,6 +696,88 @@ Procedure BrushResetColor()
   
 EndProcedure
 
+; gadget
+Procedure BrushUpdateUI(openpreset=0)
+  
+  With brush(action)
+    ; set the gadget with new params
+    
+    ; quickgadget panel
+    
+    
+    ; stroke
+    If action <> #Action_CloneStamp
+      SetGadgetState(#G_BrushStroke,\Stroke)
+    EndIf
+    
+    ; Image
+    If openpreset=0
+      ; on update l'image
+      BrushUpdateImage(1,1)
+    EndIf
+    SetGadgetState(#G_BrushPreview,ImageID(#Img_PreviewBrush))
+    
+    ; size
+    SetGadgetText(#G_BrushSizeSG,Str(\size))
+    SetGadgetState(#G_BrushSizeTB,\size)
+    
+    SetGadgetState(#G_BrushSize,\size)
+    SetGadgetState(#G_BrushSizeW,\SizeW)
+    SetGadgetState(#G_BrushSizeH,\sizeH)
+    SetGadgetState(#G_BrushSizeRand,\SizeRand)
+    SetGadgetState(#G_BrushSizeMin,\SizeMin)
+    SetGadgetState(#G_BrushSizePressure,\Sizepressure)
+
+    ; alpha
+    SetGadgetState(#G_BrushAlphaTB,\alpha)
+    SetGadgetText(#G_BrushAlphaSG,Str(\alpha))
+    SetGadgetState(#G_BrushAlpha,\alpha)
+    SetGadgetState(#G_BrushAlphaPressure,\AlphaPressure)
+    SetGadgetState(#G_BrushAlphaRand,\AlphaRand)
+    ; SetGadgetState(#G_BrushAlphaFactorVsTime,\AlphaFactorVsTime)
+    ; SetGadgetState(#G_BrushTraVsTime,\AlphaVsTime)
+    ; SetGadgetState(#G_BrushAlphaMin,\AlphaMin)
+    
+    
+    ; tool parameters
+    ;SetGadgetState(#G_BrushType,\type)
+    ;SetGadgetState(#G_BrushTool,\tool)
+    SetGadgetState(#G_BrushPas,\pas)
+    SetGadgetState(#G_brushTrait,\Trait)
+    SetGadgetState(#G_BrushMix,\mix)  
+    SetGadgetState(#G_BrushMixTyp,\MixType)  
+    SetGadgetState(#G_BrushVisco,\visco)
+    
+    SetGadgetText(#G_PresetName,\name$)
+    
+    SetGadgetState(#G_BrushHardnessTB,\Hardness)
+    SetGadgetText(#G_BrushHardnessSG,Str(\Hardness))
+    SetGadgetState(#G_brushHardness,\Hardness)
+    SetGadgetState(#G_brushSoftness,\Softness)
+    SetGadgetState(#G_brushSmooth,\Smooth)
+    SetGadgetState(#G_brushIntensity,\Intensity)
+    
+    SetGadgetState(#G_BrushSymetry,\symetry)
+    
+    
+    ; dynamics
+    SetGadgetState(#G_BrushRandRotate,\randRot)
+    SetGadgetState(#G_BrushRotate,\Rotate)
+    SetGadgetState(#G_BrushRotateAngle,\RotateByAngle)
+    SetGadgetState(#G_BrushScatter,\scatter)
+    
+    ; color
+    SetGadgetState(#G_BrushMixTB,\Mix)
+    SetGadgetText(#G_BrushMixSG,Str(\Mix))
+    SetGadgetState(#G_BrushMix,\Mix)
+    SetGadgetState(#G_BrushMixTyp,\MixType)
+    SetGadgetState(#G_BrushMixLayer,\MixLayer)
+    SetGadgetState(#G_BrushVisco,\Visco)
+    SetGadgetState(#G_BrushLavage,\Wash)
+    SetGadgetState(#G_BrushWater, \Water)
+
+  EndWith
+EndProcedure
 
 ; presets
 Procedure.s GetParentItemText(gadget)
@@ -821,44 +915,7 @@ Procedure OpenPreset(file$,brush$="")
   BrushSet()
   BrushUpdateImage(1,1)
   BrushUpdateColor()
-  
-  With brush(action)
-    ; set the gadget with new params
-    SetGadgetState(#G_BrushPreview,ImageID(#Img_PreviewBrush))
-    
-    SetGadgetState(#G_BrushRandRotate,\randRot)
-    SetGadgetState(#G_BrushRotate,\Rotate)
-    SetGadgetState(#G_BrushRotateAngle,\RotateByAngle)
-    
-    SetGadgetState(#G_BrushScatter,\scatter)
-    
-    ; size
-    SetGadgetState(#G_BrushSize,\size)
-    SetGadgetState(#G_BrushSizeW,\SizeW)
-    SetGadgetState(#G_BrushSizeH,\sizeH)
-    SetGadgetState(#G_BrushSizeRand,\SizeRand)
-    SetGadgetState(#G_BrushSizeMin,\SizeMin)
-    
-    ; alpha
-    SetGadgetState(#G_BrushAlpha,\alpha)
-    SetGadgetState(#G_BrushAlphaPressure,\AlphaPressure)
-    SetGadgetState(#G_BrushAlphaRand,\AlphaRand)
-    ;SetGadgetState(#G_BrushAlphaFactorVsTime,\AlphaFactorVsTime)
-    ;SetGadgetState(#G_BrushTraVsTime,\AlphaVsTime)
-    
-    ;SetGadgetState(#G_BrushType,\type)
-    ;SetGadgetState(#G_BrushTool,\tool)
-    SetGadgetState(#G_BrushPas,\pas)
-    SetGadgetState(#G_brushTrait,\Trait)
-    SetGadgetState(#G_BrushMix,\mix)  
-    SetGadgetState(#G_BrushMixTyp,\MixType)  
-    SetGadgetState(#G_BrushVisco,\visco)
-    SetGadgetText(#G_PresetName,\name$)
-    
-    SetGadgetState(#G_brushHardness,\Hardness)
-    SetGadgetState(#G_brushSmooth,\Smooth)
-    SetGadgetState(#G_brushIntensity,\Intensity)
-  EndWith
+  BrushUpdateUI(1)
   
 EndProcedure
 Procedure OpenPresetBank()
@@ -967,7 +1024,8 @@ Procedure SaveBrush()
 EndProcedure
 Procedure SaveBrushPreset(mode=0,file$="")
   
-  If mode = 0 ; on sauve un nouveau brush
+  ; save a new preset brush
+  If mode = 0 Or file$ = #Empty$ 
     file$ = SaveFileRequester("Save a Brush Preset", OptionsIE\DirPreset$+"Preset.abp","*.abp",0)
     If GetExtensionPart(file$) <> "abp"
       file$ = file$ + ".abp"
@@ -976,7 +1034,7 @@ Procedure SaveBrushPreset(mode=0,file$="")
     file$ = OptionsIE\DirPreset$+"\"+file$+".abp"
   EndIf
   
-  If file$ 
+  If file$ <> #Empty$
     If CreatePreferences(file$)
       SaveBrush()    
       ClosePreferences()
@@ -994,9 +1052,9 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 146
-; FirstLine = 11
-; Folding = gBA5--AAAAAwBBg5-
+; CursorPosition = 191
+; FirstLine = 6
+; Folding = AAAQDAAAAAAPEAAg2
 ; EnableXP
 ; DisableDebugger
 ; EnableUnicode

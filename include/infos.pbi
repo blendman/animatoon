@@ -110,13 +110,54 @@
 ; - center the view bug when UI panel (right or left) is hiden
 ; - reset the view bug when UI panel (right or left) is hiden
 ; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
-; - after crop, selection should be deselected
 ; - fill with pattern could use the pattern selected or image (at choice)
-; - when save the preset (not export), it's name ="", so it's saved properly
 ; - if change color selector and clic on same tool, the position of the cursor isn't the same (so color isn't the same)
 
 
-; 09/06/2021  0.5.9.9.3
+
+
+; 14/06/2021  0.5.9.9.8
+; // Changes
+; - cut : "clear" the layer only if copy is ok
+; - changes in Edit_Select()
+; // Fixes
+; - savebrushpreset if name$ = #empty$, it save an empty name
+; - openpreset : some gadgets for tool aren't updated
+; - Change tool : some gadgets for tool aren't updated
+; - when Layer_ApplyAlpha() : selection should be deselectionned
+; - after crop, selection should be deselected
+; - cut/copy layer content only if a selection is valid
+; - when ctrl+A (select all), we don't see the selection box
+
+
+; 13/06/2021  0.5.9.9.6
+; // New
+; - Reisze_Doc window (with some options)
+; // changes
+; - Brush\Usewater : only use it when brush\usewater= 1
+; - Resize_Doc only if W or H is changed
+; - Resize_Doc : now unpremultiply all images
+; - Resize_Doc : add option for use smooth of not if resize
+; - export image : delete the "_screen" in the exported name
+; // fixes
+; - fixe text langage error (english).
+
+
+; 12/06/2021  0.5.9.9.5
+; // Changes
+; - improve the "water" option when painting, much better.
+; // fixes
+; - the brush image isn't loaded at start.
+
+
+; 11/06/2021  0.5.9.9.4
+; // New
+; - Layer_importImage : add multiselection to import several image at once.
+
+
+; 10/06/2021  0.5.9.9.3
+; // New
+; - Windowbrushimage : textgadget for image name
 ; // Fixes
 ; - fixe a bug with unpremultiply
 
@@ -1993,8 +2034,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 121
-; FirstLine = 105
+; CursorPosition = 116
+; FirstLine = 99
 ; Folding = ++
 ; EnableXP
 ; DisableDebugger

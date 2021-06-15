@@ -170,8 +170,10 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   Edit_Paste()
                   
                 Case #Menu_Cut
-                  Edit_Copy()
-                  Layer_Clear(LayerId)
+                  If Edit_Copy()
+                    Layer_Clear(LayerId)
+                  EndIf
+                  
                   
                 Case #Menu_Copy
                   Edit_Copy()
@@ -197,9 +199,12 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   ;}
                   
                   ;{ select
-                Case #Menu_SelectAll, #Menu_DeSelect
-                  sel = (EventMenu-#Menu_DeSelect)
-                  Edit_Select(1+sel)
+                Case #Menu_SelectAll 
+                  ;sel = (EventMenu-#Menu_DeSelect)
+                  Edit_Select(1)
+                  
+                Case #Menu_DeSelect
+                  Edit_Select(0)
                   
                 Case #Menu_SelectAlphaLayer
                   Layer_SelectAlpha()
@@ -402,6 +407,7 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   
                 Case #Menu_LayerApplyAlpha
                   Layer_ApplyAlpha()
+                  Edit_Select(0)
                   ;}
                   
                   ;{ Filters
@@ -946,6 +952,16 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                       
                     Case #G_BrushLavage
                       Brush(Action)\Wash = GetGadgetState(#G_BrushLavage)
+                      
+                    Case #G_BrushBlendmode
+                      bm = GetGadgetState(#G_BrushBlendmode)
+                      Select bm
+                        Case 0
+                          brush(action)\blendmode = #Bm_Normal
+                        Case 1 ; dissolve
+                          brush(action)\blendmode = #Bm_Dissolve
+                      EndSelect
+                      
                       
                     Case #G_BrushWater
                       Brush(Action)\Water = GetGadgetState(#G_BrushWater)
@@ -1531,7 +1547,6 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                   BrushUpdateImage(0,1)
                 EndIf
                 
-                
                 ; clear the layer_tempo
                 Select action 
                   Case #Action_Box, #Action_Circle, #Action_Line, #Action_Gradient
@@ -1611,8 +1626,8 @@ End
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 54
-; FirstLine = 20
-; Folding = hvTAcAAE0biKMNFAYAxj1DimwdIA+
+; CursorPosition = 961
+; FirstLine = 207
+; Folding = h4HAAGAAuZTMAgAAgBAAAAAAjBjB5
 ; EnableXP
 ; EnableUnicode

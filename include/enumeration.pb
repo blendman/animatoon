@@ -27,7 +27,8 @@ Enumeration
   #fnt_Arial12Italic
   #fnt_Arial11
   #FontArial20Bold
-
+  #FontDefaultGadget
+  
   #Font_last
 EndEnumeration
 
@@ -66,6 +67,8 @@ Enumeration ; windows
   #Win_BrushEditor
   #Win_BrushImage
   
+  ; edition
+  #Win_DocResize
   
   ; Images settings / reglages images
   #Win_Contrast
@@ -577,8 +580,10 @@ Enumeration ; gadgets
   #G_BrushMixLayer
   #G_BrushMixLayerCustom
   
-  ; filter
+  
+  ; filter & blendmode
   #G_BrushFilter
+  #G_BrushBlendmode
   
   ;{ tool clone stamp
   #G_BrushSource
@@ -813,6 +818,7 @@ Enumeration ; gadgets
   ; brush image
   #G_brushImageDir
   #G_brushImageDirButton
+  #G_brushImageName
   #G_brushImageChooseBrushFolder
   #G_brushImageSA
   #G_brushImageCanvas
@@ -823,7 +829,19 @@ Enumeration ; gadgets
   
   ;}  
   
+  ;{-- MENU EDITIONS
+
+  ;}
+  
   ;{-- MENU IMAGES
+   ; Resize document
+  #G_WinResize_NewW
+  #G_WinResize_NewH
+  #G_WinResize_Infos
+  #G_WinResize_CbbOptions
+  #G_WinResize_KeepProportion
+
+  
   ; color balance    
   #IE_BalColNormal
   #IE_BalColNew
@@ -1105,9 +1123,9 @@ EndEnumeration
 
 ; CompilerEndIf
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 586
-; FirstLine = 141
-; Folding = wfAMHAAAg+
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 585
+; FirstLine = 137
+; Folding = 5fAMDAwAA9
 ; EnableXP
 ; EnableUnicode

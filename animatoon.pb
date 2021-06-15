@@ -6,13 +6,12 @@
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
 #ProgramVersion   = "0.5.9.9"
-#ProgramRevision  = 2
+#ProgramRevision  = 8
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
-#ProgramNbLine    = "23600"
+#ProgramNbLine    = "24000"
 ; Application
 #ProgramName      = "Animatoon"
 #ProgramAuteur    = "Blendman"
-
 ;}
 
 ;-- structure
