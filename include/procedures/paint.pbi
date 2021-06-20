@@ -1114,12 +1114,12 @@ Procedure Paint_EraseAlpha(RotImg,x_result,y_result,Water)
   
 EndProcedure
 ;Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0)
-Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
+Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0,output=0)
   
   ; pour peindre sur le sprite et sur l'image
   ; il faut la même procédure pour un rendu identique
   ; outputID permet de savoir sur quoi on va peindre. 0 = sprite, 1 = image
-  
+  ; output : c'est pour mettre spriteoutput() ou imageoutput(), par exemple.
   ; Debug "dessin sur "+Str(OutputID)
   
   CheckAlpha() ; Macro in paint.pbi, alpha with pression, random, etc...
@@ -1170,7 +1170,11 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
         Zeangle = (angle+Rnd(Brush(Action)\randRot)) * (1-OutputID) + (anglefromsprite) * OutputID
         
         ;If Brush(Action)\RotatebyAngle = 1 
-        RotImg = RotateImageEx2(ImageID(#BrushCopy), zeangle) 
+        RotImg = RotateImageEx2(ImageID(#BrushCopy), zeangle)
+        If Not IsImage(RotImg)
+          RotImg = CopyImage(#BrushCopy, #PB_Any)
+        EndIf
+        
         ; test pour voir si je peux rotationné en fonction de l'angle
           www = ImageWidth(RotImg) 
           hhh = ImageHeight(RotImg)
@@ -1240,7 +1244,7 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
 ;           Else
             RotImg= CopyImage(#BrushCopy,#PB_Any)
 ;           EndIf  
-          
+            
           ResizeImage(RotImg,ImageWidth(RotImg)*FinalSize, ImageHeight(RotImg)*FinalSize,1 - Brush(Action)\Smooth)
           x_result + Brush(Action)\centerX -ImageWidth(RotImg)/2 
           y_result + Brush(Action)\centerY -ImageHeight(RotImg)/2
@@ -1308,7 +1312,9 @@ Macro DoPaint(xx,yy,StartX1,StartY1,size,colo,OutputID=0, output=0)
     
     If Brush(Action)\rotate > 0
       RotImg = RotateImageEx2(ImageID(#BrushCopy),Random(Brush(Action)\rotate))  
-      
+      If Not IsImage(RotImg)
+        RotImg = CopyImage(#BrushCopy, #PB_Any)
+      EndIf
       ; RotImg = UnPreMultiplyAlpha(RotImg)
       
       ; manque le resize en fonction de la taille, etc...
@@ -1565,8 +1571,9 @@ EndProcedure
 
 
 ; color, blending
-Procedure.l ColorBlending(Couleur1.l, Couleur2.l, Echelle.f) ; Mélanger 2 couleurs
-                                                             ; by Le soldat inconnu, thanks !
+Procedure.i ColorBlending(Couleur1.i, Couleur2.i, Echelle.f) 
+  ; Blend two color // Mélanger 2 couleurs
+  ; by Le soldat inconnu, thanks !
   
   Protected Rouge, Vert, Bleu, Rouge2, Vert2, Bleu2
   
@@ -2219,12 +2226,12 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 103
-; FirstLine = 78
-; Folding = byPAAAAAAAAAAAAawBAgPAAAo9BAAPwDAen9
-; EnableAsm
+; CursorPosition = 1574
+; FirstLine = 296
+; Folding = AAAAAAAAAAAAAAAawBAAEAAgA9AAAPAAAAA9
 ; EnableXP
 ; EnableOnError
+; Compiler = PureBasic 6.00 Alpha 2 - C Backend (Windows - x64)
 ; Warnings = Display
 ; EnablePurifier
 ; EnableUnicode

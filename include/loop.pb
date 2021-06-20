@@ -962,33 +962,12 @@ CompilerElseIf #PB_Compiler_OS = #PB_OS_Windows Or #PB_Compiler_OS = #PB_OS_MacO
                           brush(action)\blendmode = #Bm_Dissolve
                       EndSelect
                       
-                      
                     Case #G_BrushWater
                       Brush(Action)\Water = GetGadgetState(#G_BrushWater)
                       
                     Case #G_BrushStampUseColor, #G_BrushStampColorBM
                       Brush(action)\usecolor = GetGadgetState(#G_BrushStampUseColor)
                       SetStampPatternImage(-1,-1)
-                      
-;                     Case #G_BrushPrevious
-;                       BrushInitNb()
-;                       If Brush(Action)\id > 1
-;                         Brush(Action)\id -1
-;                       Else
-;                         Brush(Action)\Id = Brush(#Action_Brush)\BrushNumMax+1
-;                       EndIf 
-;                       BrushUpdateImage(1,1)
-;                       BrushUpdateColor() 
-;                       
-;                     Case #G_BrushNext
-;                       BrushInitNb()
-;                       If Brush(Action)\id < Brush(#Action_Brush)\BrushNumMax+1
-;                         Brush(Action)\id +1
-;                       Else
-;                         Brush(Action)\id = 1
-;                       EndIf                
-;                       BrushUpdateImage(1,1)
-;                       BrushUpdateColor()     
                       ;}
                       
                       ;{ Move, rotate, transform & line, fillarea for some parameters
@@ -1626,8 +1605,8 @@ End
 ;}
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 961
-; FirstLine = 207
-; Folding = h4HAAGAAuZTMAgAAgBAAAAAAjBjB5
+; CursorPosition = 963
+; FirstLine = 205
+; Folding = h4HAAGAAuZTMAgAAgBAAAAAgjBjB5
 ; EnableXP
 ; EnableUnicode

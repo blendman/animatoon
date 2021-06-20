@@ -1,5 +1,49 @@
 ﻿
 ************************* CHANGELOG ********************************
+20/06/2021  0.6.0.3
+// Changes
+- Move the brush preview on the first tab in tool panel
+- By Default, the position of the paper is=100 (all over the First 100 layers)
+// Fixes
+- when load brush preset -> brush\BrushName$ isn't updated
+- when resize_doc(resize image) : the layers And images are resized
+- bug With resize_doc/transform layer And unpremultiply
+- With a bug With RotateImageEx2() To compile in X64 And With pb6.00 BackEnd C (thanks Fred !!)
+- Background window : trackbar For contrast & brightness hasn't the good min/max value.
+- Background window : brightness trackbar didn't update the paper.
+
+
+19/06/2021  0.6.0.2
+// Fixes
+- when change brush image-> brush\BrushName$ isn't updated
+- when change Tool-> brush\BrushName$ isn't updated
+
+
+18/06/2021  0.6.0.1
+// Test
+- brush color blendmode  : multiply, add, screen. Seems ok.
+// Fixes
+- when change tool brush-> eraser, the brush image isn't changed
+
+
+17/06/2021  0.6.0.0
+// New
+- New window For Layer_repeated (wip)
+- paper\pos : the position of the paper, before Or after some layers.
+- window background : add panel (base, texture, parameters)
+- window background : add gadget position
+// Changes
+- Paper can now be over all layers in multiply mode (paper has its own position).
+
+
+15/06/2021  0.5.9.9
+// New
+- brush color blendmode (only normal And dissolve (wip, doesn't work correctly for all cases))
+- New Image of start
+// Changes
+- lots of minor changes in th tool parameter panel gadgets (positions, size)
+
+
 14/06/2021  0.5.9.9.8
 // Changes
 - cut : "clear" the layer only if copy is ok

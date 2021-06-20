@@ -1,7 +1,4 @@
 ﻿
-; image
-
-
 ; images
 Procedure LoadImage2(nb, file$, w=25, h=25)
   
@@ -41,132 +38,130 @@ Procedure FreeImage2(img)
 EndProcedure
 
 
+;{ module unpremultiply
 
-
-
-
-; MOdule by Wilbert
-DeclareModule Premultiply
-  
-  ; 32 bits RGBA or BGRA pixel buffer
-  
-  Declare PremultiplyPixels(*PixelBuffer32, NumPixels)
-  Declare UnpremultiplyPixels(*PixelBuffer32, NumPixels)
-  
-EndDeclareModule
-
-Module Premultiply
-  
-  EnableASM
-  DisableDebugger
-  
-  CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-    Macro rax : eax : EndMacro
-    Macro rbx : ebx : EndMacro
-    Macro rcx : ecx : EndMacro
-    Macro rdx : edx : EndMacro
-    Macro rsi : esi : EndMacro
-  CompilerEndIf
-  
-  Procedure PremultiplyPixels(*PixelBuffer32, NumPixels)
-    LEA rax, [premultiply.l_premultiplyTable]
-    MOV rdx, *PixelBuffer32
-    MOV rcx, NumPixels
-    PUSH rbx
-    PUSH rsi
-    MOV rsi, rax
-    !premultiply.l_premul0:
-    MOVZX eax, word [rdx + 2]
-    CMP ah, 255
-    !je premultiply.l_premul1
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx + 2], bl
-    MOV al, [rdx + 1]
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx + 1], bl
-    MOV al, [rdx]
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx], bl
-    !premultiply.l_premul1:
-    ADD rdx, 4
-    SUB rcx, 1
-    !jnz premultiply.l_premul0
-    POP rsi
-    POP rbx   
-  EndProcedure
-  
-  Procedure UnpremultiplyPixels(*PixelBuffer32, NumPixels)
-    LEA rax, [premultiply.l_premultiplyTable + 0x10000]
-    MOV rdx, *PixelBuffer32
-    MOV rcx, NumPixels
-    PUSH rbx
-    PUSH rsi
-    MOV rsi, rax
-    !premultiply.l_unpremul0:
-    MOVZX eax, word [rdx + 2]
-    CMP ah, 255
-    !je premultiply.l_unpremul1
-    CMP ah, 0
-    !je premultiply.l_unpremul1
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx + 2], bl
-    MOV al, [rdx + 1]
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx + 1], bl
-    MOV al, [rdx]
-    MOVZX ebx, byte [rsi + rax]
-    MOV [rdx], bl
-    !premultiply.l_unpremul1:
-    ADD rdx, 4
-    SUB rcx, 1
-    !jnz premultiply.l_unpremul0
-    POP rsi
-    POP rbx
-  EndProcedure
-  
-  Procedure FillTable()
-    LEA rdx, [premultiply.l_premultiplyTable]
-    PUSH rbx
-    MOV ebx, 255
-    SUB ecx, ecx
-    !premultiply.l_filltable0:
-    MOVZX eax, ch
-    MUL cl
-    ADD eax, 127
-    DIV bl
-    MOV [rdx + rcx], al
-    ADD cx, 1
-    !jnz premultiply.l_filltable0
-    ADD rdx, 0x10000
-    MOV ecx, 0x100
-    SUB bx, bx
-    !premultiply.l_filltable1:
-    MOV eax, 255
-    CMP cl, ch
-    !jae premultiply.l_filltable2
-    MUL cl
-    ADD ax, bx
-    DIV ch
-    !premultiply.l_filltable2:
-    MOV [rdx + rcx], al
-    ADD cl, 1
-    !jnz premultiply.l_filltable1
-    MOVZX bx, ch
-    ADD bx, 1
-    SHR bx, 1
-    ADD ch, 1
-    !jnz premultiply.l_filltable1
-    POP rbx
-  EndProcedure
-  
-  FillTable()
-  
-  DataSection
-    !premultiply.l_premultiplyTable: times 131072 db 0
-  EndDataSection
-  
-EndModule
-
+; ; MOdule by Wilbert
+; DeclareModule Premultiply
+;   
+;   ; 32 bits RGBA or BGRA pixel buffer
+;   
+;   Declare PremultiplyPixels(*PixelBuffer32, NumPixels)
+;   Declare UnpremultiplyPixels(*PixelBuffer32, NumPixels)
+;   
+; EndDeclareModule
+; 
+; Module Premultiply
+;   
+;   EnableASM
+;   DisableDebugger
+;   
+;   CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+;     Macro rax : eax : EndMacro
+;     Macro rbx : ebx : EndMacro
+;     Macro rcx : ecx : EndMacro
+;     Macro rdx : edx : EndMacro
+;     Macro rsi : esi : EndMacro
+;   CompilerEndIf
+;   
+;   Procedure PremultiplyPixels(*PixelBuffer32, NumPixels)
+;     LEA rax, [premultiply.l_premultiplyTable]
+;     MOV rdx, *PixelBuffer32
+;     MOV rcx, NumPixels
+;     PUSH rbx
+;     PUSH rsi
+;     MOV rsi, rax
+;     !premultiply.l_premul0:
+;     MOVZX eax, word [rdx + 2]
+;     CMP ah, 255
+;     !je premultiply.l_premul1
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx + 2], bl
+;     MOV al, [rdx + 1]
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx + 1], bl
+;     MOV al, [rdx]
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx], bl
+;     !premultiply.l_premul1:
+;     ADD rdx, 4
+;     SUB rcx, 1
+;     !jnz premultiply.l_premul0
+;     POP rsi
+;     POP rbx   
+;   EndProcedure
+;   
+;   Procedure UnpremultiplyPixels(*PixelBuffer32, NumPixels)
+;     LEA rax, [premultiply.l_premultiplyTable + 0x10000]
+;     MOV rdx, *PixelBuffer32
+;     MOV rcx, NumPixels
+;     PUSH rbx
+;     PUSH rsi
+;     MOV rsi, rax
+;     !premultiply.l_unpremul0:
+;     MOVZX eax, word [rdx + 2]
+;     CMP ah, 255
+;     !je premultiply.l_unpremul1
+;     CMP ah, 0
+;     !je premultiply.l_unpremul1
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx + 2], bl
+;     MOV al, [rdx + 1]
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx + 1], bl
+;     MOV al, [rdx]
+;     MOVZX ebx, byte [rsi + rax]
+;     MOV [rdx], bl
+;     !premultiply.l_unpremul1:
+;     ADD rdx, 4
+;     SUB rcx, 1
+;     !jnz premultiply.l_unpremul0
+;     POP rsi
+;     POP rbx
+;   EndProcedure
+;   
+;   Procedure FillTable()
+;     LEA rdx, [premultiply.l_premultiplyTable]
+;     PUSH rbx
+;     MOV ebx, 255
+;     SUB ecx, ecx
+;     !premultiply.l_filltable0:
+;     MOVZX eax, ch
+;     MUL cl
+;     ADD eax, 127
+;     DIV bl
+;     MOV [rdx + rcx], al
+;     ADD cx, 1
+;     !jnz premultiply.l_filltable0
+;     ADD rdx, 0x10000
+;     MOV ecx, 0x100
+;     SUB bx, bx
+;     !premultiply.l_filltable1:
+;     MOV eax, 255
+;     CMP cl, ch
+;     !jae premultiply.l_filltable2
+;     MUL cl
+;     ADD ax, bx
+;     DIV ch
+;     !premultiply.l_filltable2:
+;     MOV [rdx + rcx], al
+;     ADD cl, 1
+;     !jnz premultiply.l_filltable1
+;     MOVZX bx, ch
+;     ADD bx, 1
+;     SHR bx, 1
+;     ADD ch, 1
+;     !jnz premultiply.l_filltable1
+;     POP rbx
+;   EndProcedure
+;   
+;   FillTable()
+;   
+;   DataSection
+;     !premultiply.l_premultiplyTable: times 131072 db 0
+;   EndDataSection
+;   
+; EndModule
+;}
 
 
 ; resize image
@@ -183,7 +178,19 @@ Procedure UnPreMultiplyAlpha(image)
         alpha2 = Alpha(color)
         If alpha=0 : alpha=1 : EndIf
         If alpha2>0
-          Plot(x, y, RGBA( (255 * Red(color) + (alpha2 /2)) /alpha, (255 * Green(color) + (alpha2 /2)) /alpha, (255 * Blue(color) + (alpha2 /2)) /alpha, alpha2))
+          r = (255 * Red(color) + (alpha2 /2)) /alpha
+          If r>255
+            r=255
+          EndIf
+          g = (255 * Green(color) + (alpha2 /2)) /alpha
+          If g>255
+            g=255
+          EndIf
+          b = (255 * Blue(color) + (alpha2 /2)) /alpha
+          If b>255
+            b = 255
+          EndIf
+          Plot(x, y, RGBA( r, g, b, alpha2))
         Else
           Plot(x, y, RGBA(Red(color), Green(color), Blue(color), alpha2))
         EndIf
@@ -203,8 +210,6 @@ Procedure ResizeImage2_(image, w, h, mode=#PB_Image_Smooth)
   
   ; ProcedureReturn image
 EndProcedure
-
-
 
 
 
@@ -256,8 +261,6 @@ Macro IE_SetImageOutput1(mode=0)
   EndIf
   
 EndMacro
-
-
 
 
 Macro IE_GetImagePixelColor(img)
@@ -1426,7 +1429,6 @@ EndProcedure
 
 ;}
 
-
 ;{ image transformations
 ; miror
 Procedure MirorImage(Img,mirorH=1)
@@ -1455,7 +1457,6 @@ Procedure MirorImage(Img,mirorH=1)
         ; SaveImage(NewImg, Filename$ + ".mirrored.jpg", #PB_ImagePlugin_JPEG)
         
       EndIf
-      
       
     EndIf
     
@@ -1492,24 +1493,19 @@ Procedure MirorImage(Img,mirorH=1)
 EndProcedure
 
 ; Rotation
-Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'un angle en ° - rotation of an image, in degres.
+Procedure.i RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'un angle en ° - rotation of an image, in degres.
   
   Shared ImageBrushW.w, ImageBrushH.w
   ; Procedure par Le Soldat inconnu - Merci 
   
   Protected bmi.BITMAPINFO, bmi2.BITMAPINFO, hdc.l, NewImageID, Mem, n, nn, bm.BITMAP
   
-  ;   If IsImage(NewImageID)
-  ;     FreeImage(NewImageID)
-  ;   EndIf
-  
-  
   Angle = Angle * #PI / 180 ; On convertit en radian
   
   Cos.f = Cos(Angle)
   Sin.f = Sin(Angle)
   
-  CouleurFond = Brush(action)\ColorQ ; 0
+  ; CouleurFond = Brush(action)\ColorQ ; 0
   
   GetObject_(ImageID, SizeOf(BITMAP), @bm.BITMAP) ; windows only; is there a version for linux, mac os ?
   
@@ -1670,8 +1666,6 @@ Procedure.l RotateImageEx2(ImageID, Angle.f, Mode.a=2) ; Rotation d'une image d'
     EndIf
     FreeMemory(Mem)
     
-    ; NewImageID = UnPreMultiplyAlpha(NewImageID)
-    
   EndIf
   
   ProcedureReturn NewImageID
@@ -1718,20 +1712,16 @@ Procedure RotateImage_Menu(mode=0)
     
   EndIf
   
-  
-  
 EndProcedure
 
 
 ;}
 
 
-
-
 ;{ Blendmode, drawingmode brush
 
 
-;{ Drawingmode brush
+;{ Drawingmode (filters & blendmode) for brush
 
 ; Checker
 Procedure cb4(x,y,top,bottom)
@@ -2173,7 +2163,7 @@ EndProcedure
 ;}
 
 
-;{ blendmode
+;{ blendmode for layers
 
 Procedure bm_screen(x, y, SourceColor, TargetColor)
   ; color = 255 - ( ( 255 - bottom ) * ( 255 - top ) ) / 255
@@ -2384,12 +2374,10 @@ EndProcedure
 ;}
 
 
-
-
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 1800
-; FirstLine = 72
-; Folding = AwHwAAAAAAAgHAAAAAAAAAAAAAAOA+fggSAAAAAAwAGAA9
+; CursorPosition = 1495
+; FirstLine = 56
+; Folding = A9fAAAAAAAwBAAAAAAAAaDu-fDAAAAAAAAAAAAAYAAAA+
 ; EnableAsm
 ; EnableXP
 ; EnableUnicode

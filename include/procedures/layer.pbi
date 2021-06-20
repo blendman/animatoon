@@ -63,16 +63,18 @@ Procedure IE_UpdatePaperList()
   
 EndProcedure
 Procedure PaperDraw()
-  
-  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
   z.d = OptionsIE\zoom*0.01
-  
+  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
   ; draw the color of the background
   ZoomSprite(#Sp_PaperColor,doc\w*z,doc\h*z)
   DisplayTransparentSprite(#Sp_PaperColor,CanvasX,CanvasY, 255)
+EndProcedure
+Procedure PaperTextureDraw()
   
+  z.d = OptionsIE\zoom*0.01
   ;   draw the paper
-  SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha) ; multiply
+  ;   SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha) 
+  SpriteBlendingMode(0,2)  ; multiply
   ZoomSprite(#Sp_Paper,doc\w*z,doc\h*z)
   DisplayTransparentSprite(#Sp_Paper,CanvasX,CanvasY, paper\alpha)
   
@@ -195,19 +197,24 @@ Procedure PaperUpdate(load=0)
     If OptionsIE\UseCanvas = 0
       
       If StartDrawing(SpriteOutput(#Sp_PaperColor))
-        Box(0, 0, OutputWidth(), OutputHeight(), paper\color) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
+        Box(0, 0, OutputWidth(), OutputHeight(), paper\color) 
+        ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
         StopDrawing()
       EndIf
       
       ; draw on the sprite the new background
       If StartDrawing(SpriteOutput(#Sp_Paper))
+        
+
         DrawingMode(#PB_2DDrawing_AlphaBlend )
         For i=0 To (doc\w/w)*z +1
           For j = 0 To (doc\h/h)*z +1
             DrawImage(ImageID(tempImgPaper),i*w,j*h)
           Next j 
         Next i       
-        
+        ; white because blendmode = multiply, suld be changed if blendmode for paper is changed
+        Box(0, 0, OutputWidth(), OutputHeight(), RGBA(255,255,255,255-paper\alpha)) ;RGBA(Red(paper\color), Green(paper\Color), Blue(paper\Color), 255))
+
         StopDrawing()
         
       EndIf
@@ -697,6 +704,98 @@ Procedure Layer_UpdateUi(i)
 ;   
 EndProcedure
 
+
+Procedure.s Layer_OpenWindowRepeated()
+  
+  Protected quit
+  
+  w=300
+  h=300
+  If OpenWindow(#Win_Layer,0,0,w,h,Lang("Layer repeated"),#PB_Window_SystemMenu|#PB_Window_ScreenCentered,WindowID(#winmain))
+    
+    ;SetGadgetFont(#PB_Default, FontID(#FontDefaultGadget)) 
+    
+    Addbuttons(#Win_Layer)
+    x=10
+    y=10
+    w1=w-20
+    h1=25
+    ; Gadget to add for info : 
+;     ; combobox To choose image/pattern For bg
+;     If ComboBoxGadget(#G_layerBG_Cbb_PatternType,x,y,w1,h1)
+;        GadgetToolTip(#G_layerBG_Cbb_PatternImageBtn, lang("Select the pattern Type (pattern or image)"))
+; 
+;     EndIf
+;     y+h1+5
+    
+    ; image Or pattern To Repeat (a load button Or pattern image To choose ?)
+    If StringGadget(#G_layerBG_Cbb_PatternImage,x,y,w1-60-5,h1,layer(LayerId)\ImageName$)
+      If ButtonGadget(#G_layerBG_Cbb_PatternImageBtn,x+w1-60,y,60,h1,"...")
+        GadgetToolTip(#G_layerBG_Cbb_PatternImageBtn, lang("Select the pattern or image to use on the layer repeated"))
+      EndIf
+    EndIf
+    y+h1+5
+    
+    ; scale
+    If StringGadget(#G_layerBG_Scale,x,y,w1,h1,Str(layer(LayerId)\Repeated),#PB_String_Numeric)
+    EndIf
+    y+h1+5
+    
+    ; contrast/brightness.
+    If TrackBarGadget(#G_layerBG_Cbb_Contrast,x,y,w1,h1,1,100)
+    EndIf 
+    y+h1+5
+    If TrackBarGadget(#G_layerBG_Cbb_Brightness,x,y,w1,h1,1,100)
+    EndIf
+      
+      
+    ;SetGadgetFont(#PB_Default, #PB_Default) 
+    
+    
+    Repeat
+      event = WaitWindowEvent(1)
+      EventGadget = EventGadget()
+      
+      Select event
+          
+        Case #PB_Event_CloseWindow
+          quit = 1
+          
+        Case #PB_Event_Gadget
+          
+          Select EventGadget
+            Case #G_layerBG_Cbb_PatternImageBtn
+              file$ = OpenFileRequester(lang("Image"),GetCurrentDirectory()+"data\presets\patterns","*.*",0)
+              If file$ <> #Empty$
+                tmp = LoadImage(#PB_Any,file$)
+                SetGadgetText(#G_layerBG_Cbb_PatternImage, file$)
+              EndIf
+              
+              
+            Case #GADGET_WinBGED_BtnOk
+              ok  =1
+              quit = 1
+              layer(layerID)\Repeated = Val(GetGadgetText(#G_layerBG_Scale))
+              info$="1"
+              
+            Case #GADGET_WinBGED_BtnCancel
+              quit = 1
+              
+          EndSelect
+          
+      EndSelect
+      
+    Until quit >=1
+    
+    CloseWindow(#Win_Layer)
+    ProcedureReturn info$
+  EndIf
+  
+  
+EndProcedure
+
+
+
 Procedure Layer_SetGadgetState()
   
   i = layerID
@@ -731,7 +830,11 @@ Procedure Layer_GetLayerId()
         EndIf
       ElseIf Lx > 80 
         ; layer properties
-        WindowLayerProp()
+        If layer(layerId)\typ = #Layer_TypBG
+          Layer_OpenWindowRepeated()
+        Else
+          WindowLayerProp()
+        EndIf
       EndIf
       
     Case #PB_EventType_LeftButtonDown
@@ -875,6 +978,38 @@ EndProcedure
 
 
 ; add, delete
+Procedure Layer_Delete()
+  
+  ; DeleteArrayElement(layer(), layerid)
+  ; FreeGadget2(layer(LayerId)\IG_LayerMenu)
+  
+  FreeImage2(layer(LayerId)\Image)
+  FreeImage2(layer(LayerId)\ImageBM)
+  FreeImage2(layer(LayerId)\ImageAlpha)
+  FreeImage2(layer(LayerId)\ImageTemp)
+  FreeSprite2(layer(LayerId)\Sprite)
+  
+  If layerid <ArraySize(layer())
+    
+    For a=layerId To ArraySize(layer())-1
+      Layer(a) = layer(a+1)
+      Layer(a)\ordre -1
+    Next
+    
+  EndIf
+  
+  ReDim layer(ArraySize(layer())-1)
+  ; on update le gadget liste layer
+  LayerNb - 1
+  LayerId -1
+  If layerid >ArraySize(layer())
+    layerid = ArraySize(layer())
+  EndIf
+  Layer_UpdateList()
+  CheckIfInf(LayerId,0)
+  ScreenUpdate(1)
+  
+EndProcedure
 Procedure Layer_Add(x=0,y=0,txt$="")
   
   Shared OpenLayer
@@ -893,6 +1028,7 @@ Procedure Layer_Add(x=0,y=0,txt$="")
       
   EndSelect
   
+  ; Then add a new layer
   ReDim layer(LayerNb)
   n = ArraySize(layer())
   LayerId = n
@@ -919,7 +1055,8 @@ Procedure Layer_Add(x=0,y=0,txt$="")
         \name$ = "Background"+Str(LayerIdMax)
         \W_Repeat = 100
         \H_Repeat = 100
-        Debug "bg !!!"
+        \Repeated = 10
+        ; Debug "bg !!!"
         
       Case #Layer_TypBitmap
         \name$ = "Layer"+Str(LayerIdMax)
@@ -1022,45 +1159,23 @@ Procedure Layer_Add(x=0,y=0,txt$="")
   If openlayer = 0
     IE_UpdateLayerUi() 
   EndIf
+  
+  
   ; on ajoute 1 au nombre total de layers
   LayerNb + 1
   
   ; idem pour layer IDmax, c'est un nombre qu'on garde, pour avoir des id unique pour les calques.
   LayerIdMax + 1
   
-EndProcedure
-Procedure Layer_Delete()
-  
-  ; DeleteArrayElement(layer(), layerid)
-  ; FreeGadget2(layer(LayerId)\IG_LayerMenu)
-  
-  FreeImage2(layer(LayerId)\Image)
-  FreeImage2(layer(LayerId)\ImageBM)
-  FreeImage2(layer(LayerId)\ImageAlpha)
-  FreeImage2(layer(LayerId)\ImageTemp)
-  FreeSprite2(layer(LayerId)\Sprite)
-  
-  If layerid <ArraySize(layer())
-    
-    For a=layerId To ArraySize(layer())-1
-      Layer(a) = layer(a+1)
-      Layer(a)\ordre -1
-    Next
-    
+  If  OptionsIE\LayerTyp = #Layer_TypBG
+    If Layer_OpenWindowRepeated() = #Empty$
+      Layer_Delete()
+      ProcedureReturn #Null
+    EndIf
   EndIf
   
-  ReDim layer(ArraySize(layer())-1)
-  ; on update le gadget liste layer
-  LayerNb - 1
-  LayerId -1
-  If layerid >ArraySize(layer())
-    layerid = ArraySize(layer())
-  EndIf
-  Layer_UpdateList()
-  CheckIfInf(LayerId,0)
-  ScreenUpdate(1)
-  
 EndProcedure
+
 
 
 
@@ -1808,7 +1923,7 @@ Procedure Layer_Draw_OnScreen(i)
 ;     ClipSprite(Layer(i)\Sprite, #PB_Default , #PB_Default  , #PB_Default , #PB_Default )
 ;   EndIf
   
-   DisplayTransparentSprite(Layer(i)\Sprite, canvasX+layer(i)\x * z, canvasY+layer(i)\y * z, layer(i)\alpha)
+  DisplayTransparentSprite(Layer(i)\Sprite, canvasX+layer(i)\x * z, canvasY+layer(i)\y * z, layer(i)\alpha)
   ; DisplayTransparentSprite(Layer(i)\Sprite,c__x1+layer(i)\x * z, c__y1+layer(i)\y * z, layer(i)\alpha)
   SpriteBlendingMode(#PB_Sprite_BlendSourceAlpha, #PB_Sprite_BlendInvertSourceAlpha)
   
@@ -1839,6 +1954,11 @@ Procedure Layer_DrawAll()
   
   ; to draw all layers on screen with sprite
   For i=0 To ArraySize(layer())
+    If Paper\pos = i
+      ; the paper textures
+      PaperTextureDraw() 
+    EndIf
+    
     If Layer(i)\view 
       Layer_Draw_OnScreen(i)
 ;       If i = layerId
@@ -1848,6 +1968,10 @@ Procedure Layer_DrawAll()
 ;       EndIf  
     EndIf
   Next i
+  
+  If paper\pos > ArraySize(layer())
+    PaperTextureDraw() 
+  EndIf
   
 EndProcedure
 Procedure Layer_Draw_OnCanvas(i)
@@ -2602,8 +2726,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 1817
-; FirstLine = 80
-; Folding = AAAAAAAAAAAA7AAAAAAAAAAAAAAgHAvBAAAAAAAAAAAAAw
+; CursorPosition = 731
+; FirstLine = 59
+; Folding = AAAAAAAAAAAAAAA5-DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAw
 ; EnableXP
 ; EnableUnicode

@@ -838,10 +838,17 @@ Procedure OpenOptions()
     
     ; change some parameters For selection
     OptionsIE\SelectionType = Brush(#Action_Select)\Type
-    If OptionsIE\brushName$ = ""
+    If OptionsIE\brushName$ = #Empty$
       OptionsIE\brushName$ = brush(#Action_Brush)\BrushName$
-      If OptionsIE\brushName$ = ""
+      If OptionsIE\brushName$ = #Empty$
         OptionsIE\brushName$ = "brush"+Str(Brush(#action_brush)\id)+".png"
+      EndIf
+     
+      If brush(#Action_Brush)\BrushName$ = #Empty$
+        brush(#Action_Brush)\BrushName$ = "brush"+Str(Brush(#action_brush)\id)+".png"
+      EndIf
+      If brush(#Action_Eraser)\BrushName$ = #Empty$
+        brush(#Action_Eraser)\BrushName$ = "brush"+Str(Brush(#Action_Eraser)\id)+".png"
       EndIf
     EndIf
   
@@ -1341,6 +1348,7 @@ Procedure Doc_Open()
                       paper\scale = Val(StringField(line$, 4, "|"))
                       paper\intensity = Val(StringField(line$, 5, "|"))
                       paper\Color = Val(StringField(line$, 6, "|"))
+                      paper\pos = Val(StringField(line$, 7, "|"))
                       ; update the background parameters
                       SetGadgetState(#G_paperScale, paper\scale)
                       SetGadgetText(#G_PaperScaleSG, Str(paper\scale))
@@ -1714,7 +1722,7 @@ Procedure Doc_Save()
           UpdateWindowInfo("SAVE : #Save text info")
           WriteStringN(0, "; Made By Animatoon ")
           WriteStringN(0, "Version|"+ OptionsIE\Version$+ "|")
-          WriteStringN(0, "Background|"+ OptionsIE\Paper$+ "|"+Str(paper\alpha)+ "|"+Str(paper\scale)+ "|"+Str(paper\intensity)+ "|"+Str(paper\Color))
+          WriteStringN(0, "Background|"+ OptionsIE\Paper$+ "|"+Str(paper\alpha)+ "|"+Str(paper\scale)+ "|"+Str(paper\intensity)+ "|"+Str(paper\Color)+ "|"+Str(paper\pos))
           
           image$ = "Image|"+Str(Doc\W)+"|"+Str(Doc\H)+"|"+Str(Nb)+"|"+Str(OptionsIE\Zoom)+"|"+Str(CanvasX)+"|"+Str(CanvasY)+"|"
           WriteStringN(0, Image$)
@@ -2502,8 +2510,8 @@ Procedure ResizeDoc(canvas=0)
   
   ; need To be changed by a window to resize the doc (like to create a new doc)
   newsize$ = Win_DocResize()
-  ;w = Val(InputRequester("Width","New Width of the Document", ""))
-  ;h = Val(InputRequester("Height","New Height of the Document", ""))
+  ; w = Val(InputRequester("Width","New Width of the Document", ""))
+  ; h = Val(InputRequester("Height","New Height of the Document", ""))
   Debug "newsize$ : "+ newsize$
   
   If newsize$ <> #Empty$
@@ -2512,7 +2520,7 @@ Procedure ResizeDoc(canvas=0)
     w = Val(StringField(newsize$, 1, ","))
     h = Val(StringField(newsize$, 2, ","))
     smooth = Val(StringField(newsize$, 3, ","))
-     
+    
     If w<>doc\w Or h<>doc\h
       
       If w*h >= 3000*3000
@@ -2543,10 +2551,13 @@ Procedure ResizeDoc(canvas=0)
         
         If ok
           
+          doc\w = w
+          doc\h = h
+          
           ;Debug "On va redimensionner. New size : "+Str(doc\w)+"/"+Str(doc\h)
           
           n = ArraySize(layer())
-          n1 = (n+1)*10 +20
+          n1 = (n+1)*10 +10
           ;Debug "nb layer : "+Str(n)
           StatusBarProgress(#Statusbar,3,5,#PB_StatusBar_BorderLess,0,n1)
           
@@ -2939,10 +2950,10 @@ EndProcedure
 ; Layers : see layer.pbi
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 2902
-; FirstLine = 20
-; Folding = CEAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAQBXAAAAAAA59
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 2555
+; FirstLine = 54
+; Folding = CEAAAABAAAeAAAwH5AAgMEAAAAAIIAAAAAAgAE--CAAAAA6
 ; EnableXP
 ; Executable = ..\..\animatoon0.52.exe
 ; EnableUnicode

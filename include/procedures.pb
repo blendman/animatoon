@@ -109,17 +109,18 @@ EndProcedure
 
 ; utile sprite
 Procedure SpriteToImage(Sprite)
-  hDC=StartDrawing(SpriteOutput(Sprite))
-  bmp.BITMAP\bmWidth=SpriteWidth(Sprite)
-  bmp\bmHeight=SpriteHeight(Sprite)
-  bmp\bmPlanes=1
-  bmp\bmBitsPixel=GetDeviceCaps_(hDC,#BITSPIXEL)
-  bmp\bmBits=DrawingBuffer()
-  bmp\bmWidthBytes=DrawingBufferPitch()
-  hBmp=CreateBitmapIndirect_(bmp)
-  StopDrawing()
-  ;Debug hBmp
-  ProcedureReturn hBmp
+;   ; attention, windows only
+;   hDC=StartDrawing(SpriteOutput(Sprite))
+;   bmp.BITMAP\bmWidth=SpriteWidth(Sprite)
+;   bmp\bmHeight=SpriteHeight(Sprite)
+;   bmp\bmPlanes=1
+;   bmp\bmBitsPixel=GetDeviceCaps_(hDC,#BITSPIXEL)
+;   bmp\bmBits=DrawingBuffer()
+;   bmp\bmWidthBytes=DrawingBufferPitch()
+;   hBmp=CreateBitmapIndirect_(bmp)
+;   StopDrawing()
+;   ;Debug hBmp
+;   ProcedureReturn hBmp
 EndProcedure
 Procedure CreateSelection()
   
@@ -238,7 +239,7 @@ Procedure CanvasDraw(useCanvasPosition=1)
   
 
   ; the background paper
-   DrawingMode(#PB_2DDrawing_AllChannels)
+  DrawingMode(#PB_2DDrawing_AllChannels)
   ; the color
   Box(x, y, doc\W, doc\H, RGBA(Red(paper\Color), Green(paper\Color), Blue(paper\Color), 255))
   
@@ -365,6 +366,7 @@ EndProcedure
 ; screen
 Macro DrawUtil()
   
+  
   ; Selection
   If OptionsIE\Selection = 2
     ZoomSprite(#Sp_Select, OptionsIE\SelectionW*z,OptionsIE\SelectionH*z)
@@ -397,10 +399,11 @@ Procedure ScreenDraw()
     ClearScreen(RGB(120,120,120))
     
     ; the paper
-    PaperDraw() ; in layers.pbi
+    PaperDraw() ; THe color, in layers.pbi
     
     ; les calques
     Layer_DrawAll() ; in layers.pbi
+    
     
     ; les utilitaires
     
@@ -672,9 +675,9 @@ XIncludeFile "procedures\window.pbi"
 
 
 ; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 45
-; FirstLine = 14
-; Folding = BAAzHAAAAYrvBA5
+; CursorPosition = 369
+; FirstLine = 47
+; Folding = gAAynAAAAcrvBA5
 ; EnableXP
 ; Executable = ..\_old\animatoon_screen0.22.exe
 ; SubSystem = openGL

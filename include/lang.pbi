@@ -64,17 +64,17 @@ CompilerIf #PB_Compiler_IsIncludeFile = 1
     
     If m = 0
       ;     Debug keyword$
-      If keyword$ <> ""
+      If keyword$ <> #Empty$
         
         ; check if we have a last char  = space (chr(32)), and change the keywords if found
-        If Mid(keyword$, Len(keyword$)) = Chr(32)
+        If Mid(keyword$, Len(keyword$)) = Chr(32) Or  Mid(keyword$, Len(keyword$)) = "="
           keyword$ = Left(keyword$, Len(keyword$)-1)
-          Debug "Error : a 'space' char is found, should not be here, please delete the last chr(32) (space) character for this lang() : " +  keyword$
+          Debug "Error : a 'space' char is found, should not be here, please delete the last chr(32) (space)or '=' character For this lang() : " +  keyword$
         EndIf
         
         ; then read the word$ with the  keyword$ ok (without a last char = chr(32)
         word$= ReadPreferenceString(keyword$, keyword$)
-        If word$ <> ""
+        If word$ <> #Empty$
           ; Lang0(oldkeyword$) = ReplaceString(word$,"#",Chr(13))
           Lang0(keyword$) = ReplaceString(word$,"#",Chr(13))
         EndIf
@@ -692,6 +692,6 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
 ; CursorPosition = 71
-; FirstLine = 58
-; Folding = 0PAAA-
+; FirstLine = 48
+; Folding = 0-DAA-
 ; EnableXP

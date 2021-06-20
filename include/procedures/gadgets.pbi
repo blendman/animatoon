@@ -819,8 +819,6 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
     Case #Action_Brush, #Action_eraser, #Action_Pen, #Action_CloneStamp
       ;{ Brush, eraser, pen, clone stamp
       
-      
-      ;AddGadgetItem(#G_PanelTool,0,Lang("Gen"))
       ;{ general parameters
       i = 0
       h1 = 10
@@ -829,6 +827,17 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddSTringTBGadget(#G_BrushMixNameG, #G_BrushMixTB, #G_BrushMixSG, Brush(Action)\Mix,  lang("Mix"), lang("Brush Color mixing"),xx,h1+i,tbw,wb2,1,100) : i+25
       AddSTringTBGadget(#G_BrushIntensityNameG, #G_BrushIntensityTB, #G_BrushIntensitySG, Brush(Action)\Intensity,  lang("Int"), lang("Brush Color intensity"),xx,h1+i,tbw,wb2,0,255) : i+25
       AddSTringTBGadget(#G_BrushHardnessNameG, #G_BrushHardnessTB, #G_BrushHardnessSG, Brush(Action)\Hardness,  lang("Hard"), lang("Brush Color Hardness"),xx,h1+i,tbw,wb2,0,255) : i+25
+      
+      ; brush preview
+      i+5
+      If ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
+        GadgetToolTip(#G_BrushPreview, lang("Clic to open the window brush image, to change the image of the tool (brush, eraser, pen...)"))
+        UpdateBrushPreview()
+      EndIf
+      ;ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
+      ;ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
+      i+110
+     
       ;}
       
       ;{ Base parameters (size, image)
@@ -848,18 +857,9 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       AddCheckBox(#G_BrushSizeRand,xx,h1+i,25,20,Lang("R"),Brush(Action)\SizeRand,lang("Size Random"))
       i+ub + 10
       
-      ; brush Shape (preview)
-      If FrameGadget(#G_FrameBrushImage,0,h1+3+i,ScreenX-15,155,Lang("Shape"))
+      If FrameGadget(#G_FrameBrushImage,0,h1+3+i,ScreenX-15,75,Lang("Shape"))
         i+20
       EndIf 
-      If ImageGadget(#G_BrushPreview,ScreenX/2-60,h1+i,100,100,ImageID(#Img_PreviewBrush),#PB_Image_Border) 
-        GadgetToolTip(#G_BrushPreview, lang("Clic to open the window brush image, to change the image of the tool (brush, eraser, pen...)"))
-        UpdateBrushPreview()
-      EndIf
-      ;ButtonGadget(#G_BrushPrevious, 5,h1+i,15,105,"<")
-      ;ButtonGadget(#G_BrushNext, GadgetX(#G_BrushPreview)+GadgetWidth(#G_BrushPreview)+3,h1+i,15,105,">") 
-      i+110
-      
       ComboBoxGadget(#G_BrushStrokeTyp,5,h1+i,65,cbbh)
       AddGadgetItem(#G_BrushStrokeTyp,0,lang("Image"))
       AddGadgetItem(#G_BrushStrokeTyp,1,lang("Circle"))
@@ -867,9 +867,11 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
       SetGadgetState(#G_BrushStrokeTyp,0)
       
       AddCheckBox(#G_BrushTrim,75,h1+i,60,20,lang("Trim"),brush(action)\Trim, lang("Crop the image of the brush"))
+     
       
       ;}
       
+      ;{ a stamp tab, if tool = clonestamp
       If action=#Action_CloneStamp
         AddGadgetItem(#G_PanelTool,-1,Lang("Stamp"))
         i=3
@@ -882,7 +884,7 @@ Procedure CreateToolPanel() ; to create the gadget for each tool when selected /
         i+cbbh
         AddCheckBox(#G_BrushStampUseColor,xx,h1+i,120,20,Lang("Use color"), brush(action)\usecolor,Lang("Use the color with the pattern"))
       EndIf
-      
+      ;}
       
       AddGadgetItem(#G_PanelTool,-1,Lang("Tra"))
       ;{ alpha, aspect & flow
@@ -1556,7 +1558,7 @@ Procedure IE_GadgetAdd()
     yy = 10
     FrameGadget(#PB_Any,10,yy,ScreenX-20,110, Lang("Paper"))
     yy + 20
-    If  ListViewGadget(#G_ListPaper,20,yy,ScreenX-50, 80)
+    If ListViewGadget(#G_ListPaper,20,yy,ScreenX-50, 80)
       IE_UpdatePaperList()
       YY+GadgetHeight(#G_ListPaper) +20
     EndIf
@@ -2062,12 +2064,15 @@ Procedure UpdateTool(Gad)
           
         Case #Action_Eraser
           Brush(Action)\Type  = #ToolType_Eraser
+          OptionsIE\brushName$=   brush(action)\BrushName$
           
         Case #Action_Brush
           Brush(Action)\Type  = #ToolType_Brush
+          OptionsIE\brushName$=   brush(action)\BrushName$
           
         Case #Action_Pen
           Brush(Action)\Type  = #ToolType_Pen
+          OptionsIE\brushName$=   brush(action)\BrushName$
           
       EndSelect
       
@@ -2091,7 +2096,8 @@ Procedure UpdateTool(Gad)
 ;       txt$ = Str(Brush(#Action_CloneStamp)\color)+" / "+Str(Brush(#Action_Brush)\color)
 ;       MessageRequester("", txt$)
 ;     EndIf
-    
+        
+
     SetColor()
     SetColorSelector(brush(action)\color,0,0,4,1)
   EndIf
@@ -2115,8 +2121,8 @@ EndProcedure
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 895
-; FirstLine = 120
-; Folding = B5BAA7AAMAAAgGQAAO2JNAAAAgAQB9iJADgFAg-9-
+; CursorPosition = 1560
+; FirstLine = 147
+; Folding = B5BAA7AAMAAAgGQAA1GTaAAAAARgC5FTACALAA864
 ; DisableDebugger
 ; EnableUnicode

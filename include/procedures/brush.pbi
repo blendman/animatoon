@@ -177,7 +177,7 @@ EndProcedure
 Procedure BrushUpdateImage(load=0,color=0)
   
   Shared brushEditor
-  
+  Static NotOK
   ; need to check if action is a brush/erase/pen
   ac = action
   If action <> #Action_Brush And action <> #Action_Eraser And action <> #Action_Pen And action <> #Action_CloneStamp
@@ -187,21 +187,28 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   ; if load new image
   If load >= 1
-    notok =0
-    Directory$ = OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" + OptionsIE\brushName$
+    ; notok =0
+    Directory$ = OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" + Brush(ac)\BrushName$
     
-    ;Debug Directory$
-    If Not LoadSprite(#Sp_BrushOriginal,Directory$,#PB_Sprite_AlphaBlending) 
-      notok = 1
-    EndIf
-    ; LoadSprite(#Sp_BrushOriginal,Directory$+Str(Brush(Action)\id)+".png",#PB_Sprite_AlphaBlending)
-    If Not LoadImage(#BrushOriginal,Directory$)
-      notok = 1
+    If FileSize(Directory$) > 0
+      ; Debug Directory$
+      notOK = 0
+      If Not LoadSprite(#Sp_BrushOriginal,Directory$,#PB_Sprite_AlphaBlending) 
+        notok = 1
+        ; BrushError = 1
+      EndIf
+      ; LoadSprite(#Sp_BrushOriginal,Directory$+Str(Brush(Action)\id)+".png",#PB_Sprite_AlphaBlending)
+      If Not LoadImage(#BrushOriginal,Directory$)
+        notok = 1
+        ;BrushError = 1
+      EndIf
     EndIf
     
     If Notok=1
-      OptionsIE\brushName$ = "brush"+Str(Brush(ac)\Id)+".png"
-      BrushUpdateImage(1)
+      MessageRequester(lang("Error"),Lang("It seems the brush isn't exists "+Directory$),#PB_MessageRequester_Error   )
+      ;OptionsIE\brushName$ = "brush"+Str(Brush(ac)\Id)+".png"
+      ;brush(ac)\BrushName$ = OptionsIE\brushName$
+      ;BrushUpdateImage(1)
       ProcedureReturn 0
     Else
       brush(ac)\Image$ = OptionsIE\brushName$
@@ -259,8 +266,10 @@ Procedure BrushUpdateImage(load=0,color=0)
   
   If Brush(ac)\rotate > 0
     tmp = RotateImageEx2(ImageID(#BrushCopy),Brush(ac)\rotate)
-    CopyImage(tmp,#BrushCopy)  
-    FreeImage(tmp)
+    If IsImage(tmp)
+      CopyImage(tmp, #BrushCopy)  
+      FreeImage(tmp)
+    EndIf
     RotateSprite(#Sp_BrushCopy,Brush(ac)\rotate,#PB_Absolute)
   EndIf
   
@@ -904,6 +913,7 @@ Procedure OpenPreset(file$,brush$="")
         \Image$ = "brush"+Str(\id)+".png"
       EndIf
       OptionsIE\BrushName$ = \image$ 
+      Brush(action)\BrushName$ = \image$ 
       Debug "OptionsIE\BrushName$ : "+OptionsIE\BrushName$
       
     EndWith
@@ -1051,10 +1061,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 191
-; FirstLine = 6
-; Folding = AAAQDAAAAAAPEAAg2
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 915
+; FirstLine = 90
+; Folding = AAAAAAAAAAAAOAAA+
 ; EnableXP
 ; DisableDebugger
 ; EnableUnicode

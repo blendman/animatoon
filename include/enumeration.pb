@@ -756,6 +756,15 @@ Enumeration ; gadgets
   
   ;}
   
+  ;{ window layer repeated
+  #G_layerBG_Scale
+  #G_layerBG_Cbb_PatternType
+  #G_layerBG_Cbb_PatternImage
+  #G_layerBG_Cbb_PatternImageBtn
+  #G_layerBG_Cbb_Contrast
+  #G_layerBG_Cbb_Brightness
+  ;}
+
   
   ;{**** window by menu
   
@@ -866,6 +875,7 @@ Enumeration ; gadgets
   #GADGET_WinBGED_BtnUpdateBG
   #GADGET_WinBGED_BtnsaveBGColors
   #GADGET_WinBGED_listBG
+  #GADGET_WinBGED_Panel
   #GADGET_WinBGED_SA_Paper
   #GADGET_WinBGED_Canvas_Paper
   #GADGET_WinBGED_SA_colors
@@ -879,6 +889,12 @@ Enumeration ; gadgets
   #GADGET_WinBGED_TB_intensity
   #GADGET_WinBGED_TB_intensitySG
   #GADGET_WinBGED_TB_intensityName
+  #GADGET_WinBGED_TB_Brightness
+  #GADGET_WinBGED_TB_BrightnessSG
+  #GADGET_WinBGED_TB_BrightnessName
+  #GADGET_WinBGED_TB_Position
+  #GADGET_WinBGED_TB_PositionName
+  #GADGET_WinBGED_TB_Blendmode
   #GADGET_WinBGED_BtnCancel
   #GADGET_WinBGED_BtnOk
   
@@ -1123,9 +1139,9 @@ EndEnumeration
 
 ; CompilerEndIf
 
-; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 585
-; FirstLine = 137
-; Folding = 5fAMDAwAA9
+; IDE Options = PureBasic 5.61 (Windows - x86)
+; CursorPosition = 896
+; FirstLine = 91
+; Folding = wfAMAgBGA5
 ; EnableXP
 ; EnableUnicode

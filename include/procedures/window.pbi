@@ -27,7 +27,7 @@ Macro WinDocNewCont(typ)
   SetGadgetColor(Cont,#PB_Gadget_BackColor,col2)
   u = xx
   xx = 10
-  
+  ws1 = 70
   Select Typ
       
     Case 0 ; recent document
@@ -93,13 +93,13 @@ Macro WinDocNewCont(typ)
         Format$(7) = "Pixels (px)"
         
         TGWidth=TG(xx+5,yy, lang("Width"),col2)
-        SpinGadget(#GADGET_WNewW,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewW,Str(doc\w_def))
-        CBPixelW = ComboBoxGadget(#PB_Any,xx+115,yy,80,20) 
+        SpinGadget(#GADGET_WNewW,xx+60,yy,ws1,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewW,Str(doc\w_def))
+        CBPixelW = ComboBoxGadget(#PB_Any,xx+ws1+65,yy,80,20) 
         
         YY +25
         TGHeight=TG(xx+5,yy, lang("Height"),col2)
-        SpinGadget(#GADGET_WNewH,xx+60,yy,50,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewH,Str(doc\h_def)) 
-        CBPixelH = ComboBoxGadget(#PB_Any,xx+115,yy,80,20) 
+        SpinGadget(#GADGET_WNewH,xx+60,yy,ws1,20,1,10000,#PB_String_Numeric) : SetGadgetText(#GADGET_WNewH,Str(doc\h_def)) 
+        CBPixelH = ComboBoxGadget(#PB_Any,xx+ws1+65,yy,80,20) 
         
         For i = 0 To n
           AddGadgetItem(CBPixelH,i,Format$(i))
@@ -661,6 +661,7 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
       If BrushImage(i)\x = x And BrushImage(i)\y = y
         brushImageId = i
         OptionsIE\brushName$ = RemoveString(BrushImage(brushImageId)\filename$, OptionsIE\DirBankBrush$ + OptionsIE\DirBrush$ + "\" )
+        Brush(action)\BrushName$ =  OptionsIE\brushName$
         BrushUpdateImage(1)
         Break
       EndIf
@@ -668,6 +669,7 @@ Procedure WindowbrushUpdateImgList(updatelist=1,x=0,y=0)
     ;}
     
   EndIf
+  
   
   SetGadgetText(#G_brushImageName, OptionsIE\brushName$)
   
@@ -995,7 +997,7 @@ Procedure.s Win_DocResize()
             Case #G_WinResize_NewH
               h = GetGadgetState(#G_WinResize_NewH)
               If keepProportion
-                w = (oldw*h)/oldw
+                w = (oldw*h)/oldh
                 SetGadgetState(#G_WinResize_NewW,w)
               EndIf
               
@@ -1366,7 +1368,7 @@ Procedure WindowBackgroundEditor()
     h1 = WindowHeight(#Win_BGeditor)
     Col = RGB(80,80,80)
     col2 = RGB(120,120,120)
-    SetWindowColor(#Win_BGeditor,col)
+    ; SetWindowColor(#Win_BGeditor,col)
     
     
     ;{ add the gadgets    
@@ -1382,15 +1384,17 @@ Procedure WindowBackgroundEditor()
     old\name$ = OptionsIE\Paper$
     old\scale = paper\scale ; GetGadgetState(#G_paperScale)
     old\alpha = paper\alpha ;GetGadgetState(#G_PaperAlpha)
-    old\intensity = paper\intensity; GetGadgetState(#G_PaperIntensity)
+    old\intensity = paper\intensity ; GetGadgetState(#G_PaperIntensity)
+    old\brightness = paper\brightness 
     old\color = paper\Color
+    old\pos = paper\pos
     
     ;** define some variables for gadgets
     
     ; position of the scrollarea
     y0 = 30
     ; height for the scrollarea and canvas paper & colors
-    hh = WinH - 100 - y0
+    hh = WinH - y0
     
     ; width of the canvas for paper image
     wcanvas = winW - 270-40 
@@ -1423,9 +1427,62 @@ Procedure WindowBackgroundEditor()
     
     ;}
     
+    If PanelGadget(#GADGET_WinBGED_Panel,10+wlg,0,winW-wlg,hh)
+      
+      ; AddGadgetItem(#GADGET_WinBGED_Panel, -1, lang("Base"))
+      
+    ;{ panel parameters (scale, 
+     AddGadgetItem(#GADGET_WinBGED_Panel, -1, lang("Parameters"))
+    ;{ other gagdets (trackbar, button...)
+    ; the alpha gadgets (trackbar, name, spin)
+    y =5 ;  y0 + hh+10
+    wTB = 150 ; trackbar width
+    wSG = 40  ; stringgadget width
+    wtg = 60  ; textgadget width
+    AddSTringTBGadget(#GADGET_WinBGED_TB_ALphaName,#GADGET_WinBGED_TB_ALpha,#GADGET_WinBGED_TB_ALphaSG, paper\alpha, 
+                      lang("Alpha"), lang("Alpha of the background"), 5, y, wTB, wSG, 0, 255, wtg)
+    
+    ; the scale gadgets (trackbar, name, spin)
+    x4 = 5 + wTB + wSG + wtg
+    AddSTringTBGadget(#GADGET_WinBGED_TB_scaleName, 
+                      #GADGET_WinBGED_TB_scale, 
+                      #GADGET_WinBGED_TB_scaleSG, 
+                      paper\scale, 
+                      lang("Scale"), 
+                      lang("Scale of the background"), 
+                      15+x4, y, wTB, wSG, 1, 50, wtg)
+    
+    ; the intensity gadgets (trackbar, name, spin)
+    AddSTringTBGadget(#GADGET_WinBGED_TB_intensityName, 
+                      #GADGET_WinBGED_TB_intensity, 
+                      #GADGET_WinBGED_TB_intensitySG, 
+                      paper\intensity, 
+                      lang("Contrast"), 
+                      lang("Contrast of the background"), 
+                      5, y+30, wTB, wSG, 1, 1000, wtg)  
+    
+    ; brightness
+    AddSTringTBGadget(#GADGET_WinBGED_TB_brightnessName, 
+                      #GADGET_WinBGED_TB_brightness, 
+                      #GADGET_WinBGED_TB_brightnessSG, 
+                      paper\brightness, 
+                      lang("Brigthness"), 
+                      lang("Brigthness of the background"), 
+                      15+x4, y+30, wTB, wSG, 1, 100, wtg)  
+    
+    AddStringGadget(#GADGET_WinBGED_TB_Position,5,y+60,wTB,25,
+                    Str(paper\pos),
+                    Lang("Position")+" : ",
+                    Lang("Position of the paper (0 : under all, +100 : over all, other position to be over the layers)"))
+                    
+    ;}
+    ;}
+    
+    ;{ panel "texture" (image and color)
+      AddGadgetItem(#GADGET_WinBGED_Panel, -1, lang("Texture"))
     ;{ paper background
     ; a scrollarea +canvas to see the paper image
-    If ScrollAreaGadget(#GADGET_WinBGED_SA_Paper, 10+wlg, y0, winW - 220-wlg, hh, winW - 250,  h2+20)
+    If ScrollAreaGadget(#GADGET_WinBGED_SA_Paper,5,5,winW-220-wlg,hh-20,winW-250,h2+20)
       SetGadgetColor(#GADGET_WinBGED_SA_Paper, #PB_Gadget_BackColor, col2)      
       ; Debug Round(wcanvas/100, #PB_Round_Down)
       
@@ -1468,12 +1525,12 @@ Procedure WindowBackgroundEditor()
     ;{ color background
     
     ; the buton to save a color for background (use the *.gpl format (palette like gimp/krita/mypaint), the same used for swatchs
-    xb = 15+winW - 220
+    xb = 10+winW-220-wlg
     AddButonImage3(#GADGET_WinBGED_BtnsaveBGColors, xb, 5, wb, wb, #ico_New, #PB_Button_Default, 
                    lang("Create a new color (and save it in the color presets"))
     
     ; a scrollarea +canvas to see the colors
-    If ScrollAreaGadget(#GADGET_WinBGED_SA_colors, xb, y0, 200, hh, 150,  WinH*2)
+    If ScrollAreaGadget(#GADGET_WinBGED_SA_colors, xb, 5+wb+2, 200, hh-wb-20, 150,  WinH*2)
       
       SetGadgetColor(#GADGET_WinBGED_SA_colors, #PB_Gadget_BackColor, col2)  
       
@@ -1527,32 +1584,17 @@ Procedure WindowBackgroundEditor()
     EndIf
     
     ;}
-    
-    ;{ other gagdets (trackbar, button...)
-    ; the alpha gadgets (trackbar, name, spin)
-    y = y0 + hh+10
-    wTB = 150 ; trackbar width
-    wSG = 40  ; stringgadget width
-    wtg = 55  ; textgadget width
-    AddSTringTBGadget(#GADGET_WinBGED_TB_ALphaName,#GADGET_WinBGED_TB_ALpha,#GADGET_WinBGED_TB_ALphaSG, paper\alpha, 
-                      lang("Alpha"), lang("Alpha of the background"), 5, y, wTB, wSG, 0, 255, wtg)
-    
-    ; the scale gadgets (trackbar, name, spin)
-    x4 = 5 + wTB + wSG + wtg
-    AddSTringTBGadget(#GADGET_WinBGED_TB_scaleName, #GADGET_WinBGED_TB_scale, #GADGET_WinBGED_TB_scaleSG, paper\scale, 
-                      lang("Scale"), lang("Scale of the background"), 15+x4, y, wTB, wSG, 1, 50, wtg)
-    
-    ; the intensity gadgets (trackbar, name, spin)
-    AddSTringTBGadget(#GADGET_WinBGED_TB_intensityName, #GADGET_WinBGED_TB_intensity, #GADGET_WinBGED_TB_intensitySG, paper\intensity, 
-                      lang("Intensity"), lang("Intensity of the background"), 5, y+30, wTB, wSG, 1, 10, wtg)  
     ;}
+    
+      CloseGadgetList()
+    EndIf
     
     ;{ add two buttons in the bottom
     w1 = WindowWidth(#Win_BGeditor)
     h1 = WindowHeight(#Win_BGeditor)
     
-    ButtonGadget(#GADGET_WinBGED_BtnOk, w1-70, h1 -25, 60, 20,Lang("Ok"))
-    ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-140, h1-25, 60, 20, Lang("Cancel"))
+    ButtonGadget(#GADGET_WinBGED_BtnOk, w1-70, h1 -25, 60, 25,Lang("Ok"))
+    ButtonGadget(#GADGET_WinBGED_BtnCancel, w1-140, h1-25, 60, 25, Lang("Cancel"))
     SetGadgetColor(#GADGET_WinBGED_BtnCancel,#PB_Gadget_BackColor,col2)
     SetGadgetColor(#GADGET_WinBGED_BtnOk, #PB_Gadget_BackColor,col2)
     
@@ -1578,6 +1620,10 @@ Procedure WindowBackgroundEditor()
         Case #PB_Event_Gadget
           
           Select EventGadget
+              
+            Case #GADGET_WinBGED_TB_Position
+              paper\pos = Val(GetGadgetText(#GADGET_WinBGED_TB_Position))
+              ScreenUpdate(0)
               
             Case #GADGET_WinBGED_Canvas_Paper
               If eventtype = #PB_EventType_LeftButtonDown  
@@ -1664,6 +1710,19 @@ Procedure WindowBackgroundEditor()
               EndIf
               PaperUpdate(1)
               ScreenUpdate(0)
+              ;} 
+              
+            Case #GADGET_WinBGED_TB_brightness, #GADGET_WinBGED_TB_brightnessSG
+              ;{
+              If EventGadget = #GADGET_WinBGED_TB_brightness
+                paper\brightness = setmin(GetGadgetState(EventGadget), 1)
+                SetGadgetText(#GADGET_WinBGED_TB_brightnessSG, Str(paper\brightness))
+              Else
+                paper\brightness = setmin(Val(GetGadgetText(EventGadget)), 1)
+                SetGadgetState(#GADGET_WinBGED_TB_brightness, paper\brightness)
+              EndIf
+              PaperUpdate(1)
+              ScreenUpdate(0)
               ;}
               
             Case #GADGET_WinBGED_BtnsaveBGColors
@@ -1719,6 +1778,8 @@ Procedure WindowBackgroundEditor()
       paper\alpha = old\alpha
       paper\intensity = old\intensity
       paper\Color= old\color
+      paper\brightness = old\brightness
+      paper\pos = old\pos
       PaperUpdate(1)
       ScreenUpdate(0)
       
@@ -1731,6 +1792,8 @@ Procedure WindowBackgroundEditor()
     SetGadgetState(#G_PaperAlphaSG, paper\alpha)
     SetGadgetState(#G_PaperIntensity, paper\intensity)
     SetGadgetState(#G_PaperIntensitySG, paper\intensity)
+    SetGadgetState(#G_PaperBrightnessSG, paper\brightness )
+    SetGadgetState(#G_PaperBrightness, paper\brightness )
     
   EndIf
   
@@ -1853,10 +1916,10 @@ EndProcedure
 
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 1019
-; FirstLine = 124
-; Folding = BAGAAAAAAAgBEIB--PAAAAAAAAAAA+
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 1781
+; FirstLine = 244
+; Folding = AAAAAAAAAAMQgEQJAAAAcOAAHAGBw
 ; EnableAsm
 ; EnableXP
 ; Warnings = Display

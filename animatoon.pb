@@ -5,8 +5,8 @@
 ;-- constantes
 XIncludeFile "include\enumeration.pb"
 ;{ constantes by default
-#ProgramVersion   = "0.5.9.9"
-#ProgramRevision  = 8
+#ProgramVersion   = "0.6.0.3"
+#ProgramRevision  = 0
 #ProgramDate      = #PB_Compiler_Date ; "23/07/2015", 02/2021
 #ProgramNbLine    = "24000"
 ; Application
@@ -290,12 +290,11 @@ XIncludeFile "include\loop.pb"
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 8
+; CursorPosition = 7
 ; Folding = jBAk
 ; EnableXP
-; EnableOnError
 ; UseIcon = teo.ico
 ; Executable = _release\windows\x86\0.598\animatoon0.598.exe
-; DisableDebugger
+; Compiler = PureBasic 5.73 LTS (Windows - x86)
 ; Warnings = Display
-; EnablePurifier
+; Constant = #PB_Compiler_Backend

@@ -722,6 +722,7 @@ Structure sLayer
   
   ImageAlpha.i ; le canal alpha
   ImageStyle.i ; image pour le style
+  ImageName$
   
   Sprite.i
   CopySpritetoImg.a ; to know if we need to copy sprite to image
@@ -799,11 +800,17 @@ Structure sPaper
   imageId.i
   imageIdTexture.i
   Color.i
+  
+  pos.w
+  blendmode.a
+  blendSource.a
+  blendtarget.a
 EndStructure
 Global Paper.sPaper
 ; Define by default
 Paper\alpha = 255
 Paper\scale = 10
+Paper\pos = 100
 Paper\intensity = 1
 Paper\Color = RGB(255, 255, 255)
 
@@ -872,9 +879,9 @@ Global NewList Ani_Plugins.sPlugins()
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 526
-; FirstLine = 122
-; Folding = AYBMIA2+
+; CursorPosition = 812
+; FirstLine = 66
+; Folding = AAAAAQG+
 ; Markers = 397
 ; EnableXP
 ; EnableUnicode

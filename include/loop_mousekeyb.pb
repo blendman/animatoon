@@ -131,6 +131,10 @@ If GetActiveWindow() = #WinMain
               ; layer bottom // on affiche les calques du dessous
               For i = 0 To ArraySize(layer())
                 If layer(i)\ordre <= layer(layerId)\ordre
+                  If Paper\pos = layer(i)\ordre
+                    ; the paper textures
+                    PaperTextureDraw() 
+                  EndIf
                   If layer(i)\view 
                     Layer_Draw_OnScreen(i)
                   EndIf
@@ -267,19 +271,26 @@ If GetActiveWindow() = #WinMain
                     
                     ; we have to display again the layer under the current // Puis, on réaffiche les calques du dessous, ben oui
                     If clear =1 And OptionsIE\UseCanvas = 0
-                      ClearScreen(RGB(120,120,120)) 
-                      
-                      ; Puis on affiche le fond (paper)          
-                      PaperDraw() 
-                      
-                      ; on affiche les calques du dessous
-                      For i = 0 To ArraySize(layer())
-                        If layer(i)\ordre <= layer(layerId)\ordre
-                          If layer(i)\view 
-                            Layer_Draw_OnScreen(i)
+                      ;If action <> #Action_Eraser
+                        ClearScreen(RGB(120,120,120)) 
+                        
+                        ; Puis on affiche le fond (paper)          
+                        PaperDraw() 
+                        
+                        ; on affiche les calques du dessous
+                        For i = 0 To ArraySize(layer())
+                          If layer(i)\ordre <= layer(layerId)\ordre
+                            If Paper\pos = layer(i)\ordre
+                              ; the paper textures
+                              PaperTextureDraw() 
+                            EndIf
+                            
+                            If layer(i)\view 
+                              Layer_Draw_OnScreen(i)
+                            EndIf
                           EndIf
-                        EndIf
-                      Next i 
+                        Next i 
+;                       EndIf
                     EndIf
                     
                     
@@ -941,12 +952,22 @@ If GetActiveWindow() = #WinMain
           If clear = 1 
             If OptionsIE\Selection <> 1 ; And action <> #Action_Eraser
               For i = 0 To ArraySize(layer())
+                  
                 If layer(i)\ordre > layer(layerId)\ordre
+                  If Paper\pos = layer(i)\ordre ; And paper\pos >layer(layerId)\ordre
+                    ; the paper textures
+                    PaperTextureDraw() 
+                  EndIf
+
                   If layer(i)\view 
                     Layer_Draw_OnScreen(i)
                   EndIf
                 EndIf
-              Next i 
+              Next i
+              If paper\pos > ArraySize(layer())
+                 PaperTextureDraw() 
+              EndIf
+              
             EndIf
           EndIf
           
@@ -1300,9 +1321,12 @@ EndIf
 
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 398
-; FirstLine = 129
-; Folding = 855F-1AIo0x-8-FAAAYbi-0JKQACAAAAAAA-
+; IDE Options = PureBasic 6.00 Alpha 2 (Windows - x64)
+; CursorPosition = 413
+; FirstLine = 137
+; Folding = 8556-pBwP3H-v-XAAAgtJ+-fiCEgAAAAAAAw
 ; EnableXP
+; Compiler = PureBasic 6.00 Alpha 2 - C Backend (Windows - x64)
+; Warnings = Display
+; EnablePurifier
 ; EnableUnicode

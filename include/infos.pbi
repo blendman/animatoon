@@ -48,10 +48,10 @@
 
 ; TOOLS
 ; - bug linear gradient !!
-; wip - add pattern tool (stamp/tampon)
 ; - add a kind ot pattern stamp-brush paint ( grey level + color, to add a kind of texture during the painting) // 
 ; (ajouter sorte de tampon (niveau de gris) + couleur, pour peindre de l'aquarelle (texture) avec une couleur.)
 ; - add new parameters to tool (brush()) : LockXY, ConfirmAction, instead of IE_options\lockXY and IE_Options\confirmaction....
+; - fill with pattern could use the pattern selected or image (at choice)
 
 ; PAPER
 ; Wip - paper scale : ok when change trackbar paperScale
@@ -71,7 +71,6 @@
 
 ; INTERFACE (gadget, menu..)
 ; - add mode advanced (current UI) and simple mode (just a simple tool panel + color)
-; - add trackbar for : brush size, alpha
 ; - add scrollarea gadget pour : brush (gen, tra, dyn), option paper
 ; - Give the choice for gadget for brush // donner le choix de l'interface (parametre sur onglet gen ou séparé (sur onglet tra et dyn))
 ; - Add (ajouter) Emulate Numpad (We can use the keyboard 1 to 0 to replace the numpad //on utilise alors les touches 1 à 0 en remplacement).
@@ -80,7 +79,6 @@
 
 
 ;-- CHANGE todo
-
 ; - brush : when use a sizewidth or height < 20px, brush has black border. -> create new image (square) With image resized drawn on it, use it As brush.
 ; - WIP  new tool stamp (use pattern or copie a part of our image)
 ; - wip : new tool "vector brush/paint" (see my example in branch "vector_drawing.pb")
@@ -110,10 +108,59 @@
 ; - center the view bug when UI panel (right or left) is hiden
 ; - reset the view bug when UI panel (right or left) is hiden
 ; - sometimes, export image -> unable to create the image (with big image 3000x3000 for example).
-; - fill with pattern could use the pattern selected or image (at choice)
 ; - if change color selector and clic on same tool, the position of the cursor isn't the same (so color isn't the same)
 
+; Todo WIP :  
+; - Background : add grain paper. 
+; - Layer_repeated : finish window
+; BUGS : 
+; - bug when transform layer : flickering
+; - flickering : when use eraser, fillarea
 
+
+
+; 20/06/2021  0.6.0.3
+; // Changes
+; - Move the brush preview on the first tab in tool panel
+; - By Default, the position of the paper is=100 (all over the First 100 layers)
+; // Fixes
+; - when load brush preset -> brush\BrushName$ isn't updated
+; - when resize_doc(resize image) : the layers And images are resized
+; - bug With resize_doc/transform layer And unpremultiply
+; - With a bug With RotateImageEx2() To compile in X64 And With pb6.00 BackEnd C (thanks Fred !!)
+; - Background window : trackbar For contrast & brightness hasn't the good min/max value.
+; - Background window : brightness trackbar didn't update the paper.
+
+
+; 19/06/2021  0.6.0.2
+; // Fixes
+; - when change brush image-> brush\BrushName$ isn't updated
+; - when change Tool-> brush\BrushName$ isn't updated
+
+
+; 18/06/2021  0.6.0.1
+; // Test
+; - brush color blendmode  : multiply, add, screen. Seems ok.
+; // Fixes
+; - when change tool brush-> eraser, the brush image isn't changed
+
+
+; 17/06/2021  0.6.0.0
+; // New
+; - New window for Layer_repeated (wip)
+; - paper\pos : the position of the paper, before or after some layers.
+; - window background : add panel (base, texture, parameters)
+; - window background : add gadget position
+; // Changes
+; - Paper is now over all layer in multiply mode (in function of its position).
+
+
+; 15/06/2021  0.5.9.9
+; // New
+; - brush color blendmode (only normal and dissolve (wip, doesn't work correctly for all cases))
+; - New Image of start
+; // Changes
+; - lots of minor changes in th tool parameter panel gadgets (positions, size)
 
 
 ; 14/06/2021  0.5.9.9.8
@@ -132,7 +179,7 @@
 
 ; 13/06/2021  0.5.9.9.6
 ; // New
-; - Reisze_Doc window (with some options)
+; - Resize_Doc window (with some options)
 ; // changes
 ; - Brush\Usewater : only use it when brush\usewater= 1
 ; - Resize_Doc only if W or H is changed
@@ -2034,8 +2081,8 @@
 
 
 ; IDE Options = PureBasic 5.73 LTS (Windows - x86)
-; CursorPosition = 116
-; FirstLine = 99
+; CursorPosition = 123
+; FirstLine = 103
 ; Folding = ++
 ; EnableXP
 ; DisableDebugger

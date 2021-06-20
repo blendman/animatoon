@@ -54,8 +54,8 @@ Declare CreateImage2(img,w,h,img$,d=24,t=0)
 
 ; image processing
 Declare ResizeImage2_(image, w, h, mode=#PB_Image_Smooth)
-Declare.l ColorBlending(Couleur1.l, Couleur2.l, Echelle.f) 
-Declare.l RotateImageEx2(ImageID, Angle.f, Mode.a=2)
+Declare.i ColorBlending(Couleur1.i, Couleur2.i, Echelle.f) 
+Declare.i RotateImageEx2(ImageID, Angle.f, Mode.a=2)
 Declare UnPreMultiplyAlpha(image)
 Declare UpdateColorFG()
 
@@ -89,10 +89,11 @@ Declare BrushResetColor()
 ; window
 Declare WindowLayerProp()
 Declare.s Win_DocResize()
+Declare Addbuttons(win)
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
-; CursorPosition = 48
-; FirstLine = 36
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
+; CursorPosition = 57
+; FirstLine = 67
 ; EnableXP
 ; EnableUnicode

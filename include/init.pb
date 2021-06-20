@@ -81,12 +81,12 @@ LoadImage2(#ico_LayerMask,     OptionsIE\Theme$ +"\layerbtn3.jpg")
 
 ; Load FOnt
 If LoadFont(#FontArial20Bold, "arial", 20,  #PB_Font_Bold) : EndIf
-If LoadFont(#FontDefaultGadget, "Arial", 9) : EndIf
+If LoadFont(#FontDefaultGadget, "Arial", 11) : EndIf
 
 
-; IDE Options = PureBasic 5.61 (Windows - x86)
+; IDE Options = PureBasic 5.73 LTS (Windows - x86)
 ; CursorPosition = 83
-; FirstLine = 54
+; FirstLine = 50
 ; Folding = --
 ; EnableXP
 ; EnableUnicode
