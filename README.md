@@ -1,5 +1,7 @@
 ## Animatoon
 
+![animatoon](https://raw.githubusercontent.com/blendman/animatoon/main/data/animatoon.jpg)
+
 
 **Animatoon** is a 2D painting program (and later, I hope to add animation), for windows, and Later for MacOS and Linux (I'm looking for users of Purebasic who would like to compile for this platform). This software lets you create traditionnal hand-drawn painting, using bitmap, and vector graphics (in a next version). Animatoon is free and open-source (licence GPLv3).
 
