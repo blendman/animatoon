@@ -294,7 +294,7 @@ XIncludeFile "include\loop.pb"
 ; Folding = jBAk
 ; EnableXP
 ; UseIcon = teo.ico
-; Executable = _release\windows\x86\0.598\animatoon0.598.exe
+; Executable = ..\..\purebasic\2D\animatoon_pb_screen\AnimatoonForgithub\_release\windows\x86\0.603\animatoon.exe
+; DisableDebugger
 ; Compiler = PureBasic 5.73 LTS (Windows - x86)
-; Warnings = Display
 ; Constant = #PB_Compiler_Backend
